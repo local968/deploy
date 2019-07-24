@@ -1,21 +1,17 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 import { MuiCard } from './MuiModule';
 
 import {
-  List,
-  ListItem,
-  ListItemText,
-  Input,
-  ClickAwayListener,
-  Popper,
-  MenuItem,
-  MenuList,
-  Paper,
-  ListSubheader,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  TextField,
   IconButton,
 } from '@material-ui/core';
 
@@ -26,47 +22,14 @@ import Expression from '../Expression';
 
 import EN from '../../../constant/en';
 
-const useStyles = makeStyles({
-  form: {
-    display: 'flex',
-    flexWrap: 'nowrap',
-    flex: 'auto',
-    alignItems: 'center',
-    maxWidth: '100%',
-  },
-  label: {
-    width: 200,
-    flex: 'none',
-    padding: '4px 0',
-  },
-  text: {
-    display: 'flex',
-    flex: 'none',
-  },
-  tools: {
-    flex: '1 1',
-  },
-  popper: {
-    marginLeft: '5px',
-    zIndex: 1111,
-  },
-  list: {
-    maxHeight: '20rem',
-    overflowY: 'auto',
-  },
-  suggPape: {
-    maxHeight: '300px',
-    overflowY: 'auto',
-  },
-  grammar: {
-    padding: '8px 12px',
-    maxWidth: '300px',
-    wordWrap: 'break-word',
-    backgroundColor: '#f0f4f8',
+const useStyles = withStyles({
+  table: {
+    minWidth: '40rem',
   },
 });
 
 interface ExpressionsProps {
+  classes;
   exps: Array<Exp>;
   index: number;
   setIndex: (k: number) => void;
@@ -97,56 +60,38 @@ interface recommendObj {
   start: number;
 }
 
-function Expressions(props: ExpressionsProps) {
-  const classes = useStyles({});
+class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
+  constructor(props) {
+    super(props);
 
-  const {
-    exps,
-    index,
-    setIndex,
-    addLine,
-    deleteIndex,
-    setRange,
-    deleteExp,
-    left,
-    right,
-    addExp,
-    handleFunction,
-    handleVariables,
-    changeExpLabel,
-    variables,
-    functions,
-    func,
-  } = props;
+    this.state = {
+      suggestions: [],
+      isOpen: false,
+      isTipOpen: false,
+      el: '',
+    };
+  }
 
-  const [state, setState] = React.useState({
-    suggestions: [],
-    isOpen: false,
-    isTipOpen: false,
-    el: '',
-  } as ExpressionsState);
-
-  const selectOne = (k: number) => (e: React.MouseEvent<HTMLElement>) => {
-    const input = e.currentTarget.getElementsByTagName('input')[0];
-    setIndex(k);
-    setState({
-      ...state,
-      el: input ? input.id : '',
-    });
-    input.focus();
+  // public selectOne = (k: number) => (e: React.MouseEvent<HTMLElement>) => {
+  //   const input = e.currentTarget.getElementsByTagName('input')[0];
+  //   this.props.setIndex(k);
+  //   this.setState({
+  //     el: input ? input.id : '',
+  //   });
+  //   input.focus();
+  // };
+  _onChangeLabel = () => (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.changeExpLabel(e.target.value);
   };
-  const changeInput = (k: number) => (
-    e: React.ChangeEvent<HTMLInputElement>,
+  public deleteOne = (k: number) => (
+    e: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    changeExpLabel(e.target.value);
-  };
-  const deleteOne = (k: number) => (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    deleteIndex(k);
+    this.props.deleteIndex(k);
   };
 
-  const getRecommendValue = () => {
-    const currentExp: Exp = exps[index];
+  getRecommendValue = () => {
+    const currentExp: Exp = this.props.exps[this.props.index];
     const {
       value,
       range: [start, end],
@@ -164,46 +109,46 @@ function Expressions(props: ExpressionsProps) {
     }
     return obj;
   };
-  const recommend: recommendObj = getRecommendValue();
+  recommend: recommendObj = this.getRecommendValue();
 
-  const handleClickAway = () => {
-    setState({
-      ...state,
+  handleClickAway = () => {
+    this.setState({
       isOpen: false,
     });
   };
 
-  const hideGrammarTip = () => {
-    setState({
-      ...state,
+  public hideGrammarTip = () => {
+    this.setState({
       isTipOpen: false,
     });
   };
 
-  const onFocus = (k: number) => (e: React.MouseEvent<HTMLInputElement>) => {
+  public onFocus = (k: number) => (e: React.MouseEvent<HTMLInputElement>) => {
     const input: HTMLInputElement = e.currentTarget.getElementsByTagName(
       'input',
     )[0];
-    setState({
-      ...state,
+    this.setState({
       isOpen: true,
       el: input ? input.id : '',
     });
-    const len = exps[k]['value'].length;
-    setRange(len, len);
-    setIndex(k);
+    const len = this.props.exps[k]['value'].length;
+    this.props.setRange(len, len);
+    this.props.setIndex(k);
     input.focus();
     e.stopPropagation();
   };
 
-  const getSuggestions = () => {
+  public getSuggestions = () => {
     let suggestions: Array<Coordinate> = [];
-    if (recommend.value) {
-      let _v: string = recommend.value;
-      let list: Array<Coordinate> = [...functions, ...variables];
-      if (recommend.value.indexOf('@') === 0) {
-        _v = recommend.value.slice(1);
-        list = [...variables];
+    if (this.recommend.value) {
+      let _v: string = this.recommend.value;
+      let list: Array<Coordinate> = [
+        ...this.props.functions,
+        ...this.props.variables,
+      ];
+      if (this.recommend.value.indexOf('@') === 0) {
+        _v = this.recommend.value.slice(1);
+        list = [...this.props.variables];
       }
       suggestions = list.filter(
         (i: Coordinate) => (i.value || '').indexOf(_v) > -1,
@@ -212,132 +157,110 @@ function Expressions(props: ExpressionsProps) {
     return suggestions;
   };
 
-  const estimateAdd = (exp: Exp, k: number, expSize: number) => {
+  public estimateAdd = (exp: Exp, k: number, expSize: number) => {
     const { label, value } = exp;
     return !label || !_.size(value) || k + 1 != expSize;
   };
 
-  const selectItem = (v: Coordinate) => () => {
+  public selectItem = (v: Coordinate) => () => {
     switch (v.type) {
       case Type.Func:
-        handleFunction(v, recommend.start);
+        this.props.handleFunction(v, this.recommend.start);
         return;
       case Type.ID:
-        handleVariables(v, recommend.start);
+        this.props.handleVariables(v, this.recommend.start);
         return;
       default:
         return;
     }
   };
 
-  const input: HTMLElement | null = state.el
-    ? document.getElementById(state.el)
-    : null;
-  const expSize = _.size(exps);
-  return (
-    <MuiCard>
-      <List
-        component={'div'}
-        disablePadding
-        dense
-        className={classes.list}
-        subheader={
-          <ListSubheader>
-            <form className={classes.form}>
-              <ListItemText
-                className={classes.label}
-                primary={EN.Variablename}
-                primaryTypographyProps={{ align: 'left' }}
-              />
-              <ListItemText className={classes.text} primary=" " />
-              <ListItemText
-                primary={EN.formula}
-                primaryTypographyProps={{ align: 'left' }}
-              />
-            </form>
-          </ListSubheader>
-        }
-      >
-        {exps.map((exp: Exp, k: number) => (
-          <ListItem
-            key={k}
-            selected={k === index}
-            onClick={e => selectOne(k)(e)}
-          >
-            <form className={classes.form}>
-              <Input
-                className={classes.label}
-                value={exp.label}
-                onChange={changeInput(k)}
-                inputProps={{ style: { backgroundColor: '#fff' } }}
-              />
-              <ListItemText primary="=" className={classes.text} />
-              <Expression
-                exp={exp}
-                setRange={setRange}
-                deleteExp={deleteExp}
-                left={left}
-                right={right}
-                addExp={addExp}
-                onFocus={onFocus(k)}
-                sign={k}
-                setIndex={() => setIndex(k)}
-                toogleTooltip={() => setState({ ...state, isTipOpen: true })}
-              />
-              <div className={classes.tools}>
-                <IconButton onClick={deleteOne(k)} disabled={expSize === 1}>
-                  <DeleteIcon />
-                </IconButton>
-                <IconButton
-                  onClick={addLine}
-                  disabled={!!estimateAdd(exp, k, expSize)}
-                >
-                  <AddIcon />
-                </IconButton>
-              </div>
-            </form>
-          </ListItem>
-        ))}
-        {/* <ListItem>
-      <Button fullWidth size='large' color='primary' variant="contained" onClick={addLine}>+</Button>
-    </ListItem> */}
-        <Popper
-          open={state.isOpen && !!recommend.value}
-          anchorEl={input}
-          placement="bottom-start"
-          className={classes.popper}
-        >
-          <Paper className={classes.suggPape}>
-            <ClickAwayListener onClickAway={handleClickAway}>
-              <MenuList>
-                {getSuggestions().map((item: Coordinate, k: number) => {
-                  return (
-                    <MenuItem key={k} onClick={selectItem(item)}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-              </MenuList>
-            </ClickAwayListener>
-          </Paper>
-        </Popper>
-        <Popper
-          open={!!func && state.isTipOpen}
-          anchorEl={input}
-          placement="bottom-end"
-          className={classes.popper}
-        >
-          <Paper>
-            <ClickAwayListener onClickAway={hideGrammarTip}>
-              <div className={classes.grammar}>
-                {func ? func.grammar : null}
-              </div>
-            </ClickAwayListener>
-          </Paper>
-        </Popper>
-      </List>
-    </MuiCard>
-  );
+  // input: HTMLElement | null = this.state.el
+  //   ? document.getElementById(this.state.el)
+  //   : null;
+  expSize = _.size(this.props.exps);
+
+  render() {
+    const {
+      classes,
+      exps,
+      index,
+      setIndex,
+      addLine,
+      deleteIndex,
+      setRange,
+      deleteExp,
+      left,
+      right,
+      addExp,
+      handleFunction,
+      handleVariables,
+      changeExpLabel,
+      variables,
+      functions,
+      func,
+    } = this.props;
+
+    return (
+      <MuiCard style={{ paddingBottom: 0 }}>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell style={{width: 252}}>{EN.Variablename}</TableCell>
+              <TableCell style={{width: 10}} />
+              <TableCell style={{width: 360}}>{EN.formula}</TableCell>
+              <TableCell align={'right'}/>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {exps.map((exp: Exp, k: number) => (
+              <TableRow key={k}>
+                <TableCell>
+                  <TextField
+                    label={'New Name'}
+                    // className={classes.textField}
+                    value={exp.label}
+                    onChange={this._onChangeLabel}
+                    margin={'dense'}
+                    variant={'outlined'}
+                  />
+                </TableCell>
+                <TableCell>=</TableCell>
+                <TableCell>
+                  <Expression
+                    exp={exp}
+                    setRange={setRange}
+                    deleteExp={deleteExp}
+                    left={left}
+                    right={right}
+                    addExp={addExp}
+                    onFocus={this.onFocus(k)}
+                    sign={k}
+                    setIndex={() => setIndex(k)}
+                    toogleTooltip={() => this.setState({ isTipOpen: true })}
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    onClick={this.deleteOne(k)}
+                    disabled={this.expSize === 1}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={addLine}
+                    disabled={!!this.estimateAdd(exp, k, this.expSize)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </MuiCard>
+    );
+  }
 }
 
-export default Expressions;
+export default useStyles(Expressions);

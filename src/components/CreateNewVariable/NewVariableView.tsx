@@ -27,8 +27,10 @@ const Subtitle = props => (
 
 // Custom Container
 const MyContainer = styled(Container)({
-  minWidth: 360,
-  padding: 0
+  minWidth: 600,
+  margin: '1.2rem 0',
+  paddingRight: 0,
+  paddingLeft: 0
 });
 
 // Custom Grid
