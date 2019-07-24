@@ -45,7 +45,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 			selectArea:[low,high],//选中的区域
 			low:0,
 			high:0,
-			sliderValue:[startValue,endValue],//当前显示的范围
+			sliderValue:[+(startValue.toFixed(3)),+(endValue.toFixed(3))],//当前显示的范围
 			bin,
 		};
 		this.chart = React.createRef();
@@ -93,7 +93,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 
 		const [rs,re] = sliderValue;
 
-		const interval = (re-rs) / bin;
+		const interval = (re-rs) / bin + 0.01;
 
 		request.post({
 			url: '/graphics/outlier-range',
@@ -165,9 +165,14 @@ export default class OutlierRange extends PureComponent<Interface>{
 		}
 		const sliderValue = _.cloneDeep(_sliderValue);
 
+		const [startValue,endValue] = sliderValue;
+
+
 		const _data = data.map(itm=>{
-			const _min = Math.max(itm[0],min);
-			const _max = Math.min(itm[1],max);
+			// const _min = Math.max(itm[0],min);
+			// const _max = Math.min(itm[1],max);
+			const _min = Math.max(itm[0],startValue);
+			const _max = Math.min(itm[1],endValue);
 			return [_min,_max,itm[2]]
 		});
 
@@ -191,7 +196,6 @@ export default class OutlierRange extends PureComponent<Interface>{
 		const nameTextStyle = {
 			color:'#000',
 		};
-		const [startValue,endValue] = sliderValue;
 		return {
 			xAxis: {
 				min:_.min([startValue,low,min,min - 0.5*(max-min)/2,selectArea[0]]),
@@ -278,7 +282,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 		const {chart} = this.state;
 		const {field,project} = this.props;
 		const {rawDataView={}} = project;
-		let {low,high,max,min} = rawDataView[field];
+		let {low,high} = rawDataView[field];
 
     this.setState({
 			selectArea:[low,high],
@@ -289,7 +293,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 			const startValue =  +low - 2 * +interval;
 			const endValue =  +high + 2 *+interval;
       this.setState({
-				sliderValue:[startValue,endValue],
+				sliderValue:[+(startValue.toFixed(3)),+(endValue.toFixed(3))],
         bin,
       },()=>{
 	      chart.showLoading();
@@ -370,15 +374,15 @@ export default class OutlierRange extends PureComponent<Interface>{
           {EN.ChartDisplayRange}:
           <section>
             <InputNum
-              max={endValue}
+              max={+endValue}
               precision={3}
-              value={startValue}
+              value={+startValue}
               style={{ minWidth: 100,marginLeft:20 }}
               onChange={min=>{
-                if(min>=endValue){
+                if(min>=+endValue){
                   min = endValue - 0.0001
                 }
-                return this.setSlider([min,endValue]);
+                return this.setSlider([min,+endValue]);
               }}
             />
             <a
@@ -388,15 +392,15 @@ export default class OutlierRange extends PureComponent<Interface>{
           <span>~</span>
           <section>
             <InputNum
-              min={startValue}
+              min={+startValue}
               precision={3}
-              value={endValue}
+              value={+endValue}
               style={{ minWidth: 100 }}
               onChange={max=>{
-                if(max<=startValue){
-                  max = startValue + 0.0001
+                if(max<=+startValue){
+                  max = +startValue + 0.0001
                 }
-                return this.setSlider([startValue,max]);
+                return this.setSlider([+startValue,max]);
               }}
             />
             <a

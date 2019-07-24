@@ -41,7 +41,7 @@ export default function Explanation(props: ExplanationProps) {
                   />}
                   trigger="click"
                   arrowPointAtCenter
-                // getPopupContainer = {()=>(document as any).getElementsByClassName(classes.explanation)[0]}
+                getPopupContainer = {()=>(document as any).getElementsByClassName(classes.explanation)[0]}
                 >
                   <a href='javascript:' title={mapHeader[itm]} >
                     {mapHeader[itm]}
