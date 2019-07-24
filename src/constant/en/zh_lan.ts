@@ -1204,8 +1204,8 @@ const ZH_LAN = {
   numberInsideCluster: "样本量",
   ChartDisplayRange: "图表显示范围",
   NumberOfCartons: "分箱数量",
-  SetToMinimum: "设置为最小值",
-  SetToMaximum: "设置为最大值",
+  SetToMinimum: "设置为该变量的最小值",
+  SetToMaximum: "设置为该变量的最大值",
 };
 
 export default ZH_LAN;

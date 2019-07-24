@@ -1346,8 +1346,8 @@ const EN_LAN = {
   numberInsideCluster: "Sample Size",
   ChartDisplayRange: "Chart display range",
   NumberOfCartons: "Number of cartons",
-  SetToMinimum: "Set to minimum",
-  SetToMaximum: "Set to maximum",
+  SetToMinimum: "Set to the minimum value of the variable",
+  SetToMaximum: "Set to the maximum value of the variable",
 };
 
 
