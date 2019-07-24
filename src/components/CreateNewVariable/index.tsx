@@ -1,8 +1,62 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { install } from '@material-ui/styles';
-import Computed from './Computed';
+import * as React from 'react';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react';
 
-install();
+// modules
+import { MuiDialog } from './modules/MuiModule';
+import NewVariableView from './NewVariableView';
 
-export default Computed;
+import varStores, { NewVariableStore } from './NewVariableStore';
+
+// types
+import { DialogProps } from '@material-ui/core/Dialog';
+
+interface InterfaceCreateNewVariableProps extends DialogProps {
+  title: string;
+  variables: string[];
+  mapHeader;
+  expression;
+  addNewVariable;
+}
+
+@observer
+// Create NewVariable Module
+export default class CreateNewVariableModule extends React.Component<
+  InterfaceCreateNewVariableProps
+> {
+  render() {
+    const {
+      open,
+      title,
+      onClose,
+      variables,
+      mapHeader,
+      expression,
+      addNewVariable,
+    } = this.props;
+
+    return (
+      <MuiDialog
+        {...{
+          open,
+          title,
+          onClose,
+          maxWidth: 'lg',
+          fullWidth: true,
+        }}
+        disableBackdropClick
+      >
+        <NewVariableView
+          {...{
+            onClose,
+            variables,
+            mapHeader,
+            expression,
+            addNewVariable,
+          }}
+          {...toJS(varStores as NewVariableStore)}
+        />
+      </MuiDialog>
+    );
+  }
+}

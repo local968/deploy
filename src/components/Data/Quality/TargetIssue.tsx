@@ -69,11 +69,11 @@ class TargetIssue extends Component<TargetIssueProps> {
     const { project, changeTab } = this.props;
     const {
       issues,
-      sortData,
+      uploadData,
       mapHeader,
       target,
       colType,
-      sortHeader,
+      rawHeader,
       nullLineCounts,
       mismatchLineCounts,
       outlierLineCounts,
@@ -86,10 +86,12 @@ class TargetIssue extends Component<TargetIssueProps> {
       rawDataView,
       targetIssuesCountsOrigin,
       targetArrayTemp,
+      targetUnique
     } = project;
-    const targetIndex = sortHeader.findIndex(h => h === target);
+    const targetUniques = targetUnique || NaN
+    const targetIndex = rawHeader.findIndex(h => h === target);
     const isNum = colType[target] === 'Numerical';
-    const recomm = !isNum ? 2 : Math.min((sortHeader.length - 1) * 6, 1000);
+    const recomm = !isNum ? 2 : Math.min((rawHeader.length - 1) * 6, 1000);
     const nullCount = Number.isInteger(nullLineCounts[target]) ? nullLineCounts[target] : 0;
     const mismatchCount = isNum ? mismatchLineCounts[target] : 0;
     const outlierCount = isNum ? outlierLineCounts[target] : 0;
@@ -123,15 +125,17 @@ class TargetIssue extends Component<TargetIssueProps> {
             ),
     };
     const warnings: string[] = [];
+    const unique = rawDataView[target].uniqueValues;
     // const unique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
-    const unique = targetArrayTemp.length || rawDataView[target].uniqueValues;
-    const hasNull = !targetArrayTemp.length ? !!nullCount : false;
     if (!isNum) {
+      const curUnique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
+      const hasNull = !targetArrayTemp.length ? !!nullCount : false;
+      const isNa = isNaN(targetUniques)
       if (hasNull)
-        warnings.push(`${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
-      if (unique < 2 && !hasNull)
-        warnings.push(`${EN.YourtargetvariableHas}${EN.onlyOnevalue}`);
-      if (unique === 2 && !hasNull) {
+        warnings.push(isNa ? EN.Thetargetvariablehassomenoise : `${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
+      if (curUnique < targetUniques && !hasNull)
+        warnings.push(targetUniques === 2 ? `${EN.YourtargetvariableHas}${EN.onlyOnevalue}` : `error`);
+      if (curUnique === targetUniques && !hasNull) {
         const min = Math.min(...Object.values(targetCounts));
         if (min < 3) warnings.push(EN.Itisrecommendedthatyou);
       }
@@ -294,8 +298,8 @@ class TargetIssue extends Component<TargetIssueProps> {
                 )}
               </div>
               <div className={styles.tableBody}>
-                {!!sortData.length &&
-                  sortData.map((r, k) => {
+                {!!uploadData.length &&
+                  uploadData.map((r, k) => {
                     const v = r[targetIndex];
                     const { low = NaN, high = NaN } = rawDataView[target];
                     const isMissing = isNaN(+v) ? !v : false;

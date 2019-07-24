@@ -102,8 +102,8 @@ export default class Preview extends Component {
 
   render() {
     const { project, visiable, hideTable, showTable } = this.props
-    const { sortHeader, target, trainHeader, newVariable, mapHeader } = project
-    const header = [...sortHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    const { dataHeader, target, trainHeader, newVariable, mapHeader } = project
+    const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
     return <div className={classnames(styles.content, {
       [styles.active]: visiable

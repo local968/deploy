@@ -45,15 +45,10 @@ const DisplayOutlier = (props: DisplayOutlierProps) => {
     if (loading) return []
     if (!tableRows.length) return []
 
-    // return []
-    // const { sortData, target, colType, sortHeader, headerTemp: {temp} } = this.props.project;
-    // const { checkList, showSelect } = this.state;
     const headerList = header
-    // const notShowIndex = sortHeader.filter(v => !sortHeader.includes(v)).map(v => sortHeader.indexOf(v))
     const data = tableRows.map(row => {
       return header.map(h => row[h])
     })
-    // if(!sortData.length) return []
     /**
      * 根据showSelect, indexPosition变化
      * headerRow: 标题的行数

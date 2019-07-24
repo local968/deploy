@@ -6,7 +6,7 @@ import config from 'config'
 const {isEN} = config;
 
 export default function PredictionDistributions(props){
-	const {x_name='',y_name='',width=500,height=400,model,isHoldout} = props;
+	const {x_name='',y_name='',width=500,height=400,model,isHoldout,metric} = props;
 	const {fitIndex,chartData,holdoutChartData} = model;
 	const {density} = isHoldout?holdoutChartData:chartData;
 	const {POSITIVE,NEGATIVE,PERCENTAGE} = density;
@@ -17,9 +17,9 @@ export default function PredictionDistributions(props){
 	const [point,setPoint] = useState(false);
 
 	useEffect(()=>{
-		const s:any = +(Threshold[fitIndex].toFixed(3));
-		setPoint(s);
-	},[fitIndex]);
+			const s:any = +(Threshold[fitIndex].toFixed(3));
+			setPoint(s);
+	},[metric]);
 
 	const data =  [{
 		name:'False',
@@ -48,8 +48,8 @@ export default function PredictionDistributions(props){
 		setPoint(value);
 
 		const ind = Object.values(Threshold).indexOf(t);
-			props.model.setFitIndex(ind)
-	},100);
+		model.setFitIndex(ind)
+	},200);
 
 	const nameTextStyle = {
 		color:'#000',
@@ -62,14 +62,18 @@ export default function PredictionDistributions(props){
 			yAxis:{}
 		}
 	}else{
+		const _Threshold = Object.values(Threshold);
 		option = {
 			xAxis: {
 				name:x_name,
 				type: 'value',
 				boundaryGap: false,
-				min:0,
-				max:1,
+				min:_.min(_Threshold),
+				max:_.max(_Threshold),
 				nameTextStyle,
+				axisLabel: {
+					formatter: value=>(_.floor(100*value)/100).toFixed(2),
+				},
 				axisPointer: {
 					value: point,
 					snap: true,

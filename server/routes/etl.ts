@@ -205,12 +205,13 @@ wss.register('newEtl', async (message, socket, process) => {
         stats[key].mismatchFillMethod = { type: 'delete' };
       else if (mismatch === 'zero')
         stats[key].mismatchFillMethod = { type: 'replace', value: 0 };
-      else if (mismatch && mismatch !== 'ignore')
+      else if (mismatch && mismatch !== 'ignore' && mismatch !== 'column')
         stats[key].mismatchFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][mismatch],
         };
-      else stats[key].mismatchFillMethod = { type: 'replace', value };
+      else if (!mismatch)
+        stats[key].mismatchFillMethod = { type: 'replace', value };
     }
     // if (mismatch === 'drop') stats[key].mismatchFillMethod = { type: 'delete' }
     // else if ((mismatch || mismatch === 0) && mismatch !== 'ignore') stats[key].mismatchFillMethod = { type: 'replace', value: mismatch }
@@ -232,12 +233,12 @@ wss.register('newEtl', async (message, socket, process) => {
           type: 'replace',
           value: 'NEW_VARIABLE_TYPE',
         };
-      else if (missingValue)
+      else if (missingValue && missingValue !== 'column')
         stats[key].missingValueFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][missingValue],
         };
-      else stats[key].missingValueFillMethod = { type: 'replace', value };
+      else if (!missingValue) stats[key].missingValueFillMethod = { type: 'replace', value };
     }
     // if (missingValue === 'drop') stats[key].missingValueFillMethod = { type: 'delete' }
     // else if (missingValue === 'ignore') stats[key].missingValueFillMethod = { type: 'replace', value: 'NEW_VARIABLE_TYPE' }
@@ -252,7 +253,7 @@ wss.register('newEtl', async (message, socket, process) => {
       else if (outlier === 'respective') stats[key].outlierFillMethod = { type: 'replaceRespective' };
       else if (outlier === 'zero')
         stats[key].outlierFillMethod = { type: 'replace', value: 0 };
-      else if (outlier && outlier !== 'ignore')
+      else if (outlier && outlier !== 'ignore' && outlier !== 'column')
         stats[key].outlierFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][outlier],
@@ -271,8 +272,7 @@ wss.register('newEtl', async (message, socket, process) => {
   if (project.target) {
     stats[project.target].isTarget = true;
     if (
-      project.problemType === 'Classification' ||
-      project.problemType === 'Outlier'
+      project.problemType !== 'Regression'
     ) {
       let deletedValues = [];
       if (project.targetArray && project.targetArray.length > 1) {
@@ -285,12 +285,16 @@ wss.register('newEtl', async (message, socket, process) => {
           project.colValueCounts[project.target],
         ).filter(k => !project.targetArray.includes(k));
       } else {
-        deletedValues = _.chain(project.colValueCounts[project.target])
-          .entries()
-          .sort((a, b) => b[1] - a[1])
-          .slice(2)
-          .map(([k]) => k)
-          .value();
+        //多分类 unique
+        const targetUnique = project.targetUnique
+        if (targetUnique > 0) {
+          deletedValues = _.chain(project.colValueCounts[project.target])
+            .entries()
+            .sort((a, b) => b[1] - a[1])
+            .slice(targetUnique)
+            .map(([k]) => k)
+            .value();
+        }
       }
       if (Object.keys(project.otherMap).includes(''))
         stats[project.target].missingValueFillMethod = {

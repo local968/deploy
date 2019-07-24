@@ -12,6 +12,7 @@ const Next = 'data:image/svg+xml;base64,DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2
 interface Interface {
 	project:any
 	model:any
+	mismatchArray:Array<Object>
 }
 export default class ModelProcessFlow extends Component<Interface> {
 
@@ -60,14 +61,16 @@ export default class ModelProcessFlow extends Component<Interface> {
 		return <dl className={styles.over}>
 			{this.list(data, 'categorical_encoding:one_hot_encoding:', 'Encoding:OneHotEncoding')}
 			{data['categorical_encoding:__choice__'] === "one_hot_encoding"&&<dd>
-				<p style={{display:(variables.length?'':'none')}}>
+				<div
+					className = {styles.variables}
+					style={{display:(variables.length?'':'none')}}>
 					<label>variables:</label>
 					<ul>
 						{
 							variables.map(it=><li title={it}>{it}</li>)
 						}
 					</ul>
-				</p>
+				</div>
 			</dd>}
 
 			{/*{this.list(data, 'categorical_encoding:no_encoding:', 'Encoding:No Encoding')}*/}
@@ -245,47 +248,13 @@ export default class ModelProcessFlow extends Component<Interface> {
 
 	DQFData(data,title,showTarget,outlier=false){
 		const { colType,target,rawDataView,outlierDictTemp,mapHeader} = this.props.project;
+		const {mismatchArray} = this.props;
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
 		const values = Object.entries(data);
 
-		const mismatchArray =  [{
-			value: 'mode',
-			label: EN.Replacewithmostfrequentvalue
-		}, {
-			value: 'drop',
-			label: EN.Deletetherows
-		}, {
-			value: 'ignore',//Categorical
-			label: EN.Replacewithauniquevalue
-		}, {
-			value: 'ignore',
-			label: EN.DoNothing
-		},{
-			value: 'mean',
-			label: EN.Replacewithmeanvalue
-		},{
-			value: 'min',
-			label: EN.Replacewithminvalue
-		}, {
-			value: 'max',
-			label: EN.Replacewithmaxvalue
-		}, {
-			value: 'median',
-			label: EN.Replacewithmedianvalue
-		}, {
-			value: 'zero',
-			label: EN.ReplaceWith0
-		}, {
-			value: 'others',
-			label: EN.Replacewithothers
-		},{
-			value: 'respective',
-			label: EN.ReplaceRespective
-		}];
-
-		const result:any = mismatchArray.map(itm=>({
+		const result:any = mismatchArray.map((itm:any)=>({
 			type:itm.value,
 			key:itm.label,
 			data:[],
@@ -339,7 +308,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 			<dt>{title}</dt>
 			{
 				res.map(itm=>{
-					return <dd>
+					return <dd key={itm.key}>
 						<label>{itm.key}:</label>
 						<ul>
 							{

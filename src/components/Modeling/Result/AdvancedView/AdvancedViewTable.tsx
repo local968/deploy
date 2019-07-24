@@ -8,6 +8,7 @@ import { Hint } from 'components/Common';
 import { observer } from 'mobx-react';
 import ClassificationTable from './ClassificationTable'
 import RegressionTable from './RegressionTable'
+import ClusteringTable from './ClusteringTable'
 
 interface AdvancedViewTableProps {
   project: Project,
@@ -17,8 +18,9 @@ interface AdvancedViewTableProps {
   }
   handleSort: (k: string) => void,
   metric: string,
-  handleChange: (k: string) => void,
-  models: Model[]
+  handleChange?: (k: string) => void,
+  models?: Model[],
+  currentSettingId: string
 }
 
 export interface TableHeader {
@@ -29,7 +31,7 @@ export interface TableHeader {
 }
 
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {
-  const { project, sort, handleSort, metric, handleChange, models } = props
+  const { project, sort, handleSort, metric, handleChange, models, currentSettingId } = props
   const { problemType } = project
   const [fbeta, setFbeta] = useState(project.fbeta)
 
@@ -41,8 +43,21 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
     project.updateProject({ fbeta })
   }
 
+  const renderTable = () => {
+    switch (problemType) {
+      case "Classification":
+        return <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+      case "Regression":
+        return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+      case "Clustering":
+        return <ClusteringTable sort={sort} handleSort={handleSort} project={project} models={models} currentSettingId={currentSettingId} />
+      default:
+        return null
+    }
+  }
+
   return <div className={styles.main}>
-    <div className={styles.option}>
+    {(problemType === 'Classification' || problemType === 'Regression') && <div className={styles.option}>
       {problemType === 'Classification' && <div className={styles.metricFbeta}>
         <span>{EN.FbetaValue}<Hint content={EN.FbetaValueHint} /></span>
         <InputNumber min={0.1} max={10} step={0.1} style={{ marginLeft: 10 }} onChange={handleBeta} value={fbeta} />
@@ -50,11 +65,9 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
           <div onClick={submitBeta} className={styles.metricFbetaBtn}><span>{EN.Submit}</span></div>
         </div>
       </div>}
-    </div>
+    </div>}
     <div className={styles.table}>
-      {problemType === 'Classification' ?
-        <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} /> :
-        <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} />}
+      {renderTable()}
     </div>
   </div>
 }

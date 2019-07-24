@@ -7,13 +7,39 @@ export default function TwinBar(props) {
   const _same = toJS(same);
   const _diff = toJS(diff);
 
+  const type = x_values.length > _same.length ? 'category':'value';
+
+  const _x_values = [];
+
+  if(type === 'category'){
+    x_values.sort((a,b)=>{
+      if(!isNaN(a)&&!String(a).includes('e')){
+        a = Number(a).toFixed(3);
+      }
+      if(!isNaN(b)&&!String(b).includes('e')){
+        b = Number(b).toFixed(3);
+      }
+      _x_values.push(`[${b},${a})`);
+      return true
+    })
+  }
+
   const option = {
     xAxis: {
-      type: typeof x_values[0] === 'number' ? 'value' : 'category',
-      data: x_values,
+      type: typeof x_values[0] === 'number' ? type : 'category',
+      data: _x_values.length?_x_values:x_values,
       name:x_name,
       nameLocation:'middle',
       nameGap:20,
+      axisLabel: {
+        // interval:2,
+        formatter: value=>{
+          if(!isNaN(value)&&!String(value).includes('e')){
+            return Number(value).toFixed(3);
+          }
+          return value;
+        },
+      },
     },
     yAxis: {
       type: 'value',

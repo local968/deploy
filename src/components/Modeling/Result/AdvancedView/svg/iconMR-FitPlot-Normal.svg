@@ -1,46 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="52px" height="52px" viewBox="0 0 30 31" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 54 (76480) - https://sketchapp.com -->
-    <title>iconROCCurve-Selected</title>
+<svg width="56px" height="56px" viewBox="0 0 56 56" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>iconMR-FitPlot-Normal</title>
     <desc>Created with Sketch.</desc>
-    <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="5-4-4-Model-Selection_Advanced-View_Model-Expand_ROC-Cure-Copy" transform="translate(-177.000000, -313.000000)" stroke="#1D2B3C">
-            <g id="Group-17" transform="translate(177.000000, 313.000000)">
-                <g id="iconFitPlot-Normal">
-                    <g>
-                        <rect id="Rectangle-7-Copy-3" stroke-width="1.2" fill="#FFFFFF" x="1.00301112" y="0.6" width="28.05" height="28.9935484" rx="2.4"></rect>
-                        <g id="ROCCurve" transform="translate(2.384628, 4.070362)">
-                            <g id="Arrow" stroke-linecap="square" stroke-width="0.6">
-                                <path d="M1.17544909,0.218107273 L2.11580836,1.09053636" id="Line"></path>
-                                <path d="M0.235089818,0.218107273 L1.17544909,1.09053636" id="Line-Copy-2" transform="translate(0.705269, 0.654322) scale(-1, 1) translate(-0.705269, -0.654322) "></path>
-                            </g>
-                            <g id="Arrow-Copy" transform="translate(24.464534, 22.690063) rotate(90.000000) translate(-24.464534, -22.690063) translate(23.058284, 21.819095)" stroke-linecap="square" stroke-width="0.6">
-                                <path d="M1.17544909,0.218107273 L2.11580836,1.09053636" id="Line"></path>
-                                <path d="M0.235089818,0.218107273 L1.17544909,1.09053636" id="Line-Copy-2" transform="translate(0.705269, 0.654322) scale(-1, 1) translate(-0.705269, -0.654322) "></path>
-                            </g>
-                            <path d="M1.17544909,22.4650491 L24.6844309,22.4650491" id="Line" stroke-width="0.6" stroke-linecap="square"></path>
-                            <path d="M1.17544909,22.4650491 L1.17544909,0.654321818" id="Line-Copy" stroke-width="0.6" stroke-linecap="square"></path>
-                            <path d="M1.71799668,22.0203958 L23.5295934,2.31645173" id="Line-4" stroke-width="0.9" stroke-linecap="square"></path>
-                            <path d="M3.59830673,17.4259842 L6.60680283,15.9664328 L9.61529892,10.1282272 L11.119547,13.7771057 L17.8886632,6.47934866 L11.119547,8.66867578 L14.8801671,10.1282272 L11.119547,17.4259842 L19.3929112,8.66867578 L22.4014073,4.29002154" id="Path-4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.6,4.2"></path>
-                        </g>
+    <defs>
+        <rect id="path-1" x="0.716464207" y="0" width="52" height="52" rx="2"></rect>
+    </defs>
+    <g id="20171114-Regression-AdvanceView2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iconMR-FitPlot-Normal">
+            <g id="iconFitPlot-Normal" transform="translate(1.000000, 2.000000)">
+                <g id="Rectangle-7-Copy-3">
+                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <rect stroke="#BFDBFF" stroke-width="1" x="1.21646421" y="0.5" width="51" height="51" rx="2"></rect>
+                </g>
+                <g id="ROCCurve" transform="translate(4.239338, 7.010067)" stroke="#448EED">
+                    <g id="Arrow" stroke-linecap="square">
+                        <path d="M2.08968727,0.375629192 L3.76143708,1.87814596" id="Line"></path>
+                        <path d="M0.417937454,0.375629192 L2.08968727,1.87814596" id="Line-Copy-2" transform="translate(1.253812, 1.126888) scale(-1, 1) translate(-1.253812, -1.126888) "></path>
                     </g>
-                    <g>
-                        <rect id="Rectangle-7-Copy-3" stroke-width="1.2" fill="#FFFFFF" x="1.00301112" y="0.6" width="28.05" height="28.9935484" rx="2.4"></rect>
-                        <g id="ROCCurve" transform="translate(2.384628, 4.070362)">
-                            <g id="Arrow" stroke-linecap="square" stroke-width="0.6">
-                                <path d="M1.17544909,0.218107273 L2.11580836,1.09053636" id="Line"></path>
-                                <path d="M0.235089818,0.218107273 L1.17544909,1.09053636" id="Line-Copy-2" transform="translate(0.705269, 0.654322) scale(-1, 1) translate(-0.705269, -0.654322) "></path>
-                            </g>
-                            <g id="Arrow-Copy" transform="translate(24.464534, 22.690063) rotate(90.000000) translate(-24.464534, -22.690063) translate(23.058284, 21.819095)" stroke-linecap="square" stroke-width="0.6">
-                                <path d="M1.17544909,0.218107273 L2.11580836,1.09053636" id="Line"></path>
-                                <path d="M0.235089818,0.218107273 L1.17544909,1.09053636" id="Line-Copy-2" transform="translate(0.705269, 0.654322) scale(-1, 1) translate(-0.705269, -0.654322) "></path>
-                            </g>
-                            <path d="M1.17544909,22.4650491 L24.6844309,22.4650491" id="Line" stroke-width="0.6" stroke-linecap="square"></path>
-                            <path d="M1.17544909,22.4650491 L1.17544909,0.654321818" id="Line-Copy" stroke-width="0.6" stroke-linecap="square"></path>
-                            <path d="M1.71799668,22.0203958 L23.5295934,2.31645173" id="Line-4" stroke-width="0.9" stroke-linecap="square"></path>
-                            <path d="M3.59830673,17.4259842 L6.60680283,15.9664328 L9.61529892,10.1282272 L11.119547,13.7771057 L17.8886632,6.47934866 L11.119547,8.66867578 L14.8801671,10.1282272 L11.119547,17.4259842 L19.3929112,8.66867578 L22.4014073,4.29002154" id="Path-4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.6,4.2"></path>
-                        </g>
+                    <g id="Arrow-Copy" transform="translate(43.492504, 39.077330) rotate(90.000000) translate(-43.492504, -39.077330) translate(40.992504, 37.577330)" stroke-linecap="square">
+                        <path d="M2.08968727,0.375629192 L3.76143708,1.87814596" id="Line"></path>
+                        <path d="M0.417937454,0.375629192 L2.08968727,1.87814596" id="Line-Copy-2" transform="translate(1.253812, 1.126888) scale(-1, 1) translate(-1.253812, -1.126888) "></path>
                     </g>
+                    <path d="M2.08968727,38.6898067 L43.8834327,38.6898067" id="Line" stroke-linecap="square"></path>
+                    <path d="M2.08968727,38.6898067 L2.08968727,1.12688757" id="Line-Copy" stroke-linecap="square"></path>
+                    <path d="M3.05421631,36.924015 L41.8303882,2.98944465" id="Line-4" stroke-linecap="square"></path>
+                    <polyline id="Path-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1,7" points="6.39698975 30.0114173 11.7454272 27.4977454 17.0938647 17.4430579 19.7680835 23.7272376 31.8020679 11.1588782 19.7680835 14.9293861 26.4536304 17.4430579 19.7680835 30.0114173 34.4762866 14.9293861 39.8247241 7.38837044"></polyline>
                 </g>
             </g>
         </g>

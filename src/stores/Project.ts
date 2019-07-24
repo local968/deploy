@@ -1,17 +1,13 @@
-import { observable, action, computed, toJS, autorun, IReactionDisposer } from "mobx";
+import { observable, action, computed, toJS, autorun, IReactionDisposer, when } from "mobx";
 import socketStore from "./SocketStore";
 import Model from "./Model";
-import moment from 'moment';
-import config from 'config';
-import uuid from 'uuid';
 import Papa from 'papaparse';
-import { message as antdMessage, Modal } from 'antd';
+import { message as antdMessage } from 'antd';
 import axios from 'axios'
 import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
-import { Coordinate } from "components/CreateNewVariable/model/Coordinate";
-import { when } from "q";
+import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
 
 export interface Stats {
   took: number,
@@ -167,6 +163,7 @@ class Project {
   @observable statement: string = '';
   @observable business: string = '';
   @observable changeProjectType: string = '';
+  @observable targetUnique: number = 2
 
   //etl
   @observable etling: boolean = false;
@@ -230,6 +227,7 @@ class Project {
   @observable nullFillMethodTemp: StringObject = {};
   @observable outlierFillMethodTemp: StringObject = {};
   @observable outlierDictTemp: unknown = {};
+  @observable deleteColumns: string[] = []
 
   // train
   // 训练状态
@@ -424,7 +422,8 @@ class Project {
       dataViews: null,
       dataViewsLoading: false,
       deletedCount: 0,
-      etlIndex: ''
+      etlIndex: '',
+      deleteColumns: []
     } as {
       targetMap: NumberObject,
       targetArray: string[],
@@ -438,7 +437,8 @@ class Project {
       dataViews: null,
       dataViewsLoading: boolean,
       deletedCount: number,
-      etlIndex: string
+      etlIndex: string,
+      deleteColumns: string[]
     }
   }
 
@@ -635,28 +635,6 @@ class Project {
     return this.settings.find((s: any) => s.id === this.settingId)
   }
 
-  @computed
-  get sortHeader(): string[] {
-    const { target, dataHeader } = this
-    if (!target) return dataHeader
-    return [target, ...dataHeader.filter(v => target !== v)]
-  }
-
-  @computed
-  get sortData(): string[][] {
-    const { target, sortHeader, uploadData, rawHeader } = this
-    if (!uploadData.length) return []
-    if (!target) return uploadData
-    return uploadData.map(row => {
-      const newRow: string[] = []
-      sortHeader.forEach(v => {
-        const index = rawHeader.indexOf(v)
-        if (index > -1) newRow.push(row[index])
-      })
-      return newRow
-    })
-  }
-
   @action
   goback = () => {
     const { mainStep, lastSubStep } = this
@@ -834,11 +812,13 @@ class Project {
       statement: string
       business: string
       problemType: string
-      measurement?: string
+      measurement?: string,
+      targetUnique: number
     } = {
       statement: this.statement,
       business: this.business,
-      problemType: this.changeProjectType
+      problemType: this.changeProjectType,
+      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || ((this.changeProjectType === 'Regression' || this.changeProjectType === 'Clustering') && 0)
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
@@ -970,7 +950,7 @@ class Project {
     } = {
       target: this.target,
       colType: { ...this.colType },
-      dataHeader: [...this.dataHeader],
+      dataHeader: [...this.dataHeader, ...this.deleteColumns],
       noCompute: this.noComputeTemp,
       nullFillMethod: this.nullFillMethod,
       nullFillMethodTemp: this.nullFillMethodTemp,
@@ -1035,7 +1015,8 @@ class Project {
       mismatchFillMethod: StringObject,
       outlierFillMethod: StringObject,
       missingReason: StringObject,
-      crossCount?: number
+      crossCount?: number,
+      dataHeader: string[]
     } = {
       targetMap: toJS(this.targetMapTemp),
       targetArray: toJS(this.targetArrayTemp),
@@ -1044,6 +1025,7 @@ class Project {
       mismatchFillMethod: toJS(this.mismatchFillMethodTemp),
       outlierFillMethod: toJS(this.outlierFillMethodTemp),
       missingReason: toJS(this.missingReasonTemp),
+      dataHeader: this.dataHeader.filter(h => !this.deleteColumns.includes(h))
     }
 
     if (this.problemType === 'Classification') {
@@ -1124,10 +1106,10 @@ class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin } = this;
-
+    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin, targetUnique } = this;
+    const targetUniques = targetUnique || NaN
     if (colType[target] === "Categorical") {
-      data.targetIssue = Object.keys(targetCounts).length > 2;
+      data.targetIssue = Object.keys(targetCounts).length > targetUniques;
     } else if (colType[target] === "Numerical") {
       const dataview = Reflect.get(rawDataView, target)
       const unique = dataview.uniqueValues || 1000
@@ -1151,21 +1133,21 @@ class Project {
 
   @computed
   get variableIssues() {
-    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target } = this;
+    const { dataHeader, nullLineCounts, mismatchLineCounts, outlierLineCounts, colType, totalRawLines, problemType, target, deleteColumns } = this;
     const obj = {
       mismatchRow: {},
       nullRow: {},
       outlierRow: {}
     }
-
-    dataHeader.forEach(h => {
+    const variables = [...dataHeader.filter(h => h !== target), ...deleteColumns]
+    variables.forEach(h => {
       if (colType[h] === "Numerical" && mismatchLineCounts[h]) {
         obj.mismatchRow = Object.assign(obj.mismatchRow, { [h]: (mismatchLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
       if (nullLineCounts[h]) {
         obj.nullRow = Object.assign(obj.nullRow, { [h]: (nullLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
-      if ((problemType === 'Clustering' || h === target) && colType[h] === "Numerical" && outlierLineCounts[h]) {
+      if (problemType === 'Clustering' && colType[h] === "Numerical" && outlierLineCounts[h]) {
         obj.outlierRow = Object.assign(obj.outlierRow, { [h]: (outlierLineCounts[h] || 0) / (totalRawLines || 1) * 100 })
       }
     })
@@ -1174,10 +1156,11 @@ class Project {
 
   @computed
   get variableIssueCount() {
-    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType, dataHeader } = this
-    const nullCount = Object.entries(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (Number.isInteger(v) ? v : 0), 0)
-    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
-    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).filter(([_k]) => dataHeader.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
+    const { nullLineCounts, mismatchLineCounts, outlierLineCounts, target, colType, problemType, dataHeader, deleteColumns } = this
+    const variables = [...dataHeader, ...deleteColumns]
+    const nullCount = Object.entries(Object.assign({}, nullLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (Number.isInteger(v) ? v : 0), 0)
+    const mismatchCount = Object.entries(Object.assign({}, mismatchLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0)
+    const outlierCount = problemType === 'Clustering' ? Object.entries(Object.assign({}, outlierLineCounts, { [target]: 0 }) || {}).filter(([_k]) => variables.includes(_k)).reduce((sum, [k, v]) => sum + (colType[k] === 'Numerical' && Number.isInteger(v) ? v : 0), 0) : 0
 
     return { nullCount, mismatchCount, outlierCount }
   }
@@ -1263,7 +1246,8 @@ class Project {
       nullFillMethodTemp: toJS(this.nullFillMethodTemp),
       mismatchFillMethodTemp: toJS(this.mismatchFillMethodTemp),
       outlierFillMethodTemp: toJS(this.outlierFillMethodTemp),
-      missingReasonTemp: toJS(this.missingReasonTemp)
+      missingReasonTemp: toJS(this.missingReasonTemp),
+      deleteColumns: [...this.deleteColumns]
     })
   }
 
@@ -1442,14 +1426,14 @@ class Project {
         const { validateScore, holdoutScore } = score
         let validate, holdout
         if (problemType === 'Classification') {
-          validate = currentMeasurement === 'auc' ? validateScore.auc : Reflect.get(m, currentMeasurement + 'Validation')  //m[currentMeasurement + 'Validation']
-          holdout = currentMeasurement === 'auc' ? holdoutScore.auc : Reflect.get(m, currentMeasurement + 'Holdout') //m[currentMeasurement + 'Holdout']
+          validate = Reflect.get(m, (currentMeasurement === 'log_loss' ? 'logloss' : currentMeasurement) + 'Validation')  //m[currentMeasurement + 'Validation']
+          holdout = Reflect.get(m, (currentMeasurement === 'log_loss' ? 'logloss' : currentMeasurement) + 'Holdout') //m[currentMeasurement + 'Holdout']
         } else if (problemType === 'Regression') {
           validate = Reflect.get(validateScore, currentMeasurement) //validateScore[currentMeasurement]
           holdout = Reflect.get(holdoutScore, currentMeasurement) //holdoutScore[currentMeasurement]
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
-          validate = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
-          holdout = Reflect.get(score, currentMeasurement) //score[currentMeasurement]
+          validate = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
+          holdout = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
@@ -2422,13 +2406,13 @@ class Project {
   }
 
   histogram(field: string) {
-    const { colType, dataViews, etlIndex, rawDataView } = this;
+    const { colType, dataViews, etlIndex } = this;
     const value: Stats = Reflect.get(dataViews, field);
     if (!value) {
       return {}
     }
     if (colType[field] === 'Numerical') {
-      const { max, min, std_deviation_bounds: { lower, upper } } = rawDataView[field];
+      const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
       const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
       return {
         "name": "histogram-numerical",

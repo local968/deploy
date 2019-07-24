@@ -4,21 +4,17 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
-import {
-  Popover,
-  Icon,
-  Modal,
-} from 'antd';
+import { Popover, Icon } from 'antd';
 import EN from '../../../../constant/en';
 import request from 'components/Request';
 import CreateNewVariables from '../../../CreateNewVariable';
-import SimplifiedViewRow from './SimplifiedViewRow'
-import CorrelationPlot from './CorrelationPlot'
+import SimplifiedViewRow from './SimplifiedViewRow';
+import CorrelationPlot from './CorrelationPlot';
 import { Show } from '../../../Common';
 interface Interface {
-  project:any
-  dataHeader?:any
-  colType?:any
+  project: any;
+  dataHeader?: any;
+  colType?: any;
 }
 @observer
 export default class SimplifiedViews extends Component<Interface> {
@@ -298,27 +294,20 @@ export default class SimplifiedViews extends Component<Interface> {
             </select>
           </div>
           <div className={styles.newVariable}>
-            <Show
-              name = 'start_CreateANewVariable_UN'
-            >
+            <Show name="start_CreateANewVariable_UN">
               <div className={styles.toolButton} onClick={this.showNewVariable}>
                 <span>{EN.CreateANewVariable}</span>
               </div>
             </Show>
-            <Modal
-              visible={this.visible}
-              footer={null}
-              closable={false}
-              width={'65%'}
-            >
-              <CreateNewVariables
-                onClose={this.hideNewVariable}
-                addNewVariable={addNewVariable2}
-                colType={newVariableType}
-                expression={expression}
-                mapHeader={newMapHeader}
-              />
-            </Modal>
+            <CreateNewVariables
+              title={EN.CreateANewVariable}
+              open={this.visible}
+              onClose={this.hideNewVariable}
+              addNewVariable={addNewVariable2}
+              variables={newVariableType}
+              expression={expression}
+              mapHeader={newMapHeader}
+            />
           </div>
           <div
             className={classnames(styles.toolButton, styles.toolCheck)}

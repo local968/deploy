@@ -11,6 +11,7 @@ import HS from "./HS";
 
 export default function Chart(props){
 	let {x_name='',y_name='',title='',project,name} = props;
+	const {mapHeader} = project;
 	const {data:_data={}} = props;
 	let data;
 	if(name){
@@ -55,7 +56,7 @@ export default function Chart(props){
 		case 'correlation-matrix':
 			chart = <CorrelationMatrixs
 				value={data.value}
-				type={data.type}
+				type = {data.type.map(itm=>mapHeader[itm]||itm)}
 			/>;
 			break;
 		case 'regression-numerical':

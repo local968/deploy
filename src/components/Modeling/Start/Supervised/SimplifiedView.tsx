@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Hint, ProcessLoading } from 'components/Common';
 import { observable, toJS } from 'mobx';
-import { Icon, Modal, Popover} from 'antd';
+import { Icon, Popover } from 'antd';
 import histogramIcon from './histogramIcon.svg';
 import { formatNumber } from '../../../../util';
 import request from 'components/Request';
@@ -28,7 +28,9 @@ export default class SimplifiedView extends Component<Interface> {
   @observable CorrelationMatrixData = {};
 
   componentDidMount() {
-    this.props.project.dataView().then(() => this.props.project.preTrainImportance());
+    this.props.project
+      .dataView()
+      .then(() => this.props.project.preTrainImportance());
   }
 
   show = () => {
@@ -52,7 +54,7 @@ export default class SimplifiedView extends Component<Interface> {
               interval,
             },
           })
-          .then((result:any) =>
+          .then((result: any) =>
             this.showback(target, result.data, { min, max, interval }),
           );
       } else {
@@ -66,7 +68,7 @@ export default class SimplifiedView extends Component<Interface> {
               size: uniqueValues > 8 ? 8 : uniqueValues,
             },
           })
-          .then((result:any) => this.showback(target, result.data));
+          .then((result: any) => this.showback(target, result.data));
       }
       return;
     }
@@ -74,7 +76,7 @@ export default class SimplifiedView extends Component<Interface> {
     this.showHistograms = true;
   };
 
-  showback = (target, result, message?:any) => {
+  showback = (target, result, message?: any) => {
     this.chartData = {
       ...this.chartData,
       [target]: result,
@@ -118,7 +120,7 @@ export default class SimplifiedView extends Component<Interface> {
           id: project.etlIndex,
         },
       })
-      .then((CorrelationMatrixData:any) => {
+      .then((CorrelationMatrixData: any) => {
         this.showCorrelation = true;
         let { type } = CorrelationMatrixData;
         CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);
@@ -152,7 +154,9 @@ export default class SimplifiedView extends Component<Interface> {
   };
 
   reloadTable = () => {
-    this.props.project.dataView().then(() => this.props.project.preTrainImportance());
+    this.props.project
+      .dataView()
+      .then(() => this.props.project.preTrainImportance());
   };
 
   handleChange = e => {
@@ -211,8 +215,9 @@ export default class SimplifiedView extends Component<Interface> {
       totalLines,
       dataViewProgress,
       importanceProgress,
+      targetUnique
     } = project;
-    const targetUnique = colType[target] === 'Categorical' ? 2 : 'N/A';
+    const targetUniques = targetUnique || NaN
     const targetData =
       colType[target] !== 'Categorical' && dataViews
         ? dataViews[target] || {}
@@ -233,10 +238,10 @@ export default class SimplifiedView extends Component<Interface> {
     const selectValue = hasNewOne
       ? customHeader.length
       : key === 0
-      ? 'all'
-      : key === 1
-      ? 'informatives'
-      : key - 2;
+        ? 'all'
+        : key === 1
+          ? 'informatives'
+          : key - 2;
     const newMapHeader = {
       ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),
       ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}),
@@ -277,7 +282,7 @@ export default class SimplifiedView extends Component<Interface> {
             >
               <span>{mapHeader[target]}</span>
             </div>
-            <div className={styles.targetCell}  onClick={this.show}>
+            <div className={styles.targetCell} onClick={this.show}>
               <img
                 src={histogramIcon}
                 className={styles.tableImage}
@@ -342,7 +347,7 @@ export default class SimplifiedView extends Component<Interface> {
                 [styles.none]: colType[target] !== 'Categorical',
               })}
             >
-              <span>{targetUnique}</span>
+              <span>{isNaN(targetUniques) ? 'N/A' : targetUniques}</span>
             </div>
             <div
               className={classnames(styles.targetCell, {
@@ -407,28 +412,20 @@ export default class SimplifiedView extends Component<Interface> {
             </select>
           </div>
           <div className={styles.newVariable}>
-            <Show
-              name = 'start_CreateANewVariable'
-            >
+            <Show name="start_CreateANewVariable">
               <div className={styles.toolButton} onClick={this.showNewVariable}>
                 <span>{EN.CreateANewVariable}</span>
               </div>
             </Show>
-
-            <Modal
-              visible={this.visible}
-              footer={null}
-              closable={false}
-              width={'65%'}
-            >
-              <CreateNewVariables
-                onClose={this.hideNewVariable}
-                addNewVariable={addNewVariable2}
-                colType={newVariableType}
-                expression={expression}
-                mapHeader={newMapHeader}
-              />
-            </Modal>
+            <CreateNewVariables
+              open={this.visible}
+              title={EN.CreateANewVariable}
+              onClose={this.hideNewVariable}
+              addNewVariable={addNewVariable2}
+              variables={newVariableType}
+              expression={expression}
+              mapHeader={newMapHeader}
+            />
           </div>
           <div
             className={classnames(styles.toolButton, styles.toolCheck)}
@@ -505,42 +502,42 @@ export default class SimplifiedView extends Component<Interface> {
               <Icon type="loading" />
             </div>
           ) : (
-            <div className={styles.tableBody}>
-              {allVariables
-                .sort((a, b) => {
-                  return preImportance
-                    ? this.sort *
-                        ((preImportance[a] || 0) - (preImportance[b] || 0))
-                    : 0;
-                })
-                .map((h, i) => {
-                  if (h === target) return null;
-                  const data = { ...dataViews, ...newVariableViews }[h] || {};
-                  // const map = targetMap || {};
-                  const importance = preImportance
-                    ? preImportance[h] || 0
-                    : 0.01;
-                  const isNew = newVariable.includes(h);
-                  return (
-                    <SimplifiedViewRow
-                      key={i}
-                      value={h}
-                      data={data}
-                      // map={map}
-                      importance={importance}
-                      mapHeader={newMapHeader}
-                      colType={variableType}
-                      project={project}
-                      isChecked={checkedVariables.includes(h)}
-                      handleCheck={this.handleCheck.bind(null, h)}
-                      lines={Math.min(Math.floor(totalLines * 0.95), 1000)}
-                      id={id}
-                      isNew={isNew}
-                    />
-                  );
-                })}
-            </div>
-          )}
+              <div className={styles.tableBody}>
+                {allVariables
+                  .sort((a, b) => {
+                    return preImportance
+                      ? this.sort *
+                      ((preImportance[a] || 0) - (preImportance[b] || 0))
+                      : 0;
+                  })
+                  .map((h, i) => {
+                    if (h === target) return null;
+                    const data = { ...dataViews, ...newVariableViews }[h] || {};
+                    // const map = targetMap || {};
+                    const importance = preImportance
+                      ? preImportance[h] || 0
+                      : 0.01;
+                    const isNew = newVariable.includes(h);
+                    return (
+                      <SimplifiedViewRow
+                        key={i}
+                        value={h}
+                        data={data}
+                        // map={map}
+                        importance={importance}
+                        mapHeader={newMapHeader}
+                        colType={variableType}
+                        project={project}
+                        isChecked={checkedVariables.includes(h)}
+                        handleCheck={this.handleCheck.bind(null, h)}
+                        lines={Math.min(Math.floor(totalLines * 0.95), 1000)}
+                        id={id}
+                        isNew={isNew}
+                      />
+                    );
+                  })}
+              </div>
+            )}
         </div>
         {(dataViewsLoading || preImportanceLoading) && (
           <ProcessLoading

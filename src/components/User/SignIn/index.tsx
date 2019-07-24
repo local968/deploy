@@ -26,7 +26,7 @@ const header = (props) => {
   )
 };
 
-function showConfirm(props, email, password) {
+function showConfirm(props, email, password,userStore) {
   confirm({
     width: 400,
     icon: '',
@@ -36,12 +36,26 @@ function showConfirm(props, email, password) {
     onOk() {
       props.userStore.isCheck ? localStorage.setItem('checked', String(true)) : null;
       props.userStore.change('isWatchVideo')(true);
+
+      userStore.status = 'login';
+      userStore.getStatus();
+
       props.userStore.login({ email, password }, props);
+      props && props.history.push({
+        pathname: '/support', state: {
+          key
+            : 'loginTo'
+        }
+      });
       props.userStore.change('tabKey')('2');
     },
     onCancel() {
       props.userStore.isCheck ? localStorage.setItem('checked', String(true)) : null;
       props.userStore.change('isWatchVideo')(false);
+
+      userStore.status = 'login';
+      userStore.getStatus();
+
       props.userStore.login({ email, password });
     },
   });
@@ -88,11 +102,19 @@ export default class SignIn extends Component {
     }
     const isShowModal = localStorage.getItem('checked');
     const {userStore} = this.props as any;
-    if (!isShowModal) {
-      showConfirm(this.props, email, password)
-    } else {
-      userStore.login({ email, password })
-    }
+    userStore.login({ email, password }).then((res: any) => {
+      if (res.data.status === 200) {
+        if (!isShowModal) {
+          showConfirm(this.props, email, password,userStore)
+        } else {
+          userStore.status = 'login';
+          userStore.getStatus();
+        }
+        userStore.info = res.data.info;
+      } else {
+        alert(res.data.message || 'Login failure')
+      }
+    })
   };
 
   onKeyUp = (event) => {
