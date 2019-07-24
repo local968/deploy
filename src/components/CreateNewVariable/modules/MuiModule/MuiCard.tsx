@@ -10,13 +10,19 @@ const useStyles = makeStyles({
 
 interface InterfaceMuiCardProps {
   children: React.ReactNode;
+  style?;
+  className?;
 }
 
 export default function MuiCard(props: InterfaceMuiCardProps) {
   // initial styles
   const classes = useStyles({});
 
-  const { children } = props;
+  const { children, style, className } = props;
 
-  return <div className={classes.card}>{children}</div>;
+  return (
+    <div className={`${classes.card} ${className}`} style={style}>
+      {children}
+    </div>
+  );
 }
