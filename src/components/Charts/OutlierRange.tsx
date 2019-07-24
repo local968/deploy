@@ -305,10 +305,13 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
 		const _high = Math.min(_max,end).toFixed(2);
     const [startValue,endValue] = sliderValue;
 
-		const _interval = (high-low)/ 10;
+		// const _interval = (high-low)/ 10;
 
-		const __max = +(Math.max(endValue,+max+ 2 * +_interval));
-		const __min = +(Math.min(startValue,+min- 2 * +_interval));
+		// const __max = +(Math.max(endValue,+max+ 2 * +interval));
+		// const __min = +(Math.min(startValue,+min- 2 * +interval));
+
+		const __max = max;
+		const __min = min;
 
     return [
 			<div key="div" className={styles.outlierTop}>
@@ -354,7 +357,6 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
           {EN.ChartDisplayRange}:
           <section>
             <InputNum
-              min={__min}
               max={endValue}
               precision={3}
               value={startValue}
@@ -374,7 +376,6 @@ export default class OutlierRange extends PureComponent<DataSampleProps>{
           <section>
             <InputNum
               min={startValue}
-              max={__max}
               precision={3}
               value={endValue}
               style={{ minWidth: 100 }}
