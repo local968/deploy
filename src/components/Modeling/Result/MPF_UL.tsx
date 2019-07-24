@@ -11,6 +11,7 @@ import { toJS } from 'mobx';
 interface Interface {
 	project:any
 	model:any
+	mismatchArray:Array<Object>
 }
 @observer
 export default class MPF_UL extends Component<Interface> {
@@ -175,47 +176,14 @@ export default class MPF_UL extends Component<Interface> {
 
 	DQFData(data,title,showTarget,outlier=false){
 		const { colType,target,dataViews,outlierDictTemp,mapHeader} = this.props.project;
+		const {mismatchArray} = this.props;
+
 		if(!showTarget){
 			Reflect.deleteProperty(data,target)
 		}
 		const values = Object.entries(data);
 
-		const mismatchArray =  [{
-			value: 'mode',
-			label: EN.Replacewithmostfrequentvalue
-		}, {
-			value: 'drop',
-			label: EN.Deletetherows
-		}, {
-			value: 'ignore',//Categorical
-			label: EN.Replacewithauniquevalue
-		}, {
-			value: 'ignore',
-			label: EN.DoNothing
-		},{
-			value: 'mean',
-			label: EN.Replacewithmeanvalue
-		},{
-			value: 'min',
-			label: EN.Replacewithminvalue
-		}, {
-			value: 'max',
-			label: EN.Replacewithmaxvalue
-		}, {
-			value: 'median',
-			label: EN.Replacewithmedianvalue
-		}, {
-			value: 'zero',
-			label: EN.ReplaceWith0
-		}, {
-			value: 'others',
-			label: EN.Replacewithothers
-		},{
-			value: 'respective',
-			label: EN.ReplaceRespective
-		}];
-
-		const result:any = mismatchArray.map(itm=>({
+		const result:any = mismatchArray.map((itm:any)=>({
 			type:itm.value,
 			key:itm.label,
 			data:[],
