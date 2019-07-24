@@ -395,7 +395,7 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             {Object.keys(outlierRow).length > 1 && <div className={styles.batch}>
               <Select className={styles.batchSelect} placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('outlier')}>
-                {strArray.map(item => {
+                {outArray.map(item => {
                   if (isTarget && item.value === 'column') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
