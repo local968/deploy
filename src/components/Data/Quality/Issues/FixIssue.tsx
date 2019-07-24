@@ -353,9 +353,6 @@ class FixIssue extends Component<FixIssueProps> {
                   value: 'drop',
                   label: EN.Deletetherows
                 }, {
-                  value: 'column',
-                  label: EN.Deletethecolumn
-                }, {
                   value: 'mean',
                   label: EN.Replacewithmeanvalue
                 }, {
