@@ -36,6 +36,8 @@ const useStyles = makeStyles({
     borderRadius: '0.75rem',
     fontSize: '0.875rem',
     color: '#000',
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
   },
   categorical: {
     backgroundColor: blue[100],
@@ -62,6 +64,7 @@ function Variables(props: VariablesProps) {
   // initial state
   const [state, setState] = React.useState({ filterStr: '' });
 
+  // search variable
   const _onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...state,
@@ -78,9 +81,8 @@ function Variables(props: VariablesProps) {
   return (
     <MuiCard>
       <TextField
+        margin={'normal'}
         className={classes.textFiled}
-        onChange={_onSearch}
-        margin="normal"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -88,12 +90,18 @@ function Variables(props: VariablesProps) {
             </InputAdornment>
           ),
         }}
+        onChange={_onSearch}
       />
-      <List component={'div'} dense disablePadding className={classes.list}>
+      <List
+        component={'div'}
+        disablePadding
+        dense={true}
+        className={classes.list}
+      >
         {_.map(values, (v: Coordinate, i: number) => (
           <ListItem
-            button
             component={'div'}
+            button
             key={i}
             onClick={handleClick.bind(null, v, null)}
           >

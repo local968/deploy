@@ -31,11 +31,13 @@ const useStyles = makeStyles({
     padding: '0 1rem',
   },
   listItemTitle: {
+    fontSize: '.875rem',
     fontWeight: 'bold',
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
   },
   nested: {
-    paddingLeft: 44,
+    paddingLeft: '2rem',
   },
 });
 
@@ -88,9 +90,8 @@ function Functions(props: InterfaceFunctionProps) {
   return (
     <MuiCard>
       <TextField
+        margin={'normal'}
         className={classes.textFiled}
-        onChange={_onSearch}
-        margin="normal"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -98,25 +99,31 @@ function Functions(props: InterfaceFunctionProps) {
             </InputAdornment>
           ),
         }}
+        onChange={_onSearch}
       />
-      <List component={'div'} dense disablePadding className={classes.list}>
+      <List
+        component={'div'}
+        disablePadding
+        dense={true}
+        className={classes.list}
+      >
         {_.map(values, (v, i) => (
           <div key={i}>
-            <ListItem
-              button
-              component={'div'}
-              onClick={() => onCosClick(i)}
-            >
-              <ListItemText primary={Reflect.get(EN, i)} className={classes.listItemTitle} disableTypography={true}/>
+            <ListItem component={'div'} button onClick={() => onCosClick(i)}>
+              <ListItemText
+                primary={Reflect.get(EN, i)}
+                className={classes.listItemTitle}
+                disableTypography={true}
+              />
               {state[i] ? <ExpandMore /> : <ExpandLess />}
             </ListItem>
             <Collapse in={state[i]} unmountOnExit>
-              <List component={'div'} dense disablePadding>
+              <List component={'div'} disablePadding dense>
                 {_.map(v, (val: Coordinate, index: number) => {
                   return (
                     <ListItem
-                      button
                       component={'div'}
+                      button
                       key={`${i}-${index}`}
                       className={classes.nested}
                       onMouseOver={() => onMouseOver(val.value)}

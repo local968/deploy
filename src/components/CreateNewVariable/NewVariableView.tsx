@@ -28,6 +28,7 @@ const Subtitle = props => (
 // Custom Container
 const MyContainer = styled(Container)({
   minWidth: 360,
+  padding: 0
 });
 
 // Custom Grid
@@ -130,13 +131,7 @@ export class NewVariableView extends React.Component<
         </Container>
 
         <Grid container spacing={3} component={'div'}>
-          <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
-            <Subtitle>{EN.FormField}</Subtitle>
-            <Variables
-              handleClick={this.handleVariables}
-              variables={this.variables}
-            />
-          </Grid>
+
           <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
             <Subtitle>{EN.Function}</Subtitle>
             <Functions
@@ -145,10 +140,20 @@ export class NewVariableView extends React.Component<
               functions={functions}
             />
           </Grid>
+
+          <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
+            <Subtitle>{EN.FormField}</Subtitle>
+            <Variables
+              handleClick={this.handleVariables}
+              variables={this.variables}
+            />
+          </Grid>
+
           <Grid item xs={6} md={6} component={MyGrid} zeroMinWidth>
             <Subtitle>{EN.ProjectDescription}</Subtitle>
             <Summary detailKey={detailKey} />
           </Grid>
+
         </Grid>
       </>
     );
