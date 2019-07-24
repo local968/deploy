@@ -137,7 +137,10 @@ router.post('/sample', (req, res) => {
   redis.get(`file:sample:${filename}`, (err, data) => {
     if (err) return res.json({ status: 201, message: 'file error' });
     if (!data) return res.json({ status: 202, message: 'file not exist' });
-    return res.json({ status: 200, message: 'ok', data: _.isPlainObject(data) ? JSON.parse(data) : data });
+    try {
+      data = JSON.parse(data)
+    } catch (e) { }
+    return res.json({ status: 200, message: 'ok', data });
   });
   return undefined;
 });
@@ -190,7 +193,7 @@ router.get('/reload', async (req, res) => {
   const { userId } = req.session;
   const result = await userService.status(userId);
 
-  if(result&&result.drole&&result.drole.Reload){
+  if (result && result.drole && result.drole.Reload) {
     saveSample(true);
     return res.json({
       status: 100,
