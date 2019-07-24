@@ -1394,7 +1394,8 @@ button.activeButton span {
 span.reset {
 	color: #1890ff;
 	cursor: pointer;
-	margin-left: auto;
+	margin-left: 20px;
+	text-decoration: underline;
 }
 
 .batch {
