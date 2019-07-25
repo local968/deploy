@@ -148,6 +148,10 @@ const ClusteringTable = (props: ClusteringTableProps) => {
     return [..._models.filter(_m => _m.dbscanClusters >= 2).sort(sortMethods), ..._models.filter(_m => _m.dbscanClusters < 2)]
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
+  const modelElements = useMemo(() => {
+    return models.reduce((els, m, i) => ({ ...els, [m.id]: <ClusteringTableRow model={m} project={project} key={i} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} /> }), {})
+  }, [detailArr])
+
   return <div className={styles.main}>
     <div className={styles.header}>
       {Headers.map((h, i) => {
@@ -173,7 +177,7 @@ const ClusteringTable = (props: ClusteringTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {filtedModels.map((m, i) => <ClusteringTableRow model={m} project={project} key={i} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.map(m => modelElements[m.id])}
     </div>
   </div>
 }
