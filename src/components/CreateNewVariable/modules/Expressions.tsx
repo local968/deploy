@@ -18,7 +18,7 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import { Exp, Coordinate, Type } from '../types/Coordinate';
-import Expression from '../Expression';
+import Expression from './Expression';
 
 import EN from '../../../constant/en';
 
@@ -206,10 +206,10 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell style={{width: 252}}>{EN.Variablename}</TableCell>
-              <TableCell style={{width: 10}} />
-              <TableCell style={{width: 360}}>{EN.formula}</TableCell>
-              <TableCell align={'right'}/>
+              <TableCell style={{ width: 252 }}>{EN.Variablename}</TableCell>
+              <TableCell style={{ width: 10 }} />
+              <TableCell style={{ width: 360 }}>{EN.formula}</TableCell>
+              <TableCell align={'right'} />
             </TableRow>
           </TableHead>
           <TableBody>

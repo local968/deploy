@@ -37,13 +37,14 @@ const useStyles = makeStyles({
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
   },
   nested: {
+    fontSize: '1rem',
     paddingLeft: '2rem',
   },
 });
 
 interface InterfaceFunctionProps {
-  onClick?: (v: Coordinate, i: null) => void;
-  onMouseOver?: (v?: string) => void;
+  handleClick?;
+  handleMouseOver?;
   functions?: { [key: string]: Array<Coordinate> };
 }
 
@@ -58,7 +59,7 @@ function Functions(props: InterfaceFunctionProps) {
   // initial styles
   const classes = useStyles({});
 
-  const { onClick, onMouseOver, functions } = props;
+  const { handleClick, handleMouseOver, functions } = props;
 
   // initial state
   const [state, setState] = React.useState({
@@ -126,7 +127,8 @@ function Functions(props: InterfaceFunctionProps) {
                       button
                       key={`${i}-${index}`}
                       className={classes.nested}
-                      onMouseOver={() => onMouseOver(val.value)}
+                      onClick={handleClick.bind(this, val.value)}
+                      onMouseOver={handleMouseOver.bind(this, val.value)}
                     >
                       <ListItemText primary={val.name} />
                     </ListItem>

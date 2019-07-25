@@ -30,7 +30,7 @@ const MyContainer = styled(Container)({
   minWidth: 600,
   margin: '1.2rem 0',
   paddingRight: 0,
-  paddingLeft: 0
+  paddingLeft: 0,
 });
 
 // Custom Grid
@@ -66,12 +66,14 @@ export class NewVariableView extends React.Component<
       detailKey: '',
       exps: [{ value: [], label: '', range: [0, 0] }],
       index: 0,
-      func: ''
+      func: '',
     };
   }
 
-  public handleVariables = () => {};
-  public handleFunctions = () => {};
+  public handleVariables = (v) => {
+    console.log(v)
+  };
+  public handleClick = () => {};
   public handleFunction = () => {};
   public changeExpLabel = () => {};
   public setRange = () => {};
@@ -83,7 +85,7 @@ export class NewVariableView extends React.Component<
   public addLine = () => {};
   public deleteIndex = () => {};
 
-  public onMouseOver = v => {
+  public handleMouseOver = v => {
     console.log(v);
     this.setState({
       detailKey: v,
@@ -133,12 +135,11 @@ export class NewVariableView extends React.Component<
         </Container>
 
         <Grid container spacing={3} component={'div'}>
-
           <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
             <Subtitle>{EN.Function}</Subtitle>
             <Functions
-              onClick={this.handleFunctions}
-              onMouseOver={this.onMouseOver}
+              handleClick={this.handleClick}
+              handleMouseOver={this.handleMouseOver}
               functions={functions}
             />
           </Grid>
@@ -155,7 +156,6 @@ export class NewVariableView extends React.Component<
             <Subtitle>{EN.ProjectDescription}</Subtitle>
             <Summary detailKey={detailKey} />
           </Grid>
-
         </Grid>
       </>
     );

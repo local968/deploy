@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { Input } from '@material-ui/core';
 
-import { Exp, Coordinate, Type } from './types/Coordinate';
+import { Exp, Coordinate, Type } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   exp: {
