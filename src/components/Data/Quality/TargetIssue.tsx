@@ -23,6 +23,9 @@ interface TargetIssueProps {
 @observer
 class TargetIssue extends Component<TargetIssueProps> {
   @observable visible = false;
+  @observable missing = [];
+  @observable mismatch = [];
+  @observable outlier = [];
   @observable edit = false;
 
   backToConnect = () => {
@@ -80,6 +83,7 @@ class TargetIssue extends Component<TargetIssueProps> {
       totalRawLines,
       totalLines,
       etling,
+      reloadData,
       etlProgress,
       renameVariable,
       targetCounts,
@@ -142,6 +146,12 @@ class TargetIssue extends Component<TargetIssueProps> {
     }
     if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines)
       warnings.push(EN.Yourtargetvariableisempty);
+    const updateCondition = (column, type) => () => {
+      const index = this[type].indexOf(column)
+      if ( index !== -1 ) this[type].splice(index,1)
+      if( index === -1 ) this[type].push(column)
+      reloadData(0, 500, this.missing, this.mismatch, this.outlier)
+    }
     const cannotContinue =
       !!warnings.length ||
       (!isNum && issues.targetIssue);
@@ -277,23 +287,38 @@ class TargetIssue extends Component<TargetIssueProps> {
               <div className={classnames(styles.cell, styles.error)}>
                 {!!targetPercent.mismatch && (
                   <div
-                    className={classnames(styles.errorBlock, styles.mismatch)}
+                    className={styles.errorBlock}
+                    onClick={updateCondition(target, 'mismatch')}
                   >
+                    <div className={styles.issueBackground}>
+                      <div className={styles.mismatch}></div>
+                      <div className={classnames({[styles.issueActive]: this.mismatch.indexOf(target) !== -1 })}></div>
+                    </div>
                     <span>{targetPercent.mismatch}%</span>
                   </div>
                 )}
                 {!!targetPercent.missing && (
                   <div
-                    className={classnames(styles.errorBlock, styles.missing)}
+                    className={styles.errorBlock}
+                    onClick={updateCondition(target, 'missing')}
                   >
-                    <span>{targetPercent.missing}%</span>
+                   <div className={styles.issueBackground}>
+                     <div className={styles.missing}></div>
+                     <div className={classnames({[styles.issueActive]: this.missing.indexOf(target) !== -1 })}></div>
+                   </div>
+                   <span>{targetPercent.missing}%</span>
                   </div>
                 )}
                 {!!targetPercent.outlier && (
                   <div
-                    className={classnames(styles.errorBlock, styles.outlier)}
+                    className={styles.errorBlock}
+                    onClick={updateCondition(target, 'outlier')}
                   >
-                    <span>{targetPercent.outlier}%</span>
+                   <div className={styles.issueBackground}>
+                     <div className={styles.outlier}></div>
+                     <div className={classnames({[styles.issueActive]: this.outlier.indexOf(target) !== -1 })}></div>
+                   </div>
+                   <span>{targetPercent.outlier}%</span>
                   </div>
                 )}
               </div>

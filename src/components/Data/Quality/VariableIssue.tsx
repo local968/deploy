@@ -86,7 +86,6 @@ class VariableIssue extends Component<VariableIssueProps> {
       reloadData
     } = this.props.project;
     const updateCondition = (column, type) => () => {
-
       const index = this[type].indexOf(column)
       if ( index !== -1 ) this[type].splice(index,1)
       if(!this.multiMode) {
@@ -356,13 +355,13 @@ class VariableIssue extends Component<VariableIssueProps> {
               <span>{EN.Outlier}</span>
             </div>
           )}
-            <div className={styles.multiMode}>
+          {!!mismatchCount || !!nullCount || !!outlierCount || <div className={styles.multiMode}>
               <span>{EN.MultiMode}</span>
               <Switch
                 checked={this.multiMode}
                 onChange={this.toggleMultiMode}
               />
-            </div>
+            </div>}
           {(project.problemType !== 'Clustering' && !!target) && <div className={styles.issueTabs}>
             <div className={styles.issueTab} onClick={changeTab}>
               <span>{EN.TargetVariable}</span>
