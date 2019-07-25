@@ -355,7 +355,7 @@ class VariableIssue extends Component<VariableIssueProps> {
               <span>{EN.Outlier}</span>
             </div>
           )}
-          {!!mismatchCount || !!nullCount || !!outlierCount || <div className={styles.multiMode}>
+          {(!!mismatchCount || !!nullCount || !!outlierCount) && <div className={styles.multiMode}>
               <span>{EN.MultiMode}</span>
               <Switch
                 checked={this.multiMode}
