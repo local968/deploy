@@ -354,9 +354,9 @@ class Project {
   reloadData = async (start: number, end: number, missing: string[], mismatch: string[], outlier: string[]) => {
     const complement = (key) => key + '.' + (this.colType[key] === 'Numerical' ? 'double' : 'keyword')
     let query = [`start=${start}`, `end=${end}`]
-    if(missing.length > 0) query.push('missing=' + missing.map(complement).join(','))
-    if(mismatch.length > 0) query.push('mismatch=' + mismatch.map(complement).join(','))
-    if(outlier.length > 0) {
+    if (missing.length > 0) query.push('missing=' + missing.map(complement).join(','))
+    if (mismatch.length > 0) query.push('mismatch=' + mismatch.map(complement).join(','))
+    if (outlier.length > 0) {
       query.push('outlier=' + outlier.map(complement).join(','))
       query.push('outlierValue=' + outlier.map(key => this.rawDataView[key].low + '|' + this.rawDataView[key].high).join(','))
     }
@@ -1085,6 +1085,7 @@ class Project {
   @computed
   get targetCounts() {
     const { colValueCounts, target, nullLineCounts, targetArrayTemp, targetMapTemp } = this
+    if (!target) return {}
     const countData = { ...colValueCounts[target] }
     if (nullLineCounts[target]) countData[''] = nullLineCounts[target]
     return (!targetArrayTemp.length ? countData : targetArrayTemp.map((v, k) => {

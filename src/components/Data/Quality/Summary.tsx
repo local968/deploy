@@ -51,7 +51,7 @@ class Summary extends Component<SummaryProps> {
     let targetArr = !!targetArray.length ? targetArray : Object.keys(targetCounts)
     if (targetUnique > 0) targetArr = targetArr.slice(0, targetUnique)
     const targetIsNum = colType[target] === 'Numerical'
-    const targetClassesCount = !targetIsNum ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
+    const targetClassesCount = (!!target && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
       return sum + (targetArr.includes(k) ? v : 0)
     }, 0) + (targetArr.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
     const targetPercent = {

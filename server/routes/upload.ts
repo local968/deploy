@@ -287,6 +287,18 @@ async function checkSampleExist(name: string) {
   return !!id
 }
 
+router.get('/download/pmml', async (req, res) => {
+  const { mid, projectId } = req.query;
+  const model = await redis.hgetall(`project:${projectId}:model:${mid}`);
+  const url = model.pmml
+  if (!url) return res.status(404)
+  const { data, status } = await axios.get(url)
+  if (status !== 200) return res.status(404)
+  res.attachment(`${mid}.pmml`);
+  res.write(data)
+  return res.end()
+})
+
 router.get('/download/result', async (req, res) => {
   const { filename, mid, type, projectId, etlIndex, target } = req.query;
   // const { userId } = req.session
