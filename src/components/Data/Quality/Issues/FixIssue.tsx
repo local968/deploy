@@ -171,6 +171,14 @@ class FixIssue extends Component<FixIssueProps> {
     const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow } : variableIssues.mismatchRow
     const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow } : variableIssues.nullRow
     const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow } : variableIssues.outlierRow
+
+    let nullNum = 0
+    let nullStr = 0
+    Object.keys(nullRow).forEach(h => {
+      if (colType[h] === 'Numerical') nullNum++
+      else nullStr++
+    })
+
     const variables = [...dataHeader, ...deleteColumns]
 
     const strArray = [{
@@ -313,19 +321,19 @@ class FixIssue extends Component<FixIssueProps> {
               <span>{EN.MissingValue}</span>
             </div>
             {Object.keys(nullRow).length > 1 && <div className={styles.batch}>
-              <Select placeholder={`${EN.BatchFix}(${EN.Numerical})`} value={undefined} onSelect={this.handleSelect('null', true)} className={styles.batchSelect} >
+              {nullNum > 0 && <Select placeholder={`${EN.BatchFix}(${EN.Numerical})`} value={undefined} onSelect={this.handleSelect('null', true)} className={styles.batchSelect} >
                 {numArray.map(item => {
                   if (isTarget && item.value === 'column') return null
                   if (item.value === 'others') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
-              </Select>
-              <Select placeholder={`${EN.BatchFix}(${EN.Categorical})`} value={undefined} onSelect={this.handleSelect('null', false)} className={styles.batchSelect} >
+              </Select>}
+              {nullStr > 0 && <Select placeholder={`${EN.BatchFix}(${EN.Categorical})`} value={undefined} onSelect={this.handleSelect('null', false)} className={styles.batchSelect} >
                 {strArray.map(item => {
                   if (isTarget && item.value === 'column') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
-              </Select>
+              </Select>}
             </div>}
           </div>
           <div className={styles.fixesTable}>
