@@ -24,11 +24,8 @@ const post = (params)=>{
   } = params;
 
   return new Promise((resolve,reject)=>{
-    let req = request.post(url);
-    if(STRAPI_TOKEN){
-      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-    }
-    req.send(data)
+    request.post(url)
+      .send(data)
       .set('Content-Type', 'application/json; charset=utf-8')
       .redirects(0)
       .end(function(err, res){
