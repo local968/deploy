@@ -28,7 +28,7 @@ class Summary extends Component<SummaryProps> {
 
   render() {
     const { project, editFixes } = this.props;
-    const { mapHeader, target, colType, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { targetUnique, mapHeader, target, colType, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber((deletedCount / totalRawLines * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedLines - deletedCount) / totalRawLines * 100).toString(), 2)
     const cleanPercent = formatNumber((100 - +deletePercent - +fixedPercent).toString(), 2)
@@ -48,9 +48,10 @@ class Summary extends Component<SummaryProps> {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
-    const targetArr = !targetArray.length ? Object.keys(targetCounts).slice(0, 2) : targetArray
+    let targetArr = !!targetArray.length ? targetArray : Object.keys(targetCounts)
+    if (targetUnique > 0) targetArr = targetArr.slice(0, targetUnique)
     const targetIsNum = colType[target] === 'Numerical'
-    const targetClassesCount = (!isUnsupervised && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
+    const targetClassesCount = (!!target && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
       return sum + (targetArr.includes(k) ? v : 0)
     }, 0) + (targetArr.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
     const targetPercent = {

@@ -58,6 +58,8 @@ class NormalHeader extends Component<NormalHeaderProps> {
         </Menu.Item>
       </Menu>
     );
+    const {from} = this.props.userStore.info as any;
+
     return (
       <div className={styles.header} onClick={() => routing.push('/deploy')}>
         <div className={classnames(styles.block, styles.total)}>
@@ -92,11 +94,11 @@ class NormalHeader extends Component<NormalHeaderProps> {
           <img src={mockAvatar} alt="avatar" className={styles.avatar} />
           <div className={styles.userBottom}>
             <span className={styles.name}>{userStore.info.email}</span>
-            <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+            {!from&&<Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
               <div className={styles.down}>
                 <img src={down} alt="down" />
               </div>
-            </Dropdown>
+            </Dropdown>}
           </div>
         </div>
         {/* <div className={styles.user}>

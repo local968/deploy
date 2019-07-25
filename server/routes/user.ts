@@ -113,7 +113,11 @@ router.get('/login/:token',async(req, res) => {
       if(!(plan&&plan.level)){
         return res.send({ status:302, message: 'Your account is not available'})
       }
-      await userService.update(id,{token:''});
+      const token_overdue_time = moment().format('llll');
+
+      await userService.update(id,{
+        token_overdue_time,
+      });
 
       req.session.userId = id;
       req.session.user = {
@@ -121,6 +125,7 @@ router.get('/login/:token',async(req, res) => {
         email,
         level:plan.level,
         createdTime: createdAt,
+        token,
       };
       return res.redirect('/');
     }
@@ -184,12 +189,12 @@ router.delete('/logout', (req, res) => {
 
 router.get('/status', async (req, res) => {
   if (!req.session || !req.session.userId) return res.send({ status: 401, message: 'not login' });
-  const {userId} = req.session;
+  const {userId,user={}} = req.session;
 
   const result = await userService.status(userId);
 
   if(result&&result.id){
-    const {id,email,createdAt:createdTime,drole={},plan={}} = result;
+    const {id,email,createdAt:createdTime,drole={},plan={},from='',token} = result;
     const role = drole === null ? {}:drole;
     Reflect.deleteProperty(role,'_id');
     Reflect.deleteProperty(role,'id');
@@ -207,6 +212,8 @@ router.get('/status', async (req, res) => {
         createdTime,
         role,
         level:plan&&plan.level,
+        from,
+        block:user.token&&user.token!==token,
       }
     });
   }
@@ -245,16 +252,38 @@ router.post('/signin', async (req, res) => {
   const plans = await planService.list()||[{}];
   const plan = plans.reverse()[0];
 
-  const group = await groupService.findByName('数尊');
+  let group = await groupService.findByName('数尊');
+  if(!group){
+    await groupService.create('数尊');
+    group = await groupService.findByName('数尊');
+  }
 
   await userService.register(res,{
     email,
     plan:plan.id,
     password,
     group:group&&group.id,
+    from:"数尊",
   });
 
   return res.send('success');
+});
+
+/**
+ * 数尊 注销
+ */
+router.delete('/signout/:token', async (req, res) => {
+  let {token} = req.params;
+  const user = await userService.loginByToken(token);
+
+  if(user){
+    await userService.update(user.id,{
+      token:'',
+    });
+    return res.send('signout success');
+  }
+
+  return res.send('token error');
 });
 
 router.post('/register', async (req, res) => {

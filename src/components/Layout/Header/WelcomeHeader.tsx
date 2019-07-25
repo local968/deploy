@@ -24,7 +24,7 @@ class WelcomeHeader extends Component<WelcomeHeaderProps> {
 
   changepassword = () => {
     this.props.routing.push('/changepassword')
-  }
+  };
 
   render() {
     const menu = (
@@ -37,6 +37,8 @@ class WelcomeHeader extends Component<WelcomeHeaderProps> {
         </Menu.Item>
       </Menu>
     );
+    const {from} = this.props.userStore.info as any;
+
     return (
       <div className={styles.header}>
         <div className={styles.wheader}>
@@ -44,11 +46,11 @@ class WelcomeHeader extends Component<WelcomeHeaderProps> {
           <span className={styles.welcome}>
             {EN.Welcome}, {this.props.userStore.info.email.split('@')[0]}
           </span>
-          <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+         {!from&&<Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
             <div className={styles.down}>
               <img src={down} alt="down" />
             </div>
-          </Dropdown>
+          </Dropdown>}
         </div>
         <div className={styles.notification}>
           <img src={notificationIcon} alt="notification" />
