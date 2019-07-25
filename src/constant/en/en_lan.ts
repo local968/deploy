@@ -1350,6 +1350,8 @@ const EN_LAN = {
   NumberOfCartons: "Number of cartons",
   SetToMinimum: "Set to the minimum value of the variable",
   SetToMaximum: "Set to the maximum value of the variable",
+  DownloadPmml: 'Export PMML',
+  CannotExportPmml: 'Cannot be Exported'
 };
 
 

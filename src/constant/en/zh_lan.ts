@@ -1208,6 +1208,8 @@ const ZH_LAN = {
   NumberOfCartons: "分箱数量",
   SetToMinimum: "设置为该变量的最小值",
   SetToMaximum: "设置为该变量的最大值",
+  DownloadPmml: '导出PMML',
+  CannotExportPmml: '无法导出'
 };
 
 export default ZH_LAN;
