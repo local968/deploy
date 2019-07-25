@@ -69,8 +69,10 @@ class ProjectHeader extends Component<ProjectHeaderProps> {
         </Menu.Item>
       </Menu>
     );
-    if (!projectStore.project) return null
+    if (!projectStore.project) return null;
     const { curStep, mainStep } = projectStore.project;
+    const {from} = this.props.userStore.info as any;
+
     return (
       <div className={styles.header}>
         <div className={styles.menu}>
@@ -130,11 +132,11 @@ class ProjectHeader extends Component<ProjectHeaderProps> {
             <img src={mockAvatar} alt="avatar" className={styles.avatar} />
             <div className={styles.userBottom}>
               <span className={styles.name}>{userStore.info.email}</span>
-              <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+              {!from&&<Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
                 <div className={styles.down}>
                   <img src={down} alt="down" />
                 </div>
-              </Dropdown>
+              </Dropdown>}
             </div>
           </div>
         </div>

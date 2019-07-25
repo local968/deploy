@@ -8,6 +8,14 @@ const findByName = async name=>{
 	return result&&result[0];
 };
 
+const create = async name=>{
+  await request.post({
+    url,
+    data:{name},
+  })
+};
+
 module.exports = {
 	findByName,
+  create,
 };
