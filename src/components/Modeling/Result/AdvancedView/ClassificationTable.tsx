@@ -10,7 +10,6 @@ import { TableHeader } from './AdvancedViewTable';
 import moment from 'moment';
 import { formatNumber } from '../../../../util'
 import DetailCurves from './DetailCurves';
-import { computed } from 'mobx'
 
 const Option = Select.Option
 
@@ -174,14 +173,14 @@ const ClassificationTable = (props: ClassificationTableProps) => {
     }
   };
 
-  const filtedModels = computed(() => {
+  const filtedModels = useMemo(() => {
     let _models = [...models];
     if (currentSettingId !== 'all') {
       const currentSetting = project.settings.find(setting => setting.id === currentSettingId)
       if (currentSetting) _models = _models.filter(model => model.settingId === currentSetting.id)
     }
     return _models.sort(sortMethods)
-  })//[models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId]
+  }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const sortBy = (key: string) => () => {
     handleSort(key)
@@ -192,9 +191,12 @@ const ClassificationTable = (props: ClassificationTableProps) => {
   }
 
   const handleDetail = (s: string) => {
-    if (detailArr.includes(s)) return setDetail(detailArr.filter(d => s !== s))
+    if (detailArr.includes(s)) return setDetail(detailArr.filter(d => d !== s))
     return setDetail([...detailArr, s])
   }
+  const modelElements = useMemo(() => {
+    return models.reduce((els, m, i) => ({ ...els, [m.id]: <Row model={m} metric={metric} project={project} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
+  }, [detailArr])
 
   return <div className={styles.main}>
     <div className={styles.header}>
@@ -237,7 +239,8 @@ const ClassificationTable = (props: ClassificationTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {filtedModels.get().map((m, i) => <Row model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.map(m => modelElements[m.id])}
+      {/* {filtedModels.get().map((m, i) => <Row model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)} */}
     </div>
   </div>
 }

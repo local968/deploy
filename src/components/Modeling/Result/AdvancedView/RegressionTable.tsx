@@ -111,7 +111,7 @@ const RegressionTable = (props: RegressionTableProps) => {
   }
 
   const handleDetail = (s: string) => {
-    if (detailArr.includes(s)) return setDetail(detailArr.filter(d => s !== s))
+    if (detailArr.includes(s)) return setDetail(detailArr.filter(d => d !== s))
     return setDetail([...detailArr, s])
   }
 
@@ -199,6 +199,10 @@ const RegressionTable = (props: RegressionTableProps) => {
     return _models.sort(sortMethods)
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
+  const modelElements = useMemo(() => {
+    return models.reduce((els, m, i) => ({ ...els, [m.id]: <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
+  }, [detailArr])
+
   return <div className={styles.main}>
     <div className={styles.header}>
       {Headers.map((h, i) => {
@@ -240,7 +244,8 @@ const RegressionTable = (props: RegressionTableProps) => {
       </div>
     </div>
     <div className={styles.body}>
-      {filtedModels.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)}
+      {filtedModels.map(m => modelElements[m.id])}
+      {/* {filtedModels.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)} */}
     </div>
   </div>
 }
