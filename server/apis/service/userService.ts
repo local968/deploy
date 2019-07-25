@@ -13,7 +13,8 @@ const findByEmail = async email=>{
 	return result&&result[0];
 };
 
-const register = async (res,email,plan,password)=>{
+const register = async (res,data)=>{
+	const {email=''} = data;
 	const had = await exist(email);
 
 	if(had){
@@ -24,13 +25,7 @@ const register = async (res,email,plan,password)=>{
 	}
 	return request.post({
 		url,
-		data:{
-			email,
-			password,
-			plan,
-			// plan_used:{},
-			// drole:'master'
-		},
+		data,
 	})
 };
 
@@ -60,15 +55,9 @@ const update = async (id,data)=>{
 	});
 };
 
-const addUse = async (user_id,type,multi)=>{
-	// const user:any = await status(user_id);
-	// const {plan_used} = user;
-	//
-	// plan_used[type] = plan_used[type] || 0 + multi;
-	//
-	// return update(user_id,{
-	// 	plan_used,
-	// })
+const loginByToken = async (token)=>{
+	const result = await request.get(`${url}?token=${token}`);
+	return result&&result[0];
 };
 
 module.exports = {
@@ -77,7 +66,7 @@ module.exports = {
 	login,
 	exist,
 	update,
-	addUse,
+	loginByToken,
 	findByEmail,
 	firstLogin,
 };

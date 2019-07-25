@@ -6,7 +6,8 @@ import nodemailer from 'nodemailer';
 import config from '../../config';
 import api from '../scheduleApi';
 import wss from '../webSocket';
-const {userService,planService} = require('../apis/service');
+import uuid from 'uuid';
+const {userService,planService,groupService} = require('../apis/service');
 
 const { register } = wss;
 
@@ -42,6 +43,90 @@ const sendCodeMail = (code, to) => {
 
 const router = express.Router();
 
+/**
+ * 数尊 获取token
+ */
+router.post('/login/token', async(req, res) => {
+  const { email,password } = req.body;
+
+  if(!email||!password){
+    return res.send({ status: 500, message: 'please send email and password.' })
+  }
+
+  let user = await userService.findByEmail(email);
+
+  if(!user){
+    return res.send({ status: 404, message: 'user not exists.' })
+  }
+
+  if(user.update_password){
+    const result = await userService.firstLogin(email,password,sha256(password));
+
+    if(result&&!user.plan){
+      const plan = await planService.detail('');
+      await userService.update(user.id,{
+        plan:plan._id,
+      });
+      user = await userService.findByEmail(email);
+    }else if(!result){
+      user = null;
+    }
+  }else{
+    const _result = await userService.login(email,sha256(password));
+    user = _result[0];
+  }
+
+  if(!user){
+    return res.send({ status: 400, message: 'incorrect password.'})
+  }
+  const {plan,id} = user;
+
+  if(!(plan&&plan.level)){
+    return res.send({ status:302, message: 'Your account is not available'})
+  }
+
+  const token = uuid.v4();
+
+  const token_overdue_time = moment().add(1,'year').format('llll');
+
+
+  await userService.update(id,{
+    token,
+    token_overdue_time,
+  });
+
+  return res.send({
+    token,
+    token_overdue_time,
+  })
+});
+
+/**
+ * 数尊 使用token登录
+ */
+router.get('/login/:token',async(req, res) => {
+    const {token} = req.params;
+    const user = await userService.loginByToken(token);
+    if(user&&moment()<moment(user.token_overdue_time)){
+      const {plan,id,createdAt,email} = user;
+
+      if(!(plan&&plan.level)){
+        return res.send({ status:302, message: 'Your account is not available'})
+      }
+      await userService.update(id,{token:''});
+
+      req.session.userId = id;
+      req.session.user = {
+        id,
+        email,
+        level:plan.level,
+        createdTime: createdAt,
+      };
+      return res.redirect('/');
+    }
+    return res.send({ status:500, message: 'token is Unavailable!'})
+});
+
 router.post('/login', async(req, res) => {
   const { email, password } = req.body;
 
@@ -57,8 +142,10 @@ router.post('/login', async(req, res) => {
       await userService.update(user.id,{
         plan:plan._id,
       });
+      user = await userService.findByEmail(email);
+    }else if(!result){
+      user = null;
     }
-    user = await userService.findByEmail(email);
   }else{
     const _result = await userService.login(email,sha256(password));
     user = _result[0];
@@ -144,17 +231,51 @@ router.get('/plans',async (req,res)=>{
   })
 });
 
-router.post('/register', async (req, res) => {
-  let { email, level,plan_id } = req.body;
+/**
+ * 数尊 注册
+ */
+router.post('/signin', async (req, res) => {
+  let { email,password:_password} = req.body;
 
-  const password = sha256(req.body.password);
+  if(!email||!_password){
+    return res.send({ status: 500, message: 'please send email and password.' })
+  }
+
+  const password = sha256(_password);
+  const plans = await planService.list()||[{}];
+  const plan = plans.reverse()[0];
+
+  const group = await groupService.findByName('数尊');
+
+  await userService.register(res,{
+    email,
+    plan:plan.id,
+    password,
+    group:group&&group.id,
+  });
+
+  return res.send('success');
+});
+
+router.post('/register', async (req, res) => {
+  let { email, level,plan_id,password:_password} = req.body;
+
+  if(!email||!_password){
+    return res.send({ status: 500, message: 'please send email and password.' })
+  }
+
+  const password = sha256(_password);
   const createdTime = moment().unix();
   if(!plan_id){
     const plan = await planService.detail(plan_id);
     plan_id = plan.id;
   }
 
-  const result = await userService.register(res,email,plan_id,password);
+  const result = await userService.register(res,{
+    email,
+    plan:plan_id,
+    password
+  });
 
   const {id} = result;
 
@@ -162,7 +283,7 @@ router.post('/register', async (req, res) => {
 
   req.session.user = { id, email, level, createdTime };
 
-  res.send({
+  return res.send({
     status: 200,
     message: 'ok',
     info: { id, email,role:{} }

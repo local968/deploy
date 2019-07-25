@@ -167,10 +167,18 @@ class FixIssue extends Component<FixIssueProps> {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin } = project
+    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow } : variableIssues.mismatchRow
     const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow } : variableIssues.nullRow
     const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow } : variableIssues.outlierRow
+
+    let nullNum = 0
+    let nullStr = 0
+    Object.keys(nullRow).forEach(h => {
+      if (colType[h] === 'Numerical') nullNum++
+      else nullStr++
+    })
+
     const variables = [...dataHeader, ...deleteColumns]
 
     const strArray = [{
@@ -248,6 +256,7 @@ class FixIssue extends Component<FixIssueProps> {
               <Select placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('mismatch')} className={styles.batchSelect} >
                 {numArray.map(item => {
                   if (isTarget && item.value === 'column') return null
+                  if (item.value === 'others') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
               </Select>
@@ -269,12 +278,11 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(mismatchRow).map((k, i) => {
-                const originNum = mismatchRow[k]
-                if (!originNum) return null
-                const num = mismatchRow[k] || 0
+                const percnet = mismatchRow[k]
+                if (!percnet) return null
+                const num = mismatchLineCounts[k]
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 if (showType !== 'Numerical') return null
-                const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet.toString(), 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : rawDataView[k].mode)
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
@@ -313,18 +321,19 @@ class FixIssue extends Component<FixIssueProps> {
               <span>{EN.MissingValue}</span>
             </div>
             {Object.keys(nullRow).length > 1 && <div className={styles.batch}>
-              <Select placeholder={`${EN.BatchFix}(${EN.Numerical})`} value={undefined} onSelect={this.handleSelect('null', true)} className={styles.batchSelect} >
+              {nullNum > 0 && <Select placeholder={`${EN.BatchFix}(${EN.Numerical})`} value={undefined} onSelect={this.handleSelect('null', true)} className={styles.batchSelect} >
                 {numArray.map(item => {
                   if (isTarget && item.value === 'column') return null
+                  if (item.value === 'others') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
-              </Select>
-              <Select placeholder={`${EN.BatchFix}(${EN.Categorical})`} value={undefined} onSelect={this.handleSelect('null', false)} className={styles.batchSelect} >
+              </Select>}
+              {nullStr > 0 && <Select placeholder={`${EN.BatchFix}(${EN.Categorical})`} value={undefined} onSelect={this.handleSelect('null', false)} className={styles.batchSelect} >
                 {strArray.map(item => {
                   if (isTarget && item.value === 'column') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
-              </Select>
+              </Select>}
             </div>}
           </div>
           <div className={styles.fixesTable}>
@@ -344,12 +353,11 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(nullRow).map((k, i) => {
-                const originNum = nullRow[k]
-                if (!originNum) return null
-                const num = nullRow[k] || 0
+                const percnet = nullRow[k]
+                if (!percnet) return null
+                const num = nullLineCounts[k]
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 const options = showType === 'Numerical' ? numArray : strArray
-                const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet.toString(), 2)) + '%)'
                 const mode = !rawDataView ? 'N/A' : (showType === 'Numerical' ? 'N/A' : rawDataView[k].mode)
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
@@ -397,6 +405,7 @@ class FixIssue extends Component<FixIssueProps> {
               <Select className={styles.batchSelect} placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('outlier')}>
                 {outArray.map(item => {
                   if (isTarget && item.value === 'column') return null
+                  if (item.value === 'others') return null
                   return <Option value={item.value} key={item.value}>{item.label}</Option>
                 })}
               </Select>
@@ -418,15 +427,14 @@ class FixIssue extends Component<FixIssueProps> {
             </div>
             <div className={styles.fixesBody}>
               {Object.keys(outlierRow).map((k, i) => {
-                const originNum = outlierRow[k]
-                if (!originNum) return null
-                const num = outlierRow[k] || 0
+                const percnet = outlierRow[k]
+                if (!percnet) return null
+                const num = outlierLineCounts[k]
                 const showType = colType[k] === 'Numerical' ? 'Numerical' : 'Categorical'
                 if (showType !== 'Numerical') return null
                 const isShow = showType === 'Numerical';
                 if (!isShow) return null
                 const outlier = outlierDictTemp[k] && outlierDictTemp[k].length === 2 ? outlierDictTemp[k] : [rawDataView[k].low, rawDataView[k].high];
-                const percnet = num / (totalRawLines || 1) * 100
                 const rowText = num + ' (' + (percnet === 0 ? 0 : percnet < 0.01 ? '<0.01' : formatNumber(percnet.toString(), 2)) + '%)'
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median

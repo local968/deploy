@@ -2,14 +2,11 @@ import request from 'superagent'
 import config from '../../../config'
 const {STRAPI_TOKEN} = config;
 
-const get = (url)=>{
+const get = (url,query={})=>{
   return new Promise((resolve,reject)=>{
-    let req = request.get(url);
-    if(STRAPI_TOKEN){
-      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-    }
-
-    req.redirects(0)
+     request.get(url)
+      .redirects(0)
+       .query(query)
       .end(function(err, res){
         if (err || !res.ok) {
           resolve();
