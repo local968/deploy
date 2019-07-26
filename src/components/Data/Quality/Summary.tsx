@@ -28,7 +28,7 @@ class Summary extends Component<SummaryProps> {
 
   render() {
     const { project, editFixes } = this.props;
-    const { targetUnique, mapHeader, target, colType, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { targetUnique, mapHeader, target, colType, colValueCounts, targetArray, targetCounts, nullLineCounts, mismatchLineCounts, outlierLineCounts, dataHeader, totalRawLines, deletedCount, totalLines, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber((deletedCount / totalRawLines * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedLines - deletedCount) / totalRawLines * 100).toString(), 2)
     const cleanPercent = formatNumber((100 - +deletePercent - +fixedPercent).toString(), 2)
@@ -73,15 +73,15 @@ class Summary extends Component<SummaryProps> {
             <div className={styles.summaryCube} style={{ backgroundColor: '#e72424' }} />
             <span>{EN.TargetClassesError}</span>
           </div>}
-          {(!!targetIssuesCountsOrigin.mismatchRow || !!mismatchCount) && <div className={styles.summaryType}>
+          {(!!targetPercent.mismatch || !!mismatchCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#819ffc' }} />
             <span>{EN.DataTypeMismatch}</span>
           </div>}
-          {(!!targetIssuesCountsOrigin.nullRow || !!nullCount) && <div className={styles.summaryType}>
+          {(!!targetPercent.missing || !!nullCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#ff97a7' }} />
             <span>{EN.MissingValue}</span>
           </div>}
-          {(!!targetIssuesCountsOrigin.outlierRow || !!outlierCount) && <div className={styles.summaryType}>
+          {(!!targetPercent.outlier || !!outlierCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
             <span>{EN.Outlier}</span>
           </div>}
