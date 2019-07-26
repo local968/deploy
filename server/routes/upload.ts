@@ -680,7 +680,7 @@ function scheduleDownloadCsv(
             key => key !== '__no',
           );
           const headerTexts = [
-            ...header.filter(key => key !== '__no').map(h => mapHeader[h]),
+            ...header.filter(key => !(key === '__no' || key.toString() === '-1')).map(h => mapHeader[h]),
             ...Object.keys(row).map(v =>
               target && v.startsWith(target) ? v.replace(target, mapHeader[target]) : v
             )

@@ -357,7 +357,7 @@ const etl = async (schedule, index, stats, mapHeader) => {
   const mappingResponse = await
   axios.get(`${esServicePath}/etls/${index}/header`)
   const dataHeader = mappingResponse.data.split(',')
-  const headerArray = Object.keys(dataHeader).filter(h => h !== '__no')
+  const headerArray = dataHeader.filter(h => h !== '__no')
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
     === -1)
   if(lackHeaders.length > 0) {
