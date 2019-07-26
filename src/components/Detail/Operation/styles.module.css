@@ -124,6 +124,7 @@ span.deploymentStyle {
 }
 .alertContent {
   font-size: 1.125rem;
+  word-break: break-word;
 }
 .path {
   text-decoration: underline;
