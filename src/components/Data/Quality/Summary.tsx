@@ -53,10 +53,10 @@ class Summary extends Component<SummaryProps> {
     const targetIsNum = colType[target] === 'Numerical'
     const targetClassesCount = (!!target && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
       return sum + (targetArr.includes(k) ? v : 0)
-    }, 0) + (targetArr.includes('') ? nullLineCounts[target] : 0)) : totalRawLines
+    }, 0) + nullLineCounts[target]) : totalRawLines
     const targetPercent = {
       classesError: (totalRawLines - targetClassesCount) / totalRawLines * 100,
-      missing: (!targetIsNum ? 0 : nullLineCounts[target]) / totalRawLines * 100,
+      missing: nullLineCounts[target] / totalRawLines * 100,
       mismatch: (!targetIsNum ? 0 : mismatchLineCounts[target]) / totalRawLines * 100,
       outlier: (!targetIsNum ? 0 : outlierLineCounts[target]) / totalRawLines * 100,
     }
