@@ -1944,6 +1944,7 @@ class Project {
     this.isAbort = true
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
       const { status, message, result, id } = returnValue
+      this.isAbort = false
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
       this.setProperty({ ...result, stopModel: false })
