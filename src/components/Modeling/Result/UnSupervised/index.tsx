@@ -1214,7 +1214,6 @@ const MappingDict = observer(props => {
       encode: '',
     });
   };
-  // @ts-ignore
   const tableData = React.useMemo(() => {
     const key = mappingKey || list[0];
     const mapping = colMap[key];
@@ -1263,7 +1262,7 @@ const MappingDict = observer(props => {
       },
     ];
     return [header, ...data];
-  });
+  }, [mappingKey]);
   return (
     <div className={classes.dictBlock}>
       <div className={classes.dictClose} onClick={hideDict}>
