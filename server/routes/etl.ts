@@ -29,12 +29,12 @@ wss.register('originalStats', async (message, socket) => {
   const { userId } = socket.session;
   const { index, projectId, headers } = message;
 
-  const stats = await originalStats(userId, projectId, index, headers)
+  const stats = await originalStats(index, headers)
   if (stats.status === 200) await createOrUpdate(projectId, userId, stats.result);
   return stats
 });
 
-const originalStats = async (userId, projectId, index, headers) => {
+const originalStats = async (index, headers) => {
   const headersLn = _.get(headers, 'length');
 
   const chunkSize = _.chain(headersLn)
