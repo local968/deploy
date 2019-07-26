@@ -1182,9 +1182,6 @@ wss.register('abortTrain', (message, socket) => {
         Reflect.deleteProperty(trainModel, stopId);
         const curStopIds = stopIds.filter(si => si !== stopId);
         const statusData: StatusData = {
-          train2Finished: true,
-          train2Error: false,
-          train2ing: false,
           trainModel,
           stopIds: curStopIds,
         };
@@ -1192,7 +1189,8 @@ wss.register('abortTrain', (message, socket) => {
         if (!curStopIds.length) {
           statusData.trainModel = {};
           statusData.stopIds = [];
-          statusData.train2ing = false;
+          statusData.train2Finished = true
+          statusData.train2ing = false
           if (isModeling && !modelCounts) {
             statusData.mainStep = 3;
             statusData.curStep = 3;

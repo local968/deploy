@@ -1187,7 +1187,7 @@ class Project {
     const { target, outlierLineCounts, mismatchLineCounts, nullLineCounts, colType } = this;
     const arr = {
       mismatchRow: colType[target] !== "Categorical" ? (mismatchLineCounts[target] || 0) : 0,
-      nullRow: colType[target] !== "Categorical" ? (nullLineCounts[target] || 0) : 0,
+      nullRow: nullLineCounts[target],
       outlierRow: colType[target] !== "Categorical" ? (outlierLineCounts[target] || 0) : 0,
     }
     return arr

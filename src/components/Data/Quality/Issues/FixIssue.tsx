@@ -138,8 +138,9 @@ class FixIssue extends Component<FixIssueProps> {
     const dataRow = isTarget ? { [target]: targetIssuesCountsOrigin[`${type}Row`] } : variableIssues[`${type}Row`]
     Object.keys(dataRow).forEach(k => {
       if (type === 'null') {
+        missingReasonTemp[k] = 'none'
         const isNum = colType[k] === 'Numerical'
-        this.fillMethod.missing[k] = isNum ? 'mean' : missingReasonTemp[k] === 'blank' ? 'ignore' : 'mode'
+        this.fillMethod.missing[k] = isNum ? 'mean' : 'mode'
       } else {
         this.fillMethod[type][k] = type === 'mismatch' ? 'mean' : 'drop'
       }
