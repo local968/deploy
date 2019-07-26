@@ -279,12 +279,16 @@ const api = {
   getCleanIndex: async (schedule, index, projectId, modelName) => {
     const result = await redis.hmget(
       `project:${projectId}:model:${modelName}`,
-      'stats',
+      'stats'
     );
+    const mapHeaderResult = await redis.hmget(`project:${projectId}`,
+      'mapHeader')
     let [stats] = result;
+    let [mapHeader] = mapHeaderResult
+    mapHeader = JSON.parse(mapHeader)
     stats = JSON.parse(stats);
 
-    return await etl(schedule, index, stats);
+    return await etl(schedule, index, stats, mapHeader);
   },
 
   getDatabaseData: async (message, onProgress) => {
@@ -344,11 +348,25 @@ const api = {
   },
 };
 
-const etl = async (schedule, index, stats) => {
+const etl = async (schedule, index, stats, mapHeader) => {
   if (schedule.type === 'deployment') {
     Object.keys(stats).forEach(key => {
       if (stats[key].isTarget) delete stats[key];
     });
+  }
+  const mappingResponse = await
+  axios.get(`${esServicePath}/etls/${index}/header`)
+  const dataHeader = mappingResponse.data.split(',')
+  const headerArray = Object.keys(dataHeader).filter(h => h !== '__no')
+  const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
+    === -1)
+  if(lackHeaders.length > 0) {
+    schedule.status = 'issue';
+    schedule.updatedDate = moment().unix();
+    schedule.result = { ['processError']: `column "${lackHeaders.map(k =>
+      mapHeader[k]).join(',')}" not in data` };
+    await api.upsertSchedule(schedule);
+    return false
   }
   const response = await axios.post(
     `${esServicePath}/etls/${index}/etl`,

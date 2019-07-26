@@ -42,12 +42,23 @@ async function scheduleHandler() {
       await api.upsertSchedule(schedule);
     } else {
       // send command to python
-      const fileId = await api.getCleanIndex(
-        schedule,
-        deployment[`${schedule.type}Options`].fileId,
-        deployment.projectId,
-        deployment.modelName,
-      );
+      let fileId: any = false
+      try {
+        fileId = await api.getCleanIndex(
+          schedule,
+          deployment[`${schedule.type}Options`].fileId,
+          deployment.projectId,
+          deployment.modelName,
+        );
+      }catch(e) {
+        console.error(e)
+        schedule.status = 'issue';
+        schedule.updatedDate = moment().unix();
+        schedule.result = { ['processError']: 'etl failed' };
+        await api.upsertSchedule(schedule);
+      }
+      // etl failed
+      if(fileId === false) return
       const fileName = deployment[`${schedule.type}Options`].file;
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1];
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId);
