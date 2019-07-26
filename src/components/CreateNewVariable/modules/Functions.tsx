@@ -33,8 +33,6 @@ const useStyles = makeStyles({
   listItemTitle: {
     fontSize: '.875rem',
     fontWeight: 'bold',
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
   },
   nested: {
     fontSize: '1rem',
@@ -44,7 +42,7 @@ const useStyles = makeStyles({
 
 interface InterfaceFunctionProps {
   handleClick?;
-  handleMouseOver?;
+  handleDoubleClick?;
   functions?: { [key: string]: Array<Coordinate> };
 }
 
@@ -59,7 +57,7 @@ function Functions(props: InterfaceFunctionProps) {
   // initial styles
   const classes = useStyles({});
 
-  const { handleClick, handleMouseOver, functions } = props;
+  const { handleClick, handleDoubleClick, functions } = props;
 
   // initial state
   const [state, setState] = React.useState({
@@ -128,7 +126,7 @@ function Functions(props: InterfaceFunctionProps) {
                       key={`${i}-${index}`}
                       className={classes.nested}
                       onClick={handleClick.bind(this, val.value)}
-                      onMouseOver={handleMouseOver.bind(this, val.value)}
+                      onDoubleClick={handleDoubleClick.bind(this, val.value)}
                     >
                       <ListItemText primary={val.name} />
                     </ListItem>

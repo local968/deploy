@@ -80,9 +80,10 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
   //   });
   //   input.focus();
   // };
-  _onChangeLabel = () => (e: React.ChangeEvent<HTMLInputElement>) => {
+  public _onChangeLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.changeExpLabel(e.target.value);
   };
+
   public deleteOne = (k: number) => (
     e: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -217,8 +218,8 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
               <TableRow key={k}>
                 <TableCell>
                   <TextField
-                    label={'New Name'}
-                    // className={classes.textField}
+                    label={`Name`}
+                    className={classes.textField}
                     value={exp.label}
                     onChange={this._onChangeLabel}
                     margin={'dense'}

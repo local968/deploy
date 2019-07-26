@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { Input } from '@material-ui/core';
+import { TextField, InputAdornment } from '@material-ui/core';
 
 import { Exp, Coordinate, Type } from '../types/Coordinate';
 
@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     flex: '1 1',
     overflowX: 'hidden',
   },
-  input: {
+  textField: {
     flexWrap: 'wrap',
     backgroundColor: '#fff',
   },
@@ -101,56 +101,57 @@ function Expression(props: ExpressionProps) {
 
   return (
     <>
-      <Input
-        className={classes.input}
-        value=""
+      <TextField
+        className={classes.textField}
         onChange={handleChange}
         onKeyDown={onKeyDown}
-        // onFocus={onFocus}
         onClick={onFocus}
-        // onSelect={onSelect}
-        inputProps={{
-          id: 'expInput' + sign,
-          style: {
-            width: '3px',
-            position: 'relative',
-          },
+        margin={'dense'}
+        variant={'outlined'}
+        InputProps={{
+          // id: 'expInput' + sign,
+          // style: {
+          //   width: '6px',
+          //   position: 'relative',
+          // },
+          startAdornment: (
+            <InputAdornment position="start">
+              {startValue.map((v: Coordinate, k: number) => (
+                <Block
+                  key={k}
+                  index={k}
+                  data={v}
+                  inRange={false}
+                  onClick={onClick(k)}
+                />
+              ))}
+              {rangeValue.map((v: Coordinate, k: number) => (
+                <Block
+                  key={k}
+                  index={k + start}
+                  data={v}
+                  inRange={true}
+                  onClick={onClick(k + start)}
+                />
+              ))}
+              (((((
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              {endValue.map((v: Coordinate, k: number) => (
+                <Block
+                  key={k}
+                  index={k + end}
+                  data={v}
+                  inRange={false}
+                  onClick={onClick(k + end)}
+                />
+              ))}
+              ))))))
+            </InputAdornment>
+          ),
         }}
-        startAdornment={
-          <>
-            {startValue.map((v: Coordinate, k: number) => (
-              <Block
-                key={k}
-                index={k}
-                data={v}
-                inRange={false}
-                onClick={onClick(k)}
-              />
-            ))}
-            {rangeValue.map((v: Coordinate, k: number) => (
-              <Block
-                key={k}
-                index={k + start}
-                data={v}
-                inRange={true}
-                onClick={onClick(k + start)}
-              />
-            ))}
-          </>
-        }
-        endAdornment={
-          <>
-            {endValue.map((v: Coordinate, k: number) => (
-              <Block
-                key={k}
-                index={k + end}
-                data={v}
-                inRange={false}
-                onClick={onClick(k + end)}
-              />
-            ))}
-          </>
-        }
       />
     </>
   );
