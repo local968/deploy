@@ -25,7 +25,7 @@ export default class Loading extends Component<LoadingProps> {
           <span>{EN.TrainingS}</span>
         </div>
         {<div className={styles.trainingAbort}>
-          <div className={styles.abortButton} onClick={abortTrainByEtl}>
+          <div className={styles.abortButton} onClick={() => abortTrainByEtl()}>
             {isAbort ? <span><Icon type='loading' /></span> : <span>{EN.AbortTraining}</span>}
           </div>
         </div>}

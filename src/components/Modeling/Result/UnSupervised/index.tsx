@@ -591,6 +591,31 @@ const OutlierTable = observer(props => {
             />
           );
         })}
+        {!train2Finished && <div className={classes.rowData}>
+          <div className={classes.trainingModel}>
+            <Tooltip title={EN.ModelProcessing}>
+              {EN.ModelProcessing}
+            </Tooltip>
+          </div>
+          <Show
+            name='result_abortButton_UN_OUT'
+          >
+            <div
+              className={`${classes.abortButton} ${classes.abortButtonAll}`}
+              onClick={
+                !isAbort
+                  ? () => project.abortTrainByEtl()
+                  : null
+              }
+            >
+              {isAbort ? (
+                <Icon type="loading" />
+              ) : (
+                  <span>{EN.AbortTrainingAll}</span>
+                )}
+            </div>
+          </Show>
+        </div>}
         {!train2Finished &&
           stopIds.map((stopId, k) => {
             const trainingModel = trainModel[stopId];
@@ -598,8 +623,8 @@ const OutlierTable = observer(props => {
             return (
               <div className={classes.rowData} key={k}>
                 <div className={classes.trainingModel}>
-                  <Tooltip title={EN.TrainingNewModel}>
-                    {EN.TrainingNewModel}
+                  <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
+                    {trainingModel.actionKey || EN.TrainingNewModel}
                   </Tooltip>
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />
@@ -1030,6 +1055,31 @@ const ClusteringTable = observer(props => {
             />
           );
         })}
+        {!train2Finished && <div className={classes.rowData}>
+          <div className={classes.trainingModel}>
+            <Tooltip title={EN.ModelProcessing}>
+              {EN.ModelProcessing}
+            </Tooltip>
+          </div>
+          <Show
+            name='result_abortButton_UN_AGGRE'
+          >
+            <div
+              className={`${classes.abortButton} ${classes.abortButtonAll}`}
+              onClick={
+                !isAbort
+                  ? () => project.abortTrainByEtl()
+                  : null
+              }
+            >
+              {isAbort ? (
+                <Icon type="loading" />
+              ) : (
+                  <span>{EN.AbortTrainingAll}</span>
+                )}
+            </div>
+          </Show>
+        </div>}
         {!train2Finished &&
           stopIds.map((stopId, k) => {
             const trainingModel = trainModel[stopId];
@@ -1037,8 +1087,8 @@ const ClusteringTable = observer(props => {
             return (
               <div className={classes.rowData} key={k}>
                 <div className={classes.trainingModel}>
-                  <Tooltip title={EN.TrainingNewModel}>
-                    {EN.TrainingNewModel}
+                  <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
+                    {trainingModel.actionKey || EN.TrainingNewModel}
                   </Tooltip>
                 </div>
                 <ProgressBar progress={trainingModel.value || 0} />

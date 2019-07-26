@@ -822,7 +822,8 @@ class Project {
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      await this.abortTrainByEtl()
+      await this.abortTrainByEtl(false)
+      this.models = []
       //全部恢复到problem步骤
       const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, updObj, {
         mainStep: 2,
@@ -842,8 +843,8 @@ class Project {
   @action
   fastTrackInit = async (data: UploadProps) => {
 
-    await this.abortTrainByEtl()
-
+    await this.abortTrainByEtl(false)
+    this.models = []
     const api = await socketStore.ready()
     const { header } = await api.getHeader({ index: data.originalIndex })
 
@@ -936,7 +937,8 @@ class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    await this.abortTrainByEtl()
+    await this.abortTrainByEtl(false)
+    this.models = []
     const data: {
       target: string,
       colType: StringObject,
@@ -1006,7 +1008,8 @@ class Project {
   endQuality = async () => {
     if (!this.qualityHasChanged) return
     this.etling = true
-    await this.abortTrainByEtl()
+    await this.abortTrainByEtl(false)
+    this.models = []
     const data: {
       targetMap: NumberObject,
       targetArray: string[],
@@ -1927,7 +1930,7 @@ class Project {
     })
   }
 
-  abortTrain = (stopId: string, isLoading: boolean = false) => {
+  abortTrain = (stopId: string, isModeling: boolean = true) => {
     if (!stopId) return Promise.resolve()
     if (this.stopModel) return Promise.resolve()
     this.stopModel = true
@@ -1935,7 +1938,7 @@ class Project {
       command: 'stop',
       action: 'train',
       projectId: this.id,
-      isLoading,
+      isModeling,
       stopId
     }
     this.isAbort = true
@@ -1947,11 +1950,11 @@ class Project {
     }))
   }
 
-  abortTrainByEtl = async () => {
-    this.models = []
+  abortTrainByEtl = async (isModeling: boolean = true) => {
+    // this.models = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        await this.abortTrain(si)
+        await this.abortTrain(si, isModeling)
       }
       return
       // const arr = this.stopIds.map(si => this.abortTrain(si))

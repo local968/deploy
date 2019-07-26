@@ -40,10 +40,6 @@
     color:#333;
 }
 
-.modelResult dd ul,.modelResult dt ul{
-
-}
-
 
 .popover{
     max-height:200px;
@@ -839,6 +835,7 @@ span.performanceScore {
     margin: .05em auto;
     cursor: pointer;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    width: 160px;
 }
 
 .abortButton :global(.anticon) {
@@ -1381,3 +1378,8 @@ span.performanceScore {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.abortButtonAll {
+    margin: 0;
+    margin-left: auto
+  }

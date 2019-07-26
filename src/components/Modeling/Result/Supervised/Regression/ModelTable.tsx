@@ -218,6 +218,31 @@ export default class ModelTable extends Component<Interface> {
               />
             );
           })}
+          {!train2Finished && <div className={styles.rowData}>
+            <div className={styles.trainingModel}>
+              <Tooltip title={EN.ModelProcessing}>
+                {EN.ModelProcessing}
+              </Tooltip>
+            </div>
+            <Show
+              name='result_abortButton_REGRESSION'
+            >
+              <div
+                className={`${styles.abortButton} ${styles.abortButtonAll}`}
+                onClick={
+                  !isAbort
+                    ? () => project.abortTrainByEtl()
+                    : null
+                }
+              >
+                {isAbort ? (
+                  <Icon type="loading" />
+                ) : (
+                    <span>{EN.AbortTrainingAll}</span>
+                  )}
+              </div>
+            </Show>
+          </div>}
           {!train2Finished &&
             stopIds.map((stopId, k) => {
               const trainingModel = trainModel[stopId];
@@ -225,8 +250,8 @@ export default class ModelTable extends Component<Interface> {
               return (
                 <div className={styles.rowData} key={k}>
                   <div className={styles.trainingModel}>
-                    <Tooltip title={EN.TrainingNewModel}>
-                      {EN.TrainingNewModel}
+                    <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
+                      {trainingModel.actionKey || EN.TrainingNewModel}
                     </Tooltip>
                   </div>
                   <ProgressBar progress={trainingModel.value || 0} />
