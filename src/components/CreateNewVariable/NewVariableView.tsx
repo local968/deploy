@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as _ from 'lodash';
+import { observer } from 'mobx-react';
 
 import { styled } from '@material-ui/styles';
 
@@ -11,9 +12,12 @@ import Functions from './modules/Functions';
 import Summary from './modules/Summary';
 import Expressions from './modules/Expressions';
 
+// types
 import EN from '../../constant/en';
 import { Coordinate, Type } from './types/Coordinate';
+import { NewVariableStore } from './NewVariableStore';
 
+// Custom Title
 const Subtitle = props => (
   <Typography
     variant={'subtitle2'}
@@ -39,22 +43,22 @@ const MyGrid = styled(Grid)({
 });
 
 interface InterfaceNewVariableProps {
-  classes?;
-  onClose;
-  variables: string[];
-  mapHeader;
-  expression;
+  store?: NewVariableStore;
+  onClose?;
+  variables?: string[];
+  mapHeader?;
+  expression?;
   addNewVariable: (newVariables: any[], type) => Promise<boolean>;
   functions?;
+  detailKey?: string;
+  exps?;
+  index?;
+  func?;
 }
 
-interface InterfaceNewVariableState {
-  detailKey: string;
-  exps;
-  index;
-  func;
-}
+interface InterfaceNewVariableState {}
 
+@observer
 // New Variable Module
 export class NewVariableView extends React.Component<
   InterfaceNewVariableProps,
@@ -62,34 +66,39 @@ export class NewVariableView extends React.Component<
 > {
   constructor(props) {
     super(props);
-    this.state = {
-      detailKey: '',
-      exps: [{ value: [], label: '', range: [0, 0] }],
-      index: 0,
-      func: '',
-    };
+    console.log(props);
   }
 
-  public handleVariables = (v) => {
-    console.log(v)
+  public _handleVariablesClick = (
+    v: Coordinate,
+    startIndex: number | undefined,
+  ) => {
+    console.log(v, startIndex);
   };
   public handleClick = () => {};
-  public handleFunction = () => {};
-  public changeExpLabel = () => {};
+
+  public _changeExpLabel = (v: string) => {
+    // this.props.changeExpLabel(v);
+  };
   public setRange = () => {};
   public addExp = () => {};
+
   public deleteExp = () => {};
+
   public left = () => {};
   public right = () => {};
-  public setIndex = () => {};
-  public addLine = () => {};
-  public deleteIndex = () => {};
 
-  public handleMouseOver = v => {
-    console.log(v);
-    this.setState({
-      detailKey: v,
-    });
+  public setIndex = (k: number) => {};
+
+  public addLine = () => {};
+  public deleteIndex = (k: number) => {};
+
+  public _handleFunctionsDoubleClick = v => {
+    console.log(`handleFunctionsDoubleClick: ${v}`);
+  };
+
+  public _handleFunctionsClick = v => {
+    this.props.store.setDetailKey(v)
   };
 
   // return variable's list, types: Coordinate[]
@@ -106,16 +115,15 @@ export class NewVariableView extends React.Component<
   }
 
   public render() {
-    console.log(`NewVariableView`);
-    const { detailKey, exps, index, func } = this.state;
-    const { functions } = this.props;
+    // console.log(`NewVariableView`);
+    const { detailKey, exps, index, func, functions } = this.props.store;
 
     return (
       <>
         <Container component={MyContainer}>
           <Subtitle>{EN.VariableFormula}</Subtitle>
           <Expressions
-            exps={exps}
+            exps={exps as any}
             index={index}
             setIndex={this.setIndex}
             addLine={this.addLine}
@@ -125,10 +133,10 @@ export class NewVariableView extends React.Component<
             left={this.left}
             right={this.right}
             addExp={this.addExp}
-            func={func}
-            changeExpLabel={this.changeExpLabel}
-            handleFunction={this.handleFunction}
-            handleVariables={this.handleVariables}
+            func={func as any}
+            changeExpLabel={this._changeExpLabel}
+            handleFunction={this._handleFunctionsDoubleClick}
+            handleVariables={this._handleVariablesClick}
             functions={functions && [...functions.base, ...functions.senior]}
             variables={this.variables}
           />
@@ -138,16 +146,16 @@ export class NewVariableView extends React.Component<
           <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
             <Subtitle>{EN.Function}</Subtitle>
             <Functions
-              handleClick={this.handleClick}
-              handleMouseOver={this.handleMouseOver}
-              functions={functions}
+              handleDoubleClick={this._handleFunctionsDoubleClick}
+              handleClick={this._handleFunctionsClick}
+              functions={functions as any}
             />
           </Grid>
 
           <Grid item xs={6} md={3} component={MyGrid} zeroMinWidth>
             <Subtitle>{EN.FormField}</Subtitle>
             <Variables
-              handleClick={this.handleVariables}
+              handleClick={this._handleVariablesClick}
               variables={this.variables}
             />
           </Grid>

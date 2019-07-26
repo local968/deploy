@@ -18,9 +18,6 @@ const useStyles = makeStyles({
     textAlign: 'left',
     margin: '.75rem 0',
     padding: '1rem',
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-
   },
 });
 
