@@ -7,7 +7,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   TextField,
   InputAdornment,
 } from '@material-ui/core';
@@ -15,7 +14,6 @@ import {
 import { MuiCard } from './MuiModule';
 
 import { Search } from '@material-ui/icons';
-import { blue, cyan, orange } from '@material-ui/core/colors';
 
 import { Coordinate } from '../types/Coordinate';
 
@@ -29,29 +27,16 @@ const useStyles = makeStyles({
     marginTop: '0.5rem',
     padding: '0 1rem',
   },
-  textBadge: {
-    display: 'inline-block',
-    paddingRight: '0.5rem',
-    paddingLeft: '0.5rem',
-    borderRadius: '0.75rem',
-    fontSize: '0.875rem',
-    color: '#000',
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+  primary: {
+    fontSize: '1rem',
   },
-  categorical: {
-    backgroundColor: blue[100],
-  },
-  numerical: {
-    backgroundColor: cyan[100],
-  },
-  raw: {
-    backgroundColor: orange[100],
+  secondary: {
+    color: 'rgba(0, 0, 0, 0.4)',
   },
 });
 
 interface VariablesProps {
-  handleClick: (v: Coordinate, i: null) => void;
+  handleClick;
   variables: Array<Coordinate>;
 }
 
@@ -99,18 +84,15 @@ function Variables(props: VariablesProps) {
         className={classes.list}
       >
         {_.map(values, (v: Coordinate, i: number) => (
-          <ListItem
-            component={'div'}
-            button
-            key={i}
-            onClick={handleClick.bind(null, v, null)}
-          >
-            <ListItemText primary={v.name} />
-            <ListItemSecondaryAction>
-              <span className={`${classes.textBadge} ${classes[v.varType]}`}>
-                {v.varType}
-              </span>
-            </ListItemSecondaryAction>
+          <ListItem component={'li'} button key={i} onClick={handleClick.bind(this, v)}>
+            <ListItemText
+              primary={v.name}
+              secondary={v.varType}
+              classes={{
+                primary: classes.primary,
+                secondary: classes.secondary,
+              }}
+            />
           </ListItem>
         ))}
       </List>

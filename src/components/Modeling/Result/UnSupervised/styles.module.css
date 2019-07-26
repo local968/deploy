@@ -149,7 +149,9 @@
   overflow-x: visible;
   margin-left: -200px;
   padding-left: 200px;
-  max-height: 4em;
+  max-height: 4.4em;
+  padding-top: .2em;
+  padding-bottom: .2em;
 }
 
 .modelSelect {
@@ -343,6 +345,7 @@
   margin: .05em auto;
   cursor: pointer;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  width: 160px;
 }
 
 .abortButton :global(.anticon) {
@@ -704,4 +707,9 @@ span.ccellHeaderSpan{
 
 .disabled span {
   color: #ccc;
+}
+
+.abortButtonAll {
+  margin: 0;
+  margin-left: auto
 }

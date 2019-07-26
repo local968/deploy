@@ -71,7 +71,7 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 		const {projectStore:{project:{mapHeader}}} = this.props;
 
 		schema.forEach((itm,index)=>{
-			const name = mapHeader[itm]||itm;
+			const name = (mapHeader[itm]||itm).split('').map((itm,index)=>(!index||index%15)?itm:`${itm}\n`).join('');
 			parallelAxis.push({
 				dim:index+1,
 				nameLocation:'start',

@@ -431,6 +431,7 @@ const EN_LAN = {
    */
   TrainingFailed: 'Training Failed',
   AbortTraining: 'Abort Training',
+  AbortTrainingAll: 'Abort All Training',
 
   // /app-bff/src/components/Modeling/Result
   SimplifiedView: 'Simplified View',
@@ -1350,6 +1351,9 @@ const EN_LAN = {
   NumberOfCartons: "Number of cartons",
   SetToMinimum: "Set to the minimum value of the variable",
   SetToMaximum: "Set to the maximum value of the variable",
+  DownloadPmml: 'Export PMML',
+  CannotExportPmml: 'Cannot be Exported',
+  ModelProcessing: 'Processing'
 };
 
 

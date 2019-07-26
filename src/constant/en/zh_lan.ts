@@ -312,6 +312,7 @@ const ZH_LAN = {
   NotAcceptable: '未达标',
   TrainingFailed: '训练失败',
   AbortTraining: '终止训练',
+  AbortTrainingAll: '终止所有训练',
   SimplifiedView: '简单视图',
   AdvancedView: '高级视图',
   DeployTheModel: '部署模型',
@@ -1208,6 +1209,9 @@ const ZH_LAN = {
   NumberOfCartons: "分箱数量",
   SetToMinimum: "设置为该变量的最小值",
   SetToMaximum: "设置为该变量的最大值",
+  DownloadPmml: '导出PMML',
+  CannotExportPmml: '无法导出',
+  ModelProcessing: '模型训练中'
 };
 
 export default ZH_LAN;

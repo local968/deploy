@@ -87,13 +87,13 @@ class VariableIssue extends Component<VariableIssueProps> {
     } = this.props.project;
     const updateCondition = (column, type) => () => {
       const index = this[type].indexOf(column)
-      if ( index !== -1 ) this[type].splice(index,1)
-      if(!this.multiMode) {
+      if (index !== -1) this[type].splice(index, 1)
+      if (!this.multiMode) {
         this.missing = []
         this.mismatch = []
         this.outlier = []
       }
-      if( index === -1 ) this[type].push(column)
+      if (index === -1) this[type].push(column)
       reloadData(0, 500, this.missing, this.mismatch, this.outlier)
     }
     if (etling) return [];
@@ -159,7 +159,7 @@ class VariableIssue extends Component<VariableIssueProps> {
           >
             <div className={styles.issueBackground}>
               <div className={styles.mismatch}></div>
-              <div className={classnames({[styles.issueActive]: this.mismatch.indexOf(header) !== -1 })}></div>
+              <div className={classnames({ [styles.issueActive]: this.mismatch.indexOf(header) !== -1 })}></div>
             </div>
             <span>
               {variableIssues.mismatchRow[header] < 0.01
@@ -179,7 +179,7 @@ class VariableIssue extends Component<VariableIssueProps> {
           >
             <div className={styles.issueBackground}>
               <div className={styles.missing}></div>
-              <div className={classnames({[styles.issueActive]: this.missing.indexOf(header) !== -1 })}></div>
+              <div className={classnames({ [styles.issueActive]: this.missing.indexOf(header) !== -1 })}></div>
             </div>
             <span>
               {variableIssues.nullRow[header] < 0.01
@@ -199,7 +199,7 @@ class VariableIssue extends Component<VariableIssueProps> {
           >
             <div className={styles.issueBackground}>
               <div className={styles.outlier}></div>
-              <div className={classnames({[styles.issueActive]: this.outlier.indexOf(header) !== -1 })}></div>
+              <div className={classnames({ [styles.issueActive]: this.outlier.indexOf(header) !== -1 })}></div>
             </div>
             <span>
               {variableIssues.outlierRow[header] < 0.01
@@ -264,12 +264,13 @@ class VariableIssue extends Component<VariableIssueProps> {
       target,
       issues,
       dataHeader,
+      rawHeader,
       etling,
       etlProgress,
       deleteColumns,
       variableIssueCount: { nullCount, mismatchCount, outlierCount },
     } = project;
-    const header = [...dataHeader.filter(h => h !== target), ...deleteColumns]
+    const header = rawHeader.filter(h => h !== target && (dataHeader.includes(h) || deleteColumns.includes(h)))
     const tableData = this.formatTable();
     return (
       <div className={styles.quality}>
@@ -356,12 +357,12 @@ class VariableIssue extends Component<VariableIssueProps> {
             </div>
           )}
           {(!!mismatchCount || !!nullCount || !!outlierCount) && <div className={styles.multiMode}>
-              <span>{EN.MultiMode}</span>
-              <Switch
-                checked={this.multiMode}
-                onChange={this.toggleMultiMode}
-              />
-            </div>}
+            <span>{EN.MultiMode}</span>
+            <Switch
+              checked={this.multiMode}
+              onChange={this.toggleMultiMode}
+            />
+          </div>}
           {(project.problemType !== 'Clustering' && !!target) && <div className={styles.issueTabs}>
             <div className={styles.issueTab} onClick={changeTab}>
               <span>{EN.TargetVariable}</span>

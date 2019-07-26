@@ -358,7 +358,7 @@ function checkProject(userId, id) {
       return { status: 444, message: `project:${id} has been deleted` };
     }
 
-    const plist = await projectService.list(userId)||[];
+    const plist = await projectService.list(userId) || [];
 
     if (!plist.includes(id)) {
       errorLogger.error({
@@ -1158,7 +1158,7 @@ wss.register('createNewVariable', async (message, socket, progress) => {
 });
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, _id: requestId, stopId } = message;
+  const { projectId, _id: requestId, stopId, isModeling } = message;
   const { userId } = socket.session;
   return getProjectField(projectId, 'stopIds').then((stopIds = []) => {
     if (!stopIds.length) return { status: 200, message: 'ok' };
@@ -1193,7 +1193,7 @@ wss.register('abortTrain', (message, socket) => {
           statusData.trainModel = {};
           statusData.stopIds = [];
           statusData.train2ing = false;
-          if (!modelCounts) {
+          if (isModeling && !modelCounts) {
             statusData.mainStep = 3;
             statusData.curStep = 3;
             statusData.lastSubStep = 1;
@@ -1315,6 +1315,7 @@ wss.register('train', async (message, socket, progress) => {
       const stopIds = await getProjectField(projectId, 'stopIds') || [];
       const { status, result, requestId: trainId } = queueValue;
       if (status < 0 || status === 100) {
+        await createOrUpdate(projectId, userId, { stopIds: stopIds.filter(s => s !== trainId) });
         userLogger.info({
           userId,
           pid: projectId,
@@ -1391,22 +1392,6 @@ wss.register('train', async (message, socket, progress) => {
         //   modelData,
         // );
         // processValue = await addSettingModel(userId, projectId, settingId)(modelResult);
-        // return progress(model)
-      } else if (result.data) {
-        const { model: mid, action, data } = result;
-        let saveData = {};
-        if (action === 'chartData') {
-          saveData = parseChartData(data); //原始数据
-        }
-        if (action === 'pointToShow') {
-          saveData = { qcut: data };
-        }
-        processValue = await updateModel(userId, projectId, mid, saveData);
-        // return progress(model)
-      } else if (result.imageSavePath) {
-        const { model: mid, action, imageSavePath } = result;
-        const saveData = { [action]: imageSavePath };
-        processValue = updateModel(userId, projectId, mid, saveData);
         // return progress(model)
       }
       return progress(processValue);

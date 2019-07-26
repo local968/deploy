@@ -6,7 +6,7 @@ import { observable, action } from 'mobx';
 import AdvancedView from '../AdvancedView';
 import SimpleView from './SimpleView';
 import { ProgressBar, ProcessLoading } from 'components/Common';
-import { Modal, message, Button } from 'antd'
+import { Modal, message, Button, Tooltip } from 'antd'
 import EN from '../../../../constant/en';
 import { DeploymentStore } from 'stores/DeploymentStore';
 import { ProjectStore } from 'stores/ProjectStore';
@@ -120,6 +120,7 @@ export default class ModelResult extends Component<ModelResultProps> {
 
     const modelName = selectModel.modelName;
     const cannotDownload = !isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
+    const hasPmml = !!selectModel.pmml
 
     const type = isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
@@ -173,6 +174,16 @@ export default class ModelResult extends Component<ModelResultProps> {
           </button> : <a href={`/upload/download/result?projectId=${id}&filename=${encodeURIComponent(`${realName}-${selectModel.modelName}-${type}.csv`)}&mid=${selectModel.modelName}&etlIndex=${etlIndex}&type=${type}&target=${target}`} target='_blank'>
               <button className={styles.button}>
                 <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
+              </button>
+            </a>)}
+          {this.view === 'advanced' && (!hasPmml ?
+            <Tooltip title={EN.CannotExportPmml}>
+              <button className={classnames(styles.button, styles.disabled)}>
+                <span>{`${EN.DownloadPmml}`}</span>
+              </button>
+            </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+              <button className={styles.button}>
+                <span>{`${EN.DownloadPmml}`}</span>
               </button>
             </a>)}
         </div>
