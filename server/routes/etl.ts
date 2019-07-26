@@ -29,6 +29,10 @@ wss.register('originalStats', async (message, socket) => {
   const { userId } = socket.session;
   const { index, projectId, headers } = message;
 
+  return originalStats(userId, projectId, index, headers)
+});
+
+const originalStats = async (userId, projectId, index, headers) => {
   const headersLn = _.get(headers, 'length');
 
   const chunkSize = _.chain(headersLn)
@@ -169,7 +173,8 @@ wss.register('originalStats', async (message, socket) => {
     if (e.response && e.response.data) error = e.response.data;
     return { status: 500, message: 'get index stats failed', error };
   }
-});
+}
+
 
 const getProject = async (message): Promise<Project> => {
   const { projectId } = message;
@@ -392,4 +397,6 @@ wss.register('getHeader', async message => {
   return { header: data.split(',').filter(k => k !== '__no') };
 });
 
-export default {};
+export default {
+  originalStats
+};

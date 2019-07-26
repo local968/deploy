@@ -1932,8 +1932,7 @@ class Project {
 
   abortTrain = (stopId: string, isModeling: boolean = true) => {
     if (!stopId) return Promise.resolve()
-    if (this.stopModel) return Promise.resolve()
-    this.stopModel = true
+    // if (this.isAbort) return Promise.resolve()
     const command = {
       command: 'stop',
       action: 'train',
@@ -1941,27 +1940,31 @@ class Project {
       isModeling,
       stopId
     }
-    this.isAbort = true
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
+      console.log(returnValue, 'returnValue')
       const { status, message, result, id } = returnValue
-      this.isAbort = false
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
-      this.setProperty({ ...result, stopModel: false })
+      this.setProperty(result)
     }))
   }
 
   abortTrainByEtl = async (isModeling: boolean = true) => {
     // this.models = []
+    this.isAbort = true
+    const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        await this.abortTrain(si, isModeling)
+        arr.push(this.abortTrain(si, isModeling))
       }
-      return
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
     }
-    return
+
+    return Promise.all(arr).then((aa) => {
+      console.log(aa, "false")
+      this.isAbort = false
+    })
   }
 
   setModel = (data: Model, force = false) => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Hint, ProgressBar, Table, ProcessLoading } from 'components/Common';
+import { Hint, ProgressBar, Table, ProcessLoading, TrainModel } from 'components/Common';
 import classes from './styles.module.css';
 import VariableImpact from '../VariableImpact';
 import Explanation from './explanation';
@@ -620,34 +620,7 @@ const OutlierTable = observer(props => {
           stopIds.map((stopId, k) => {
             const trainingModel = trainModel[stopId];
             if (!trainingModel) return null;
-            return (
-              <div className={classes.rowData} key={k}>
-                <div className={classes.trainingModel}>
-                  <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
-                    {trainingModel.actionKey || EN.TrainingNewModel}
-                  </Tooltip>
-                </div>
-                <ProgressBar progress={trainingModel.value || 0} />
-                <Show
-                  name='result_abortButton_UN_OUT'
-                >
-                  <div
-                    className={classes.abortButton}
-                    onClick={
-                      !isAbort
-                        ? abortTrain.bind(null, trainingModel.requestId)
-                        : null
-                    }
-                  >
-                    {isAbort ? (
-                      <Icon type="loading" />
-                    ) : (
-                        <span>{EN.AbortTraining}</span>
-                      )}
-                  </div>
-                </Show>
-              </div>
-            );
+            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_UN_OUT' key={k} />
           })}
       </div>
     </div>
@@ -1084,35 +1057,7 @@ const ClusteringTable = observer(props => {
           stopIds.map((stopId, k) => {
             const trainingModel = trainModel[stopId];
             if (!trainingModel) return null;
-            return (
-              <div className={classes.rowData} key={k}>
-                <div className={classes.trainingModel}>
-                  <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
-                    {trainingModel.actionKey || EN.TrainingNewModel}
-                  </Tooltip>
-                </div>
-                <ProgressBar progress={trainingModel.value || 0} />
-                <Show
-                  name='result_abortButton_UN_AGGRE'
-                >
-                  <div
-                    className={classes.abortButton}
-                    onClick={
-                      !isAbort
-                        ? abortTrain.bind(null, trainingModel.requestId)
-                        : null
-                    }
-                  >
-                    {isAbort ? (
-                      <Icon type="loading" />
-                    ) : (
-                        <span>{EN.AbortTraining}</span>
-                      )}
-                  </div>
-                </Show>
-
-              </div>
-            );
+            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_UN_AGGRE' key={k} />
           })}
       </div>
     </div>
