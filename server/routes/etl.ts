@@ -29,7 +29,9 @@ wss.register('originalStats', async (message, socket) => {
   const { userId } = socket.session;
   const { index, projectId, headers } = message;
 
-  return originalStats(userId, projectId, index, headers)
+  const stats = await originalStats(userId, projectId, index, headers)
+  if (stats.status === 200) await createOrUpdate(projectId, userId, stats.result);
+  return stats
 });
 
 const originalStats = async (userId, projectId, index, headers) => {
@@ -165,7 +167,6 @@ const originalStats = async (userId, projectId, index, headers) => {
       etling: false,
       etlProgress: 0,
     };
-    await createOrUpdate(projectId, userId, result);
     return { status: 200, message: 'ok', result };
   } catch (e) {
     console.log({ ...e });
