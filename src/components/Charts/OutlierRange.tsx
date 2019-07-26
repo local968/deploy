@@ -93,14 +93,14 @@ export default class OutlierRange extends PureComponent<Interface>{
 
 		const [rs,re] = sliderValue;
 
-		const interval = (re-rs) / bin + 0.01;
+		const interval = (re-rs) / bin;
 
 		request.post({
 			url: '/graphics/outlier-range',
 			data: {
 				field:field + '.double',
 				id,
-				interval:+interval,
+				interval:+(interval.toFixed(3)),
 				range:sliderValue,
 			},
 		}).then((result:any) => {
@@ -223,6 +223,18 @@ export default class OutlierRange extends PureComponent<Interface>{
 			yAxis: {
 				nameTextStyle,
 			},
+			// tooltip:{
+			// 	trigger: 'axis',
+			// 	formatter:params=>{
+			// 		const {marker,value} = params[0];
+			// 		console.log(params);
+			// 		const [x,y,z] = value;
+			//
+			// 		return `
+			// 			${marker}[${x.toFixed(3)},${y.toFixed(3)}):${z}
+			// 		`;
+			// 	}
+			// },
 			toolbox:{
 				show:false,
 			},
