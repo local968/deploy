@@ -55,6 +55,8 @@ const watchQueue = async () => {
 };
 
 const clearListener = requestId => {
+  // 模拟数据
+  pubsub.emit(requestId, { abort: true });
   pubsub.removeAllListeners(requestId);
 };
 
