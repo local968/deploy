@@ -104,7 +104,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 			data: {
 				field:field + '.double',
 				id,
-				interval:+(_interval.toFixed(6)),
+				interval:+(_interval.toFixed(3)),
 				range:sliderValue,
 			},
 		}).then((result:any) => {
