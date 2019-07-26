@@ -292,11 +292,16 @@ router.get('/download/pmml', async (req, res) => {
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`);
   const url = model.pmml
   if (!url) return res.status(404).send("error")
-  const { data, status } = await axios.get(JSON.parse(url))
-  if (status !== 200) return res.status(404).send("error")
   res.attachment(`${mid}.pmml`);
-  res.write(data)
-  return res.end()
+  return http.get(JSON.parse(url), response => {
+    if (response.statusCode !== 200) res.status(404).send('error')
+    response.on('data', (str) => {
+      res.write(str)
+    })
+    response.on('end', () => {
+      res.end()
+    })
+  })
 })
 
 router.get('/download/result', async (req, res) => {

@@ -75,6 +75,7 @@ class FixIssue extends Component<FixIssueProps> {
     const { project } = this.props
     const realFillMethod: { missing?: { [key: string]: string }, mismatch?: { [key: string]: string }, outlier?: { [key: string]: string } } = {}
     const deleteColumns: Set<string> = new Set<string>()
+    const dataHeader: Set<string> = new Set<string>([...project.dataHeader, ...project.deleteColumns])
     Object.keys(this.fillMethod).forEach(k => {
       realFillMethod[k] = {}
       Object.keys(this.fillMethod[k]).forEach(field => {
@@ -83,6 +84,7 @@ class FixIssue extends Component<FixIssueProps> {
         if (value === 0 || !!value) realFillMethod[k][field] = value
       })
     })
+    project.dataHeader = [...dataHeader]
     project.deleteColumns = [...deleteColumns]
     project.nullFillMethodTemp = { ...project.nullFillMethodTemp, ...realFillMethod.missing }
     project.mismatchFillMethodTemp = { ...project.mismatchFillMethodTemp, ...realFillMethod.mismatch }
@@ -98,20 +100,15 @@ class FixIssue extends Component<FixIssueProps> {
 
   reasonSelect = (key, e) => {
     const value = e.target.value
-    const { missingReasonTemp, nullFillMethodTemp, colType } = this.props.project
-    if (value === "none") {
-      delete nullFillMethodTemp[key]
-      delete missingReasonTemp[key]
-    } else {
-      missingReasonTemp[key] = value
-      if (colType[key] === 'Categorical' && value === 'blank') {
-        nullFillMethodTemp[key] = 'ignore'
-      } else {
-        delete nullFillMethodTemp[key]
-      }
+    const { missingReasonTemp, colType } = this.props.project
+    let defaultValue = colType[key] === 'Numerical' ? 'mean' : 'mode'
+    if (colType[key] !== 'Numerical' && value === 'blank') {
+      defaultValue = 'ignore'
     }
+    missingReasonTemp[key] = value
+    this.fillMethod.missing[key] = defaultValue
     this.props.project.missingReasonTemp = { ...missingReasonTemp }
-    this.props.project.nullFillMethodTemp = { ...nullFillMethodTemp }
+    this.fillMethod.missing = { ...this.fillMethod.missing }
   }
 
   handleInput = (key, field, value) => {
@@ -137,12 +134,12 @@ class FixIssue extends Component<FixIssueProps> {
 
   handleReset = (type) => () => {
     const { project, isTarget } = this.props
-    const { target, targetIssuesCountsOrigin, variableIssues, colType } = project
+    const { target, targetIssuesCountsOrigin, variableIssues, colType, missingReasonTemp } = project
     const dataRow = isTarget ? { [target]: targetIssuesCountsOrigin[`${type}Row`] } : variableIssues[`${type}Row`]
     Object.keys(dataRow).forEach(k => {
       if (type === 'null') {
         const isNum = colType[k] === 'Numerical'
-        this.fillMethod.missing[k] = isNum ? 'mean' : 'mode'
+        this.fillMethod.missing[k] = isNum ? 'mean' : missingReasonTemp[k] === 'blank' ? 'ignore' : 'mode'
       } else {
         this.fillMethod[type][k] = type === 'mismatch' ? 'mean' : 'drop'
       }
