@@ -126,7 +126,7 @@ function Functions(props: InterfaceFunctionProps) {
                       key={`${i}-${index}`}
                       className={classes.nested}
                       onClick={handleClick.bind(this, val.value)}
-                      onDoubleClick={handleDoubleClick.bind(this, val.value)}
+                      onDoubleClick={handleDoubleClick.bind(this, val)}
                     >
                       <ListItemText primary={val.name} />
                     </ListItem>

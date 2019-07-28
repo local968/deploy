@@ -1,4 +1,5 @@
 import { action, observable } from 'mobx';
+import * as _ from 'lodash';
 
 import EN from '../../constant/en';
 
@@ -196,10 +197,17 @@ export class NewVariableStore {
     exps[index] = newExp;
   };
 
-  @action changeExpLabel(v: string) {}
+  @action changeExpLabel(v: string) {
+    this.exps[this.index].label = v;
+  }
+
   @action setDetailKey = v => {
     this.detailKey = v;
   };
+
+  @action setIndex = (k) => {
+    this.index = k;
+  }
 }
 
 export default new NewVariableStore();

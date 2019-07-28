@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 
 // modules
@@ -53,8 +52,8 @@ export default class CreateNewVariableModule extends React.Component<
             mapHeader,
             expression,
             addNewVariable,
+            functions: store.functions
           }}
-          store={store}
         />
       </MuiDialog>
     );

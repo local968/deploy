@@ -2,17 +2,18 @@ import * as React from 'react';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { TextField, InputAdornment } from '@material-ui/core';
+import { FormControl, Input } from '@material-ui/core';
 
 import { Exp, Coordinate, Type } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   exp: {
-    width: '360px',
+    width: 400,
     flex: '1 1',
     overflowX: 'hidden',
+    letterSpacing: 6,
   },
-  textField: {
+  input: {
     flexWrap: 'wrap',
     backgroundColor: '#fff',
   },
@@ -36,6 +37,10 @@ interface ExpressionProps {
   setIndex: () => void;
 }
 
+// interface ExpressionState {
+//   isDelete: boolean,
+// }
+
 function Expression(props: ExpressionProps) {
   const {
     exp,
@@ -48,8 +53,10 @@ function Expression(props: ExpressionProps) {
     sign,
     toogleTooltip,
     setIndex,
-  } = props;
-
+  } = props; //setRange
+  // const [state, setState] = React.useState({
+  //   isDelete: false
+  // } as ExpressionState)
   const {
     value,
     range: [start, end],
@@ -58,6 +65,39 @@ function Expression(props: ExpressionProps) {
   const rangeValue: Array<Coordinate> = value.slice(start, end);
   const endValue: Array<Coordinate> = value.slice(end);
   const classes = useStyles({});
+
+  const onSelect = () => {
+    const selection: any = getSelection();
+    let curRange: [Node, Node] = [selection.anchorNode, selection.extentNode];
+    let curOffset: [number, number] = [
+      selection.anchorOffset,
+      selection.extentOffset,
+    ];
+    let curIndex: Array<number> = curRange.map((n: Node) =>
+      parseInt(
+        n.parentElement ? n.parentElement.getAttribute('data-i') || '0' : '0',
+        10,
+      ),
+    );
+
+    const isRev: boolean =
+      curIndex[0] > curIndex[1] ||
+      (curIndex[0] === curIndex[1] && curOffset[0] > curOffset[1]);
+    if (isRev) {
+      curRange.reverse();
+      curIndex.reverse();
+      curOffset.reverse();
+    }
+    const left: number =
+      curIndex[0] +
+      (curOffset[0] === (curRange[0].textContent || '').length ? 1 : 0);
+    const right: number = curIndex[1] + (curOffset[1] === 0 ? 0 : 1);
+    if (start === left && end === right) {
+      //还原range
+      return console.log('same');
+    }
+    setRange(left, right);
+  };
 
   //46 8
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -101,21 +141,23 @@ function Expression(props: ExpressionProps) {
 
   return (
     <>
-      <TextField
-        className={classes.textField}
-        onChange={handleChange}
-        onKeyDown={onKeyDown}
-        onClick={onFocus}
-        margin={'dense'}
-        variant={'outlined'}
-        InputProps={{
-          // id: 'expInput' + sign,
-          // style: {
-          //   width: '6px',
-          //   position: 'relative',
-          // },
-          startAdornment: (
-            <InputAdornment position="start">
+      <FormControl className={classes.exp}>
+        <Input
+          className={classes.input}
+          onChange={handleChange}
+          onKeyDown={onKeyDown}
+          // onFocus={onFocus}
+          onClick={onFocus}
+          // onSelect={onSelect}
+          inputProps={{
+            id: 'expInput' + sign,
+            style: {
+              width: 6,
+              position: 'relative'
+            },
+          }}
+          startAdornment={
+            <>
               {startValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
@@ -134,11 +176,10 @@ function Expression(props: ExpressionProps) {
                   onClick={onClick(k + start)}
                 />
               ))}
-              (((((
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
+            </>
+          }
+          endAdornment={
+            <>
               {endValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
@@ -148,11 +189,10 @@ function Expression(props: ExpressionProps) {
                   onClick={onClick(k + end)}
                 />
               ))}
-              ))))))
-            </InputAdornment>
-          ),
-        }}
-      />
+            </>
+          }
+        />
+      </FormControl>
     </>
   );
 }
@@ -167,17 +207,19 @@ interface BlockProps {
 const blockStyle = makeStyles({
   func: {
     color: '#F4B700',
-    backgroundColor: 'rgba(244,183,0,.1)',
+    // backgroundColor: 'rgba(244,183,0,.1)',
     padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
+    letterSpacing: 0,
   },
   id: {
-    color: '#0DB3A6',
-    backgroundColor: '#eaf7f6',
+    // color: '#0DB3A6',
+    // backgroundColor: '#eaf7f6',
     padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
+    letterSpacing: 0,
   },
   selected: {
     backgroundColor: '#3f51b5',
@@ -213,6 +255,16 @@ function Block(props: BlockProps) {
       {name}
     </span>
   );
+  // <Input
+  // disableUnderline
+  // fullWidth
+  // margin='none'
+  // className={getRenderClass()}
+  // readOnly={true}
+  // value={value}
+  // data-i={index}
+  // />
+  // <span className={getRenderClass()} data-i={index}>{value}</span>
 }
 
 export default Expression;
