@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { FormControl, Input } from '@material-ui/core';
+import { FormControl, TextField, InputAdornment } from '@material-ui/core';
 
 import { Exp, Coordinate, Type } from '../types/Coordinate';
 
@@ -11,7 +11,6 @@ const useStyles = makeStyles({
     width: 400,
     flex: '1 1',
     overflowX: 'hidden',
-    letterSpacing: 6,
   },
   input: {
     flexWrap: 'wrap',
@@ -130,7 +129,7 @@ function Expression(props: ExpressionProps) {
   };
 
   const onClick = (k: number) => (e: React.MouseEvent<HTMLSpanElement>) => {
-    const input = e.currentTarget.parentElement.getElementsByTagName(
+    const input = e.currentTarget.parentElement.parentElement.getElementsByTagName(
       'input',
     )[0];
     setRange(k + 1, k + 1);
@@ -140,32 +139,47 @@ function Expression(props: ExpressionProps) {
   };
 
   return (
-    <>
-      <FormControl className={classes.exp}>
-        <Input
-          className={classes.input}
-          value={''}
-          onChange={handleChange}
-          onKeyDown={onKeyDown}
-          // onFocus={onFocus}
-          onClick={onFocus}
-          // onSelect={onSelect}
-          inputProps={{
-            id: 'expInput' + sign,
-            style: {
-              width: 2,
-              position: 'relative'
-            },
-          }}
-          startAdornment={
-            <>
+    <FormControl component={'div'} className={classes.exp}>
+      <TextField
+        className={classes.input}
+        value={''}
+        onChange={handleChange}
+        onKeyDown={onKeyDown}
+        onClick={onFocus}
+        margin={'dense'}
+        variant={'outlined'}
+        // onSelect={onSelect}
+        inputProps={{
+          id: 'expInput' + sign,
+          style: {
+            width: 1,
+            position: 'relative',
+          },
+        }}
+        InputProps={{
+          style: {
+            padding: 0,
+          },
+          startAdornment: (
+            <InputAdornment position={'start'} style={{ marginRight: 0 }}>
+              <Block
+                style={{
+                  width: '1rem',
+                  height: '1rem',
+                }}
+                key={-1}
+                index={-1}
+                data={{}}
+                inRange={false}
+                onClick={e => onClick(-1)(e)}
+              />
               {startValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
                   index={k}
                   data={v}
                   inRange={false}
-                  onClick={onClick(k)}
+                  onClick={e => onClick(k)(e)}
                 />
               ))}
               {rangeValue.map((v: Coordinate, k: number) => (
@@ -174,31 +188,43 @@ function Expression(props: ExpressionProps) {
                   index={k + start}
                   data={v}
                   inRange={true}
-                  onClick={onClick(k + start)}
+                  onClick={e => onClick(k + start)(e)}
                 />
               ))}
-            </>
-          }
-          endAdornment={
-            <>
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position={'end'} style={{ marginLeft: 0 }}>
               {endValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
                   index={k + end}
                   data={v}
                   inRange={false}
-                  onClick={onClick(k + end)}
+                  onClick={e => onClick(k + end)(e)}
                 />
               ))}
-            </>
-          }
-        />
-      </FormControl>
-    </>
+              <Block
+                style={{
+                  width: '2rem',
+                  height: '1rem',
+                }}
+                key={-1}
+                index={-1}
+                data={{}}
+                inRange={false}
+                onClick={e => onClick(endValue.length - 1 + end)(e)}
+              />
+            </InputAdornment>
+          ),
+        }}
+      />
+    </FormControl>
   );
 }
 
 interface BlockProps {
+  style?;
   index: number;
   data: Coordinate;
   inRange: boolean;
@@ -208,19 +234,13 @@ interface BlockProps {
 const blockStyle = makeStyles({
   func: {
     color: '#F4B700',
-    // backgroundColor: 'rgba(244,183,0,.1)',
-    padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
-    letterSpacing: 0,
   },
   id: {
-    // color: '#0DB3A6',
-    // backgroundColor: '#eaf7f6',
-    padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
-    letterSpacing: 0,
+    fontWeight: 'bold',
   },
   selected: {
     backgroundColor: '#3f51b5',
@@ -230,15 +250,23 @@ const blockStyle = makeStyles({
   },
   default: {
     display: 'inline-flex',
-    padding: '6px 0 7px',
+  },
+  noPadding: {
+    display: 'inline-flex',
+  },
+  padding: {
+    display: 'inline-flex',
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 });
 
 function Block(props: BlockProps) {
-  const { index, data, inRange, onClick } = props;
-  const { name, type } = data;
   const classes = blockStyle({});
 
+  const { index, data, inRange, onClick, style } = props;
+  const { name, type } = data;
+  console.log(data);
   const getRenderClass = () => {
     if (inRange) return classes.selected;
     switch (type) {
@@ -246,13 +274,24 @@ function Block(props: BlockProps) {
         return classes.func;
       case Type.ID:
         return classes.id;
+      case 'SPLIT':
+        return classes.padding;
+      case 'LPAREN':
+        return classes.padding;
+      case 'RPAREN':
+        return classes.padding;
       default:
         return classes.default;
     }
   };
 
   return (
-    <span className={getRenderClass()} data-i={index} onClick={onClick}>
+    <span
+      style={style}
+      className={getRenderClass()}
+      data-i={index}
+      onClick={onClick}
+    >
       {name}
     </span>
   );

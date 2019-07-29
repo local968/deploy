@@ -398,6 +398,8 @@ wss.register('getHeader', async message => {
   return { header: data.split(',').filter(k => k !== '__no') };
 });
 
+export { originalStats }
+
 export default {
-  originalStats
+
 };

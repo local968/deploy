@@ -1054,6 +1054,7 @@ const ZH_LAN = {
   Dontpromptforthismessage: '不再提示该信息 ',
   YES: '是',
   NO: '否',
+  Exponential: '以e为底数，以所选变量为指数的函数。',
   Logconversionofthe2: '以2为底数，对所选变量进行Log转换。',
   VarContinuousvariablestartingwiththesymbol: 'var- 连续变量，以@符号开头。',
   Description: '说明：',
@@ -1212,7 +1213,9 @@ const ZH_LAN = {
   DownloadPmml: '导出PMML',
   CannotExportPmml: '无法导出',
   ModelProcessing: '模型训练中',
-  ModelInterpretation:'模型解释'
+  ModelInterpretation: '模型解释',
+  DeploySummary: '数据报告',
+  DeploySummaryData: '查看'
 };
 
 export default ZH_LAN;
