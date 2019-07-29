@@ -202,7 +202,7 @@ function Expression(props: ExpressionProps) {
               ))}
               <Block
                 style={{
-                  width: '2rem',
+                  width: '3rem',
                   height: '1rem',
                 }}
                 key={-1}
