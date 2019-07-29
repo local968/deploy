@@ -11,7 +11,6 @@ const useStyles = makeStyles({
     width: 400,
     flex: '1 1',
     overflowX: 'hidden',
-    letterSpacing: 6,
   },
   input: {
     flexWrap: 'wrap',
@@ -153,13 +152,13 @@ function Expression(props: ExpressionProps) {
         inputProps={{
           id: 'expInput' + sign,
           style: {
-            width: 2,
+            width: 1,
             position: 'relative',
           },
         }}
         InputProps={{
           startAdornment: (
-            <InputAdornment position="start">
+            <InputAdornment position={'start'} style={{ marginRight: 0 }}>
               {startValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
@@ -181,7 +180,7 @@ function Expression(props: ExpressionProps) {
             </InputAdornment>
           ),
           endAdornment: (
-            <InputAdornment position="end">
+            <InputAdornment position={'end'} style={{ marginLeft: 0 }}>
               {endValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
@@ -209,19 +208,12 @@ interface BlockProps {
 const blockStyle = makeStyles({
   func: {
     color: '#F4B700',
-    // backgroundColor: 'rgba(244,183,0,.1)',
-    padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
-    letterSpacing: 0,
   },
   id: {
-    // color: '#0DB3A6',
-    // backgroundColor: '#eaf7f6',
-    padding: '6px 5px 7px',
     margin: ' 0 1px',
     display: 'inline-flex',
-    letterSpacing: 0,
   },
   selected: {
     backgroundColor: '#3f51b5',
@@ -231,7 +223,17 @@ const blockStyle = makeStyles({
   },
   default: {
     display: 'inline-flex',
-    padding: '6px 0 7px',
+    // padding: '6px 0 7px',
+  },
+  paddingLeft: {
+    display: 'inline-flex',
+    paddingLeft: 4,
+    paddingRight: 4,
+  },
+  paddingRight: {
+    display: 'inline-flex',
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 });
 
@@ -247,6 +249,10 @@ function Block(props: BlockProps) {
         return classes.func;
       case Type.ID:
         return classes.id;
+      case 'LPAREN':
+        return classes.paddingRight;
+      case 'RPAREN':
+        return classes.paddingLeft;
       default:
         return classes.default;
     }
