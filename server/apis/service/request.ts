@@ -9,6 +9,7 @@ const get = (url,query={})=>{
        .query(query)
       .end(function(err, res){
         if (err || !res.ok) {
+          console.log(err)
           resolve();
         } else {
           resolve(res.body);
@@ -30,6 +31,7 @@ const post = (params)=>{
       .redirects(0)
       .end(function(err, res){
         if (err || !res.ok) {
+          console.log(err);
           reject(err)
         } else {
           resolve(res.body);
@@ -45,15 +47,12 @@ const put = (params)=>{
   } = params;
 
   return new Promise((resolve,reject)=>{
-    let req = request.put(url);
-    if(STRAPI_TOKEN){
-      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-    }
-    req.send(data)
+    let req = request.put(url).send(data)
       .set('Content-Type', 'application/json; charset=utf-8')
       .redirects(0)
       .end(function(err, res){
         if (err || !res.ok) {
+          console.log(err);
           reject(err)
         } else {
           resolve(res.body);
