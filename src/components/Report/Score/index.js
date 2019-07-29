@@ -850,7 +850,7 @@ class PredictTable extends Component {
 
         {
           project.criteria === 'cost' ? <div className={styles.costBlock}>
-            <div className={styles.costClose} onClick={this.onHide}><span>+</span></div>
+            {/*<div className={styles.costClose} onClick={this.onHide}><span>+</span></div>*/}
             <section className={styles.newTitle}>
               <label>{EN.Input}</label>
               <dl>
@@ -864,7 +864,7 @@ class PredictTable extends Component {
                 <dt>
                   <div className={styles.eventInput}>
                     <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
-                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} onBlur={this.handleChangeEvent} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
+                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
                     <span style={{ marginLeft: '0.5em' }}>%</span>
                     {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
                   </div>
