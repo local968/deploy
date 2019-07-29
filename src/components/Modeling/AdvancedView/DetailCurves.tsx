@@ -61,12 +61,11 @@ export default class DetailCurves extends Component<Interface> {
     this.props.model.resetFitIndex();
     this.setState({
       show: false,
-    });
-    setTimeout(() => {
+    },()=>{
       this.setState({
         show: true,
       });
-    }, 0);
+    });
   };
 
   componentWillReceiveProps(nextProps) {

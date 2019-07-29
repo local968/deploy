@@ -3,7 +3,7 @@ import echarts from 'echarts';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash'
 
-interface DataSampleProps {
+interface Interface {
 	height:number
 	width:number
 	x_name:string
@@ -12,7 +12,7 @@ interface DataSampleProps {
 	isHoldout:boolean
 }
 
-export default class ROCCurves extends PureComponent<DataSampleProps>{
+export default class ROCCurves extends PureComponent<Interface>{
 	private chart: any;
 	state:any;
 	constructor(props){
