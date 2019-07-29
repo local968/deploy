@@ -12,7 +12,8 @@ const defaultDeploymentOptions = {
   file: {},
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null
+  autoDisable: null,
+  mapHeader: []
 };
 
 const defaultPerformanceOptions = {
@@ -23,7 +24,8 @@ const defaultPerformanceOptions = {
   metricThreshold: 0.7,
   frequency: null,
   frequencyOptions: {},
-  autoDisable: null
+  autoDisable: null,
+  mapHeader: []
 };
 
 export default class Deploy {

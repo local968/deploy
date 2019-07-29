@@ -23,6 +23,8 @@ async function scheduleHandler() {
 
     let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return;
+    schedule.mapHeader = deployment[`${schedule.type}Options`].mapHeader
+    await api.upsertSchedule(schedule)
 
     let restrictQuery;
     try {

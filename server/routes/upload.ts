@@ -648,7 +648,7 @@ router.get('/download/:scheduleId', async (req, res) => {
     filename,
     schedule.etlIndex,
     header,
-    mapHeader,
+    schedule.mapHeader.length > 0 ? schedule.mapHeader : mapHeader,
     res,
     target,
   );

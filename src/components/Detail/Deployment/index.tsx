@@ -143,6 +143,7 @@ export default class Deployment extends Component<Interface> {
         cddo.file = file.name;
         cddo.fileId = response.originalIndex;
         cddo.source = 'file';
+        cddo.mapHeader = response.rawHeader
         cd.save();
         this.uploadPercentage = 100;
         this.uploadStatus = false;

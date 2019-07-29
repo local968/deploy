@@ -17,6 +17,7 @@ export interface Schedule {
   createdDate: number;
   name?: string;
   owner?: string;
+  mapHeader?: string[];
 }
 
 const sortStrategies = {

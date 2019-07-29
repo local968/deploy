@@ -147,7 +147,12 @@ export default function EsUploader(file, option: any = {}) {
   }
 
   const getNextChunk = async () => {
-    const _header = autoFixHeader(header).filter(key => key !== '__no').map((k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
+    let plus = 0
+    const _header = autoFixHeader(header).filter(key => key !== '__no').map((k, i) => {
+      let key = option.mapHeader ? option.mapHeader.indexOf(k) : i
+      if(option.mapHeader && key === -1) return option.mapHeader.length + plus++
+      return key
+    })
     _header.unshift('__no')
     chunk.unshift(_header)
     const csvChunk = papa.unparse(chunk)

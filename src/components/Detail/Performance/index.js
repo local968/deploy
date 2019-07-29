@@ -120,6 +120,7 @@ export default class Performance extends Component {
         cdpo.file = file.name
         cdpo.fileId = response.originalIndex
         cdpo.source = 'file'
+        cdpo.mapHeader = response.rawHeader
         cd.save()
         this.uploadPercentage = 100
         this.uploadStatus = false
