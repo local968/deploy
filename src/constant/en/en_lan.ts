@@ -1193,6 +1193,7 @@ const EN_LAN = {
   Dontpromptforthismessage: "Do not display this message.",
   YES: 'Yes',
   NO: 'No',
+  Exponential: 'Exponential function with e as the natural base, and the selected variable as the exponent.',
   Logconversionofthe2: 'Logarithmic tranformation with 2 as the base.',
   VarContinuousvariablestartingwiththesymbol: 'var- numerical variable, needs to start with @.',
   Description: 'Note:',

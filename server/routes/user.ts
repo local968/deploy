@@ -283,7 +283,7 @@ router.delete('/signout/:token', async (req, res) => {
     return res.send('signout success');
   }
 
-  return res.send('token error');
+  return res.send({ status:500, message: 'token error'});
 });
 
 router.post('/register', async (req, res) => {

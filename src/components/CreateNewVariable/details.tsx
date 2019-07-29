@@ -2,7 +2,11 @@ import EN from "../../constant/en";
 export default [
   {
     "name": "Exp",
-    "value": `${EN.Syntax}exp(@var)`,
+    "value": `
+      Exp<br/>
+      ${EN.Exponential}<br/>
+      ${EN.Syntax}exp(@var)
+    `,
   },
   {
     "name": "Log2",
@@ -10,7 +14,7 @@ export default [
       Log2<br/>
       ${EN.Logconversionofthe2}<br/>
       ${EN.Syntax}<br/>
-      Log2(@var)<br/>
+      Log2(var)<br/>
       ${EN.Input}<br/>
      ${EN.VarContinuousvariablestartingwiththesymbol}<br/>
      ${EN.Output}<br/>

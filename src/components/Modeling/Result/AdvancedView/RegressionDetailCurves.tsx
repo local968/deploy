@@ -195,7 +195,7 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
       },
       {
         text: EN.ResidualPlot,
-        hoverIcon: ResidualHover,
+        hoverIcon: ResidualNormal,
         normalIcon: ResidualNormal,
         selectedIcon: ResidualSelected,
         type: 'residualplot',

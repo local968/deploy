@@ -307,7 +307,7 @@ export default class Home extends Component<Interface> {
             closeText={EN.Nop}
             content={
               this.deleteNames.length > 1
-                ? `${EN.ConfirmOfDeletManyProject}: ${this.deleteNames.map(
+                ? `${EN.ConfirmOfDeletManyProject} ${this.deleteNames.map(
                     (name) => {
                       return name.length > 40
                         ? name.slice(0, 40) + '...'

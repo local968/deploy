@@ -79,6 +79,7 @@ export default class MuiDialog extends React.Component<
 
     return (
       <Dialog
+        style={{ zIndex: 900 }}
         aria-labelledby={'customized-dialog-title'}
         scroll={scroll}
         disableBackdropClick={disableBackdropClick}
