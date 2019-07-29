@@ -106,7 +106,7 @@ export interface TrainCommand {
   showSsPlot?: boolean,
   esIndex?: string;
   settingId?: string;
-  mapHeader?: string[]
+  mapHeader?: StringObject
 }
 
 export interface DataView {
@@ -1471,7 +1471,10 @@ class Project {
     let trainData: TrainCommand = {}
 
     const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
-    const realLabel = featureLabel.map(k => mapHeader[k])
+    const realLabel = featureLabel.reduce((prev, k) => {
+      prev[k] = mapHeader[k]
+      return prev
+    }, {})
     if (!featureLabel.length) return antdMessage.error("no feature label");
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
@@ -1694,7 +1697,10 @@ class Project {
     let trainData: TrainCommand = {}
 
     const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
-    const realLabel = featureLabel.map(k => newVariable.includes(k) ? k : mapHeader[k])
+    const realLabel = featureLabel.reduce((prev, k) => {
+      prev[k] = (newVariable.includes(k) ? k : mapHeader[k])
+      return prev
+    }, {})
     if (!featureLabel.length) return antdMessage.error("no feature label")
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")

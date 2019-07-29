@@ -4,6 +4,10 @@ import moment from 'moment';
 import scheduleApi from '../scheduleApi';
 import deploy from '../schedule';
 import _ from 'lodash';
+import config = require('../../config');
+import axios from 'axios';
+import { originalStats } from './etl'
+const esServicePath = config.services.ETL_SERVICE;
 
 const fetchDeployments = userId => () =>
   redis
@@ -250,5 +254,52 @@ wss.register('updateDeploymentModel', async (message, socket) => {
   await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment));
   wss.publish(`user:${userId}:deployments`, { type: 'update model name' });
 });
+
+
+wss.register('getScheduleSummary', async (message) => {
+  const { sid, pid } = message
+  const result: any = {}
+  try {
+    const schedule = JSON.parse(await redis.get(`schedule:${sid}`))
+    const { index, modelName } = schedule
+    const { data } = await axios.get(
+      `${esServicePath}/etls/${index}/headerArray`,
+    );
+    const origin = await originalStats(index, data)
+    if (origin.error) throw new Error(origin.message)
+
+    const originResult = origin.result
+
+    const modelStats = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'stats'))
+    const featureLabel = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'featureLabel'))
+    const target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
+    const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
+
+    const {
+      data: { totalFixedCount, deletedCount },
+    } = await axios.post(
+      `${esServicePath}/etls/${index}/fixedLines`,
+      modelStats,
+    );
+
+    const { data: { count } } = await axios.get(
+      `${esServicePath}/etls/${index}/count`
+    );
+    result.totalFixedCount = totalFixedCount
+    result.deletedCount = deletedCount
+    result.featureLabel = featureLabel
+    result.colType = originResult.colType
+    result.nullLineCounts = originResult.nullLineCounts
+    result.mismatchLineCounts = originResult.mismatchLineCounts
+    result.outlierLineCounts = originResult.outlierLineCounts
+    result.dataView = originResult.rawDataView
+    result.totalCount = count
+    result.target = target
+    result.problemType = problemType
+  } catch (e) {
+    console.log(e, 'sss')
+  }
+  return { result }
+})
 
 export default {};

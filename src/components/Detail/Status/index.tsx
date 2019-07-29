@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { action } from 'mobx';
+import { action, observable } from 'mobx';
 import classnames from 'classnames';
 import moment from 'moment';
 import styles from './list.module.css';
@@ -10,16 +10,17 @@ import { Popover } from 'antd';
 import { formatNumber } from '../../../util';
 import EN from '../../../constant/en';
 import {
-  Show,
+  Show, Modal,
 } from 'components/Common';
+import Summary from '../Summary';
 
 const transferR2 = str => (str === 'R2' ? 'R²' : str);
 
 interface Interface {
-  deploymentStore:any
-  scheduleStore:any
-  routing:any
-  match:any
+  deploymentStore: any
+  scheduleStore: any
+  routing: any
+  match: any
 }
 
 @inject('scheduleStore', 'deploymentStore', 'routing')
@@ -31,12 +32,6 @@ export default class List extends Component<Interface> {
       key
     ] = value;
     return this.props.deploymentStore.currentDeployment.save();
-  };
-
-  showScore = (score, type) => {
-    let s;
-    if (score && score[type]) s = formatNumber(score[type], 2);
-    return s || 0;
   };
 
   render() {
@@ -86,7 +81,7 @@ export default class List extends Component<Interface> {
               </div>
             </div>
             <Show
-              name = 'status_operate'
+              name='status_operate'
             >
               <a
                 className={styles.edit}
@@ -118,195 +113,10 @@ export default class List extends Component<Interface> {
                 <span className={styles.threshold}>{EN.Threshold}</span>
                 <span className={styles.status}>{EN.Status}</span>
                 <span className={styles.results}>{EN.Results}</span>
+                <span className={styles.results}>{EN.DeploySummary}</span>
               </div>
               <div className={styles.list}>
-                {scheduleStore.sortedPerformanceSchedules.map(s => (
-                  <div className={styles.project} key={s.schedule.id}>
-                    <span
-                      className={styles.modelName}
-                      title={s.schedule.modelName}
-                    >
-                      {s.schedule.modelName}
-                    </span>
-                    <span className={styles.modelInvokeTime}>
-                      {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
-                        ? s.schedule.actualTime || s.schedule.estimatedTime
-                        : moment
-                            .unix(
-                              s.schedule.actualTime || s.schedule.estimatedTime,
-                            )
-                            .format('MM/DD/YYYY-hh:mma')}
-                    </span>
-
-                    <span className={styles.deploymentStyle}>
-                      {EN.Predictwith} {EN.DataSource}
-                      {/* {s.deployment.performanceOptions.source === 'file' || s.deployment.performanceOptions.source === 'database'
-                        ? EN.DataSource
-                        : EN.APISource} */}
-                    </span>
-                    <span className={styles.executionSpeed}>
-                      {s.schedule.status === 'finished'
-                        ? s.schedule.result && s.schedule.result.executeSpeed
-                        : ' - '}
-                    </span>
-
-                    {s.deployment.modelType === 'Classification' && (
-                      <span
-                        className={classnames(styles.performance, {
-                          [styles.issue]: isExcessThreshold(s.schedule),
-                        })}
-                      >
-                        {s.schedule.result && s.schedule.status === 'finished'
-                          ? `Accuracy:${this.showScore(
-                              s.schedule.result.score,
-                              'acc',
-                            )} AUC:${this.showScore(
-                              s.schedule.result.score,
-                              'auc',
-                            )} F1:${this.showScore(
-                              s.schedule.result.score,
-                              'f1',
-                            )} Precision:${this.showScore(
-                              s.schedule.result.score,
-                              'precision',
-                            )} Recall:${this.showScore(
-                              s.schedule.result.score,
-                              'recall',
-                            )}`
-                          : ' - '}
-                      </span>
-                    )}
-
-                    {s.deployment.modelType === 'Regression' && (
-                      <span
-                        className={classnames(styles.performance, {
-                          [styles.issue]: isExcessThreshold(s.schedule),
-                        })}
-                      >
-                        {s.schedule.result && s.schedule.status === 'finished'
-                          ? `MSE:${this.showScore(
-                              s.schedule.result.score,
-                              'mse',
-                            )} RMSE:${this.showScore(
-                              s.schedule.result.score,
-                              'rmse',
-                            )} R²:${this.showScore(
-                              s.schedule.result.score,
-                              'r2',
-                            )}`
-                          : ' - '}
-                      </span>
-                    )}
-
-                    {s.deployment.modelType === 'Outlier' && (
-                      <span
-                        className={classnames(styles.performance, {
-                          [styles.issue]: isExcessThreshold(s.schedule),
-                        })}
-                      >
-                        {s.schedule.result && s.schedule.status === 'finished'
-                          ? `Accuracy:${this.showScore(
-                              s.schedule.result.score,
-                              'score',
-                            )}`
-                          : ' - '}
-                      </span>
-                    )}
-
-                    {s.deployment.modelType === 'Clustering' && (
-                      <span
-                        className={classnames(styles.performance, {
-                          [styles.issue]: isExcessThreshold(s.schedule),
-                        })}
-                      >
-                        {s.schedule.result && s.schedule.status === 'finished'
-                          ? `CVNN:${this.showScore(
-                              s.schedule.result.score,
-                              'CVNN',
-                            )} CH:${this.showScore(
-                              s.schedule.result.score,
-                              'CH',
-                            )} Silhouette Score:${this.showScore(
-                              s.schedule.result.score,
-                              'silhouette_euclidean',
-                            )}`
-                          : ' - '}
-                      </span>
-                    )}
-
-                    {/*<span*/}
-                    {/*  className={classnames(styles.performance, {*/}
-                    {/*    [styles.issue]: isExcessThreshold(s.schedule)*/}
-                    {/*  })}*/}
-                    {/*>*/}
-                    {/*  {*/}
-                    {/*    s.schedule.result &&*/}
-                    {/*    s.schedule.status === 'finished' &&*/}
-                    {/*    (s.schedule.result.problemType === 'Classification'*/}
-                    {/*      ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')} F1:${this.showScore(s.schedule.result.score, 'f1')} Precision:${this.showScore(s.schedule.result.score, 'precision')} Recall:${this.showScore(s.schedule.result.score, 'recall')}`*/}
-                    {/*      : `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)*/}
-                    {/*  }*/}
-                    {/*  {*/}
-                    {/*    s.schedule.result &&*/}
-                    {/*    s.schedule.status === 'finished' &&*/}
-                    {/*    (s.schedule.result.problemType === 'Outlier'*/}
-                    {/*      ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')}`*/}
-                    {/*      : `CVNN:${this.showScore(s.schedule.result.score, 'cvnn')} CH:${this.showScore(s.schedule.result.score, 'ch')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_score')}`)*/}
-                    {/*  }*/}
-                    {/*</span>*/}
-                    <span className={styles.threshold}>
-                      <span>
-                        {s.schedule.threshold &&
-                          `${transferR2(s.schedule.threshold.type)}:`}
-                        {/*</span>*/}
-                        {/*<br />*/}
-                        {/*<span>*/}
-                        {s.schedule.threshold &&
-                          `${s.schedule.threshold.value}`}
-                      </span>
-                    </span>
-                    {s.schedule.status !== 'issue' && (
-                      <span className={styles.status}>
-                        {s.schedule.status[0].toUpperCase() +
-                          s.schedule.status.substr(1, s.schedule.status.lenght)}
-                      </span>
-                    )}
-                    {s.schedule.status === 'issue' && (
-                      <Popover
-                        placement="left"
-                        overlayClassName={styles.popover}
-                        content={
-                          <Alert text={s.schedule.result['processError']} />
-                        }
-                      >
-                        <span
-                          className={classnames(styles.status, styles.issue)}
-                        >
-                          {EN.Issue}
-                        </span>
-                      </Popover>
-                    )}
-                    {s.schedule.status === 'finished' && s.schedule.result ? (
-                      <a
-                        className={styles.results}
-                        target="_blank"
-                        href={`/upload/download/${s.schedule.id}?filename=${
-                          typeof cdpo.file === 'string'
-                            ? cdpo.file
-                            : cdpo.sourceOptions.databaseType
-                        }-${moment
-                          .unix(
-                            s.schedule.actualTime || s.schedule.estimatedTime,
-                          )
-                          .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
-                      >
-                        {EN.Download}
-                      </a>
-                    ) : (
-                      <span className={styles.emptyResults}> - </span>
-                    )}
-                  </div>
-                ))}
+                {scheduleStore.sortedPerformanceSchedules.map(s => <SchedulePerformance schedule={s} cdpo={cdpo} key={s.schedule.id} />)}
               </div>
             </div>
           )}
@@ -375,3 +185,247 @@ const isExcessThreshold = schedule => {
     schedule.result.score[nameMap[schedule.threshold.type]],
   );
 };
+
+interface SchedulePerformanceProps {
+  socketStore?: any,
+  schedule: any,
+  cdpo: any
+}
+
+@inject('socketStore')
+@observer
+class SchedulePerformance extends Component<SchedulePerformanceProps> {
+  @observable visible = false
+  @observable loading = false
+  @observable finished = false
+  @observable summary = {}
+
+  showSummary = () => {
+    if (this.visible) return
+    if (this.finished) return this.visible = true
+    this.loading = true
+    this.visible = true
+    const { socketStore, schedule } = this.props
+    socketStore.ready()
+      .then(api => api.getScheduleSummary({ sid: schedule.schedule.id, pid: schedule.deployment.projectId }))
+      .then(result => {
+        this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader }
+        this.loading = false
+        this.finished = true
+      })
+  }
+
+  onClose = () => {
+    this.visible = false
+  }
+
+  showScore = (score, type) => {
+    let s;
+    if (score && score[type]) s = formatNumber(score[type], 2);
+    return s || 0;
+  };
+
+  render() {
+    const { cdpo, schedule: s } = this.props
+    return (
+      <div className={styles.project} >
+        <span
+          className={styles.modelName}
+          title={s.schedule.modelName}
+        >
+          {s.schedule.modelName}
+        </span>
+        <span className={styles.modelInvokeTime}>
+          {isNaN(s.schedule.actualTime || s.schedule.estimatedTime)
+            ? s.schedule.actualTime || s.schedule.estimatedTime
+            : moment
+              .unix(
+                s.schedule.actualTime || s.schedule.estimatedTime,
+              )
+              .format('MM/DD/YYYY-hh:mma')}
+        </span>
+
+        <span className={styles.deploymentStyle}>
+          {EN.Predictwith} {EN.DataSource}
+          {/* {s.deployment.performanceOptions.source === 'file' || s.deployment.performanceOptions.source === 'database'
+            ? EN.DataSource
+            : EN.APISource} */}
+        </span>
+        <span className={styles.executionSpeed}>
+          {s.schedule.status === 'finished'
+            ? s.schedule.result && s.schedule.result.executeSpeed
+            : ' - '}
+        </span>
+
+        {s.deployment.modelType === 'Classification' && (
+          <span
+            className={classnames(styles.performance, {
+              [styles.issue]: isExcessThreshold(s.schedule),
+            })}
+          >
+            {s.schedule.result && s.schedule.status === 'finished'
+              ? `Accuracy:${this.showScore(
+                s.schedule.result.score,
+                'acc',
+              )} AUC:${this.showScore(
+                s.schedule.result.score,
+                'auc',
+              )} F1:${this.showScore(
+                s.schedule.result.score,
+                'f1',
+              )} Precision:${this.showScore(
+                s.schedule.result.score,
+                'precision',
+              )} Recall:${this.showScore(
+                s.schedule.result.score,
+                'recall',
+              )}`
+              : ' - '}
+          </span>
+        )}
+
+        {s.deployment.modelType === 'Regression' && (
+          <span
+            className={classnames(styles.performance, {
+              [styles.issue]: isExcessThreshold(s.schedule),
+            })}
+          >
+            {s.schedule.result && s.schedule.status === 'finished'
+              ? `MSE:${this.showScore(
+                s.schedule.result.score,
+                'mse',
+              )} RMSE:${this.showScore(
+                s.schedule.result.score,
+                'rmse',
+              )} R²:${this.showScore(
+                s.schedule.result.score,
+                'r2',
+              )}`
+              : ' - '}
+          </span>
+        )}
+
+        {s.deployment.modelType === 'Outlier' && (
+          <span
+            className={classnames(styles.performance, {
+              [styles.issue]: isExcessThreshold(s.schedule),
+            })}
+          >
+            {s.schedule.result && s.schedule.status === 'finished'
+              ? `Accuracy:${this.showScore(
+                s.schedule.result.score,
+                'score',
+              )}`
+              : ' - '}
+          </span>
+        )}
+
+        {s.deployment.modelType === 'Clustering' && (
+          <span
+            className={classnames(styles.performance, {
+              [styles.issue]: isExcessThreshold(s.schedule),
+            })}
+          >
+            {s.schedule.result && s.schedule.status === 'finished'
+              ? `CVNN:${this.showScore(
+                s.schedule.result.score,
+                'CVNN',
+              )} CH:${this.showScore(
+                s.schedule.result.score,
+                'CH',
+              )} Silhouette Score:${this.showScore(
+                s.schedule.result.score,
+                'silhouette_euclidean',
+              )}`
+              : ' - '}
+          </span>
+        )}
+
+        {/*<span*/}
+        {/*  className={classnames(styles.performance, {*/}
+        {/*    [styles.issue]: isExcessThreshold(s.schedule)*/}
+        {/*  })}*/}
+        {/*>*/}
+        {/*  {*/}
+        {/*    s.schedule.result &&*/}
+        {/*    s.schedule.status === 'finished' &&*/}
+        {/*    (s.schedule.result.problemType === 'Classification'*/}
+        {/*      ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')} AUC:${this.showScore(s.schedule.result.score, 'auc')} F1:${this.showScore(s.schedule.result.score, 'f1')} Precision:${this.showScore(s.schedule.result.score, 'precision')} Recall:${this.showScore(s.schedule.result.score, 'recall')}`*/}
+        {/*      : `MSE:${this.showScore(s.schedule.result.score, 'mse')} RMSE:${this.showScore(s.schedule.result.score, 'rmse')} R²:${this.showScore(s.schedule.result.score, 'r2')}`)*/}
+        {/*  }*/}
+        {/*  {*/}
+        {/*    s.schedule.result &&*/}
+        {/*    s.schedule.status === 'finished' &&*/}
+        {/*    (s.schedule.result.problemType === 'Outlier'*/}
+        {/*      ? `Accuracy:${this.showScore(s.schedule.result.score, 'acc')}`*/}
+        {/*      : `CVNN:${this.showScore(s.schedule.result.score, 'cvnn')} CH:${this.showScore(s.schedule.result.score, 'ch')} Silhouette Score:${this.showScore(s.schedule.result.score, 'silhouette_score')}`)*/}
+        {/*  }*/}
+        {/*</span>*/}
+        <span className={styles.threshold}>
+          <span>
+            {s.schedule.threshold &&
+              `${transferR2(s.schedule.threshold.type)}:`}
+            {/*</span>*/}
+            {/*<br />*/}
+            {/*<span>*/}
+            {s.schedule.threshold &&
+              `${s.schedule.threshold.value}`}
+          </span>
+        </span>
+        {s.schedule.status !== 'issue' && (
+          <span className={styles.status}>
+            {s.schedule.status[0].toUpperCase() +
+              s.schedule.status.substr(1, s.schedule.status.lenght)}
+          </span>
+        )}
+        {s.schedule.status === 'issue' && (
+          <Popover
+            placement="left"
+            overlayClassName={styles.popover}
+            content={
+              <Alert text={s.schedule.result['processError']} />
+            }
+          >
+            <span
+              className={classnames(styles.status, styles.issue)}
+            >
+              {EN.Issue}
+            </span>
+          </Popover>
+        )}
+        {s.schedule.status === 'finished' && s.schedule.result ? (
+          <a
+            className={styles.results}
+            target="_blank"
+            href={`/upload/download/${s.schedule.id}?filename=${
+              typeof cdpo.file === 'string'
+                ? cdpo.file
+                : cdpo.sourceOptions.databaseType
+              }-${moment
+                .unix(
+                  s.schedule.actualTime || s.schedule.estimatedTime,
+                )
+                .format('MM-DD-YYYY_hh-mm')}-predict.csv`}
+          >
+            {EN.Download}
+          </a>
+        ) : (
+            <span className={styles.emptyResults}> - </span>
+          )}
+        {s.schedule.status === 'finished' ? <a
+          onClick={this.showSummary}
+          className={styles.results}><span className={styles.status}>{EN.DeploySummaryData}</span>
+        </a> : <span className={styles.emptyResults}> - </span>}
+        {<Modal
+          content={<Summary summary={this.summary} onClose={this.onClose} loading={this.loading} />}
+          visible={this.visible}
+          width="12em"
+          title={EN.DeploySummary}
+          onClose={this.onClose}
+          closeByMask={true}
+          showClose={true}
+        />}
+      </div>
+    )
+  }
+}

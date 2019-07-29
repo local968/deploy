@@ -1212,7 +1212,9 @@ const ZH_LAN = {
   DownloadPmml: '导出PMML',
   CannotExportPmml: '无法导出',
   ModelProcessing: '模型训练中',
-  ModelInterpretation:'模型解释'
+  ModelInterpretation: '模型解释',
+  DeploySummary: '数据报告',
+  DeploySummaryData: '查看'
 };
 
 export default ZH_LAN;
