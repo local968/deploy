@@ -864,7 +864,8 @@ class PredictTable extends Component {
                 <dt>
                   <div className={styles.eventInput}>
                     <span style={{ marginRight: '0.5em' }}>{EN.EventDistribution}</span>
-                    <NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />
+                    <span>{typeof this.distribution === 'number' ? this.distribution : (event / 100)} </span>
+                    {/*<NumberInput value={typeof this.distribution === 'number' ? this.distribution : (event / 100)} min={0.00} max={100.00} isInt={false} digits={2} cut={true} />*/}
                     <span style={{ marginLeft: '0.5em' }}>%</span>
                     {/*<span style={{ marginLeft: '10px' }}><a className={styles.reset} onClick={this.reset}>{EN.Reset}</a></span>*/}
                   </div>

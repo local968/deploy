@@ -86,6 +86,11 @@ class VariableIssue extends Component<VariableIssueProps> {
       reloadData
     } = this.props.project;
     const updateCondition = (column, type) => () => {
+      ['missing', 'mismatch', 'outlier'].forEach(t => {
+        if(t === type) return
+        const index = this[t].indexOf(column)
+        if(index !== -1) this[t].splice(index, 1)
+      })
       const index = this[type].indexOf(column)
       if (index !== -1) this[type].splice(index, 1)
       if (!this.multiMode) {

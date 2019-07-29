@@ -1366,13 +1366,72 @@ export class NewVariableView extends React.Component<
     });
   }
 
-  public func = undefined;
+  get newVariables() {
+    let variables: any;
+
+    //参数类型： concat eq 任意类型  其他的方法都需要 Numerical类型的变量
+    const { exps, index } = this.state;
+    const currExp = exps[index];
+    const { range, value } = currExp;
+    const inputIndex = range[1];
+    const pre = _.slice(value, 0, inputIndex);
+    const next = _.slice(value, inputIndex);
+    const lParenIndex = _.findLastIndex(pre, v => {
+      if (v.value === '(') {
+        return (
+          _.findIndex(next, ({ value, id }) => value === ')' && v.id === id) >
+          -1
+        );
+      }
+      return false;
+    });
+    const vari = pre.pop() || {};
+    const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
+    if (func) {
+      const { name } = func;
+      variables = _.filter(this.variables, ({ varType }: any) => varType !== 'raw');
+      if (
+        !_.includes(
+          [
+            'Number_extraction',
+            'Substring',
+            'Groupby',
+            'Substring',
+            'Concat',
+            'Eq',
+            '(',
+            ')',
+            ',',
+          ],
+          name,
+        )
+      ) {
+        variables = _.filter(
+          this.variables,
+          ({ varType }: any) => varType === 'numerical',
+        );
+      }
+      if (_.includes(['Number_extraction', 'Substring'], name)) {
+        variables = _.filter(
+          this.variables,
+          ({ varType }: any) => varType === 'categorical',
+        );
+      }
+    } else {
+      variables = this.variables;
+    }
+
+    return {
+      func,
+      variables,
+    };
+  }
 
   public render() {
     // console.log(`NewVariableView`);
     const { exps, index, detailKey, loading } = this.state;
     const { functions } = this.props;
-
+console.log(this.newVariables)
     return (
       <>
         <Container component={MyContainer}>
@@ -1388,12 +1447,12 @@ export class NewVariableView extends React.Component<
             left={this.left}
             right={this.right}
             addExp={this.addExp}
-            func={this.func}
+            func={this.newVariables.func}
             changeExpLabel={this.changeExpLabel}
             handleFunction={this.handleFunctionsDoubleClick}
             handleVariables={this.handleVariablesClick}
             functions={functions && [...functions.base, ...functions.senior]}
-            variables={this.variables}
+            variables={this.newVariables.variables}
           />
         </Container>
 
@@ -1411,7 +1470,7 @@ export class NewVariableView extends React.Component<
             <Subtitle>{EN.FormField}</Subtitle>
             <Variables
               handleClick={this.handleVariablesClick}
-              variables={this.variables}
+              variables={this.newVariables.variables}
             />
           </Grid>
 
