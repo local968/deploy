@@ -1952,19 +1952,17 @@ class Project {
   abortTrainByEtl = async (isModeling: boolean = true) => {
     // this.models = []
     this.isAbort = true
-    const arr = []
+    // const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        arr.push(this.abortTrain(si, isModeling))
+        const aa = await this.abortTrain(si, isModeling)
+        console.log(aa , 'adasda')
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
     }
-
-    return Promise.all(arr).then((aa) => {
-      console.log(aa, "false")
-      this.isAbort = false
-    })
+    this.isAbort = false
+    return
   }
 
   setModel = (data: Model, force = false) => {
