@@ -130,7 +130,9 @@ function Expression(props: ExpressionProps) {
   };
 
   const onClick = (k: number) => (e: React.MouseEvent<HTMLSpanElement>) => {
-    const input = e.currentTarget.parentElement.parentElement.getElementsByTagName('input')[0];
+    const input = e.currentTarget.parentElement.parentElement.getElementsByTagName(
+      'input',
+    )[0];
     setRange(k + 1, k + 1);
     setIndex();
     input.focus();

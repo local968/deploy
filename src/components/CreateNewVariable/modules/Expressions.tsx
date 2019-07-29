@@ -12,7 +12,12 @@ import {
   TableRow,
   TableCell,
   TextField,
-  IconButton, Grid,
+  IconButton,
+  Popper,
+  MenuItem,
+  MenuList,
+  Paper,
+  ClickAwayListener,
 } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -29,6 +34,10 @@ const useStyles = withStyles({
   },
   textField: {
     backgroundColor: '#FFF',
+  },
+  suggestPaper: {
+    maxHeight: '300px',
+    overflowY: 'auto',
   },
 });
 
@@ -222,7 +231,9 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <MyTableCell style={{ width: 252 }}>{EN.Variablename}</MyTableCell>
+              <MyTableCell style={{ width: 252 }}>
+                {EN.Variablename}
+              </MyTableCell>
               <MyTableCell style={{ width: 10 }} />
               <MyTableCell style={{ width: 360 }}>{EN.formula}</MyTableCell>
               <MyTableCell align={'right'} />
@@ -238,7 +249,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                 <MyTableCell>
                   <TextField
                     autoFocus={true}
-                    placeholder={`Name`}
+                    placeholder={`name`}
                     className={classes.textField}
                     value={exp.label}
                     onChange={this._onChangeExpLabel}
@@ -279,6 +290,44 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
             ))}
           </TableBody>
         </Table>
+        <Popper
+          open={this.state.isOpen && !!this.recommend.value}
+          anchorEl={input}
+          placement="bottom-start"
+          className={classes.popper}
+        >
+          <Paper className={classes.suggestPaper}>
+            <ClickAwayListener onClickAway={this.handleClickAway}>
+              <MenuList>
+                {this.getSuggestions().map((item: Coordinate, k: number) => {
+                  return (
+                    <MenuItem
+                      component={'li'}
+                      key={k}
+                      onClick={this.selectItem.bind(this, item)}
+                    >
+                      {item.name}
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </ClickAwayListener>
+          </Paper>
+        </Popper>
+        <Popper
+          open={!!func && this.state.isTipOpen}
+          anchorEl={input}
+          placement="bottom-end"
+          className={classes.popper}
+        >
+          <Paper>
+            <ClickAwayListener onClickAway={this.hideGrammarTip}>
+              <div className={classes.grammar}>
+                {func ? func.grammar : null}
+              </div>
+            </ClickAwayListener>
+          </Paper>
+        </Popper>
       </MuiCard>
     );
   }
