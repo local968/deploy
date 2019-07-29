@@ -36,10 +36,6 @@ interface ExpressionProps {
   setIndex: () => void;
 }
 
-// interface ExpressionState {
-//   isDelete: boolean,
-// }
-
 function Expression(props: ExpressionProps) {
   const {
     exp,
@@ -266,7 +262,7 @@ function Block(props: BlockProps) {
 
   const { index, data, inRange, onClick, style } = props;
   const { name, type } = data;
-  console.log(data);
+
   const getRenderClass = () => {
     if (inRange) return classes.selected;
     switch (type) {
@@ -295,16 +291,6 @@ function Block(props: BlockProps) {
       {name}
     </span>
   );
-  // <Input
-  // disableUnderline
-  // fullWidth
-  // margin='none'
-  // className={getRenderClass()}
-  // readOnly={true}
-  // value={value}
-  // data-i={index}
-  // />
-  // <span className={getRenderClass()} data-i={index}>{value}</span>
 }
 
 export default Expression;
