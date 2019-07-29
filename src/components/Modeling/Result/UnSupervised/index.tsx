@@ -620,7 +620,7 @@ const OutlierTable = observer(props => {
           stopIds.map((stopId, k) => {
             const trainingModel = trainModel[stopId];
             if (!trainingModel) return null;
-            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_UN_OUT' key={k} />
+            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={abortTrain} show='result_abortButton_UN_OUT' key={k} />
           })}
       </div>
     </div>
