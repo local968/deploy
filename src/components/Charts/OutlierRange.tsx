@@ -434,7 +434,7 @@ export default class OutlierRange extends PureComponent<Interface>{
           value={bin}
           style={{ width: 100 }}
           onChange={bin=>{
-            this.setState({
+	          bin&&this.setState({
               bin
             },()=>this.getData())
           }}

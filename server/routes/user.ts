@@ -7,7 +7,7 @@ import config from '../../config';
 import api from '../scheduleApi';
 import wss from '../webSocket';
 import uuid from 'uuid';
-const {userService,planService,groupService} = require('../apis/service');
+import {userService,planService,groupService} from '../apis/service'
 
 const { register } = wss;
 
@@ -53,7 +53,7 @@ router.post('/login/token', async(req, res) => {
     return res.send({ status: 500, message: 'please send email and password.' })
   }
 
-  let user = await userService.findByEmail(email);
+  let user = await userService.findByEmail(email,res);
 
   if(!user){
     return res.send({ status: 404, message: 'user not exists.' })
@@ -67,7 +67,7 @@ router.post('/login/token', async(req, res) => {
       await userService.update(user.id,{
         plan:plan._id,
       });
-      user = await userService.findByEmail(email);
+      user = await userService.findByEmail(email,res);
     }else if(!result){
       user = null;
     }
@@ -135,7 +135,7 @@ router.get('/login/:token',async(req, res) => {
 router.post('/login', async(req, res) => {
   const { email, password } = req.body;
 
-  let user = await userService.findByEmail(email);
+  let user = await userService.findByEmail(email,res);
 
   if(!user){
     return res.send({ status: 404, message: 'user not exists.' })
@@ -147,9 +147,9 @@ router.post('/login', async(req, res) => {
       await userService.update(user.id,{
         plan:plan._id,
       });
-      user = await userService.findByEmail(email);
+      user = await userService.findByEmail(email,res);
     }else if(!result){
-      user = null;
+      user = undefined;
     }
   }else{
     const _result = await userService.login(email,sha256(password));
@@ -342,7 +342,7 @@ router.put('/changepassword', async (req, res) => {
 router.post('/forgetpassword', async (req, res) => {
   const { email } = req.body;
   // const userId = await redis.get(`userEmail:${email}`);
-  const user = await userService.findByEmail(email);
+  const user = await userService.findByEmail(email,res);
 
   if (!user){
     return res.json({ status: 400, message: 'email not exists.', error: 'email not exists.' })

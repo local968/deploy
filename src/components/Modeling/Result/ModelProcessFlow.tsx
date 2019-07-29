@@ -357,7 +357,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 					<label>{EN.DropTheseVariables}(raw):</label>
 					<ul>
 						{
-							raw.map(it=><li title={it}>{it}</li>)
+							raw.map((it,ind)=><li key={ind} title={it}>{it}</li>)
 						}
 					</ul>
 				</dt>:null

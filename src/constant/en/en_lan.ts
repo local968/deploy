@@ -1353,7 +1353,8 @@ const EN_LAN = {
   SetToMaximum: "Set to the maximum value of the variable",
   DownloadPmml: 'Export PMML',
   CannotExportPmml: 'Cannot be Exported',
-  ModelProcessing: 'Processing'
+  ModelProcessing: 'Processing',
+  ModelInterpretation:'Model interpretation'
 };
 
 

@@ -8,9 +8,12 @@ const exist = async email=>{
 	return !!(had||[]).length;
 };
 
-const findByEmail = async email=>{
+const findByEmail = async (email,res)=>{
 	const result =  await request.get(`${url}?email=${email}`);
-	return result&&result[0];
+	if(!result){
+		return res.send({ status: 500, message: 'internal server error.' })
+	}
+	return result[0];
 };
 
 const register = async (res,data)=>{
