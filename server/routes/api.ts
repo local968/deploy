@@ -122,6 +122,13 @@ router.post('/deploy', async (req, res) => {
     targetIndex = Object.keys(stats).find(key => stats[key].isTarget)
     target = mapHeader[Object.keys(stats).find(key => stats[key].isTarget)]
     delete stats[targetIndex]
+    const mappingResponse = await
+    axios.get(`${esServicePath}/etls/${index}/header`)
+    const dataHeader = mappingResponse.data.split(',')
+    const headerArray = dataHeader.filter(h => h !== '__no')
+    const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
+      === -1)
+    if(lackHeaders.length > 0) return errorRes(10018)
     etlIndex = await etl(index, stats);
   } catch (e) {
     console.error(e);
@@ -273,6 +280,7 @@ const errors = {
   10015: 'file not exist',
   10016: 'create index failed',
   10017: 'etl failed',
+  10018: 'your data schema is invalid'
 };
 
 export default router;
