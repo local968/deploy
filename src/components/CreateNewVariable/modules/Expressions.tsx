@@ -70,7 +70,6 @@ interface ExpressionsState {
   suggestions: Array<Coordinate>;
   isOpen: boolean;
   isTipOpen: boolean;
-  el: string;
 }
 
 interface recommendObj {
@@ -79,6 +78,14 @@ interface recommendObj {
 }
 
 class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
+  private selectedNodes?: {
+    [key: string]: HTMLDivElement | null | undefined;
+  } = {};
+
+  private popperNode?: {
+    [key: string]: HTMLDivElement | null | undefined;
+  } = {};
+
   constructor(props) {
     super(props);
 
@@ -86,18 +93,13 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
       suggestions: [],
       isOpen: false,
       isTipOpen: false,
-      el: '',
     };
   }
 
-  public selectOne = (k: number) => (e: React.MouseEvent<HTMLElement>) => {
-    const input = e.currentTarget.getElementsByTagName('input')[0];
+  public selectOne = (k: number) => {
     if (k === this.props.index) return;
     this.props.setIndex(k);
-    this.setState({
-      el: input ? input.id : '',
-    });
-    input.focus();
+    this.selectedNodes[k].focus();
   };
 
   public _onChangeExpLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +134,9 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     return obj;
   };
 
-  private recommend: recommendObj = this.getRecommendValue();
+  private get recommend(): recommendObj {
+    return this.getRecommendValue();
+  }
 
   public handleClickAway = () => {
     this.setState({
@@ -153,7 +157,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     )[0];
     this.setState({
       isOpen: true,
-      el: input ? input.id : '',
     });
     const len = this.props.exps[k]['value'].length;
     setRange(len, len);
@@ -199,14 +202,19 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     }
   };
 
+  private setSelectedNodes = (k, el) => {
+    if (el) {
+      this.selectedNodes[k] = el;
+    }
+  };
+
   private get expSize() {
     return _.size(this.props.exps);
   }
 
   render() {
-    const input: HTMLElement | null = this.state.el
-      ? document.getElementById(this.state.el)
-      : null;
+    const input = this.selectedNodes[this.props.index];
+    console.log(input)
 
     const {
       classes,
@@ -245,7 +253,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
               <TableRow
                 key={k}
                 selected={k === index}
-                onClick={e => this.selectOne(k)(e)}
+                onClick={this.selectOne.bind(this, k)}
               >
                 <MyTableCell>
                   <TextField
@@ -256,6 +264,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     onChange={this._onChangeExpLabel}
                     margin={'dense'}
                     variant={'outlined'}
+                    inputRef={el => this.setSelectedNodes(k, el)}
                   />
                 </MyTableCell>
                 <MyTableCell style={{ padding: 0 }}>=</MyTableCell>
@@ -267,7 +276,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     left={left}
                     right={right}
                     addExp={addExp}
-                    onFocus={this.onFocus.bind(this, k)}
+                    onFocus={() => this.onFocus(k)}
                     sign={k}
                     setIndex={() => setIndex(k)}
                     toogleTooltip={() => this.setState({ isTipOpen: true })}
@@ -292,7 +301,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
           </TableBody>
         </Table>
         <Popper
-          open={this.state.isOpen && !!this.recommend.value}
+          open={!!this.recommend.value}
           anchorEl={input}
           placement="bottom-start"
           className={classes.popper}
