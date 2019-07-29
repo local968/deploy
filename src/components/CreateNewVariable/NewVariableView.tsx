@@ -4,14 +4,14 @@ import { observer } from 'mobx-react';
 
 import { styled } from '@material-ui/styles';
 
-import { Container, Grid, Typography } from '@material-ui/core';
+import { Container, Grid, Typography, Button } from '@material-ui/core';
 
 // modules
 import Variables from './modules/Variables';
 import Functions from './modules/Functions';
 import Summary from './modules/Summary';
 import Expressions from './modules/Expressions';
-import { message } from 'antd';
+import { message, Icon } from 'antd';
 
 // types
 import EN from '../../constant/en';
@@ -41,6 +41,20 @@ const MyContainer = styled(Container)({
 // Custom Grid
 const MyGrid = styled(Grid)({
   // minWidth: 360,
+});
+
+const MySave = styled(Button)({
+  backgroundImage: 'linear-gradient(to bottom, #5b657b, #243448)',
+  color: '#fff',
+  border: '1px solid transparent',
+  minWidth: '120px',
+});
+const MyCancel = styled(Button)({
+  backgroundColor: '#fff',
+  color: '#27374B',
+  border: '1px solid #27374B',
+  minWidth: '120px',
+  marginLeft: '15px',
 });
 
 interface InterfaceNewVariableProps {
@@ -1356,7 +1370,7 @@ export class NewVariableView extends React.Component<
 
   public render() {
     // console.log(`NewVariableView`);
-    const { exps, index, detailKey } = this.state;
+    const { exps, index, detailKey, loading } = this.state;
     const { functions } = this.props;
 
     return (
@@ -1406,6 +1420,24 @@ export class NewVariableView extends React.Component<
             <Summary detailKey={detailKey} />
           </Grid>
         </Grid>
+        <Container
+          style={{
+            paddingRight: 0,
+            paddingLeft: 0,
+            marginTop: 20,
+          }}
+        >
+          <MySave variant="contained" onClick={this.processAndSave} href={''}>
+            {!loading ? (
+              EN.Yes
+            ) : (
+              <Icon type="loading" style={{ fontSize: '24px' }} />
+            )}
+          </MySave>
+          <MyCancel variant="contained" onClick={this.props.onClose} href={''}>
+            {EN.CANCEL}
+          </MyCancel>
+        </Container>
       </>
     );
   }

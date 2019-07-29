@@ -95,11 +95,7 @@ export default class MuiDialog extends React.Component<
 
         <DialogContent>{children}</DialogContent>
 
-        <DialogActions>
-          <Button color={'primary'} href={''}>
-            Save changes
-          </Button>
-        </DialogActions>
+        <DialogActions />
       </Dialog>
     );
   }
