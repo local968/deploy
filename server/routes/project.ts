@@ -1,4 +1,5 @@
 import { redis } from '../redis';
+import { Router } from 'express'
 import uuid from 'uuid';
 import moment from 'moment';
 import command from '../command';
@@ -8,6 +9,9 @@ import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData } from '../types';
+
+const router = Router()
+
 const { projectService, planService } = require("../apis/service");
 
 const { restriction } = planService;
@@ -1739,4 +1743,34 @@ wss.register('getOutlierData', (message, socket, progress) => {
   })
 })
 
-export default {};
+
+router.get('/export', (req, res) => {
+  const { id, sign } = req.query
+
+  if (sign !== config.EXPORT_SECRET) return res.status(400).json({
+    status: 400,
+    message: 'auth error'
+  })
+
+  return redis.hgetall('project:' + id).then(p => {
+    const project = {
+      colType: JSON.parse(p.colType || '""'),
+      colMap: JSON.parse(p.colMap || '""'),
+      rawDataView: JSON.parse(p.rawDataView || '""'),
+      nullFillMethod: JSON.parse(p.nullFillMethod || '""'),
+      mismatchFillMethod: JSON.parse(p.mismatchFillMethod || '""'),
+      outlierFillMethod: JSON.parse(p.outlierFillMethod || '""'),
+      featureLabel: JSON.parse(p.dataHeader || '""'),
+      targetLabel: [JSON.parse(p.target || '""')],
+      problemType: JSON.parse(p.problemType || '""'),
+    }
+    return res.json({
+      status: 100,
+      message: 'ok',
+      data: project
+    })
+  })
+})
+
+
+export default router
