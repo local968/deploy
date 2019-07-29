@@ -1395,16 +1395,14 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue);
     };
-
+    console.log(`project: ${projectId} start train, command: ${_stopIds.length} `)
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
     );
 
-    console.log(commandRes, 'commandRes')
-
     const count =
       commandRes.filter((cr: any) => !cr.isAbort && cr.status === 100) || [];
-
+    console.log(`project: ${projectId} train finish`)
     const statusData = {
       train2Finished: true,
       train2ing: false,

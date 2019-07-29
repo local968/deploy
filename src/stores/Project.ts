@@ -1953,7 +1953,6 @@ class Project {
       stopId
     }
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
-      console.log(returnValue, 'returnValue')
       const { status, message, result, id } = returnValue
       if (id !== this.id) return
       if (status !== 200) return antdMessage.error(message)
@@ -1967,8 +1966,7 @@ class Project {
     // const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        const aa = await this.abortTrain(si, isModeling)
-        console.log(aa, 'adasda')
+        await this.abortTrain(si, isModeling)
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
