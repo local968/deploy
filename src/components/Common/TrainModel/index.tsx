@@ -11,7 +11,7 @@ const TrainModel = (props: any) => {
 
   const handleTrain = () => {
     setAbort(true)
-    abortTrain(trainingModel.requestId).then(() => setAbort(false))
+    abortTrain(trainingModel.requestId)
   }
 
   return <div className={styles.rowData}>
