@@ -33,6 +33,7 @@ const useStyles = withStyles({
     minWidth: '40rem',
   },
   textField: {
+    width: '100%',
     backgroundColor: '#FFF',
   },
   suggestPaper: {
@@ -42,7 +43,7 @@ const useStyles = withStyles({
 });
 
 const MyTableCell = styled(TableCell)({
-  paddingRight: 14,
+  padding: '10px 14px 10px',
 });
 
 interface ExpressionsProps {
@@ -234,7 +235,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
               <MyTableCell style={{ width: 252 }}>
                 {EN.Variablename}
               </MyTableCell>
-              <MyTableCell style={{ width: 10 }} />
+              <MyTableCell style={{ width: 8, padding: 0 }} />
               <MyTableCell style={{ width: 360 }}>{EN.formula}</MyTableCell>
               <MyTableCell align={'right'} />
             </TableRow>
@@ -257,7 +258,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     variant={'outlined'}
                   />
                 </MyTableCell>
-                <MyTableCell>=</MyTableCell>
+                <MyTableCell style={{ padding: 0 }}>=</MyTableCell>
                 <MyTableCell>
                   <Expression
                     exp={exp}
