@@ -98,6 +98,12 @@ export default class ModelDetail extends Component<Interface>{
                 {EN.Compute}
               </span>
             </div>
+            {/*<div className={classnames(styles.cell, styles.compute)}>*/}
+            {/*  <img src={Variable} alt="" />*/}
+            {/*  <span onClick={this.toggleImpact.bind(this, 'impact')}>*/}
+            {/*    111*/}
+            {/*  </span>*/}
+            {/*</div>*/}
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Process} alt="" />
               <span onClick={this.toggleImpact.bind(this, 'process')}>

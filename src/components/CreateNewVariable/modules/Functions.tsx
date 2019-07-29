@@ -22,7 +22,7 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: 500,
+    height: 400,
     overflowY: 'auto',
   },
   textFiled: {
@@ -33,8 +33,6 @@ const useStyles = makeStyles({
   listItemTitle: {
     fontSize: '.875rem',
     fontWeight: 'bold',
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
   },
   nested: {
     fontSize: '1rem',
@@ -44,29 +42,29 @@ const useStyles = makeStyles({
 
 interface InterfaceFunctionProps {
   handleClick?;
-  handleMouseOver?;
+  handleDoubleClick?;
   functions?: { [key: string]: Array<Coordinate> };
 }
 
-interface InterfaceFunctionState {
-  functions?: Array<Coordinate>;
-  base: boolean;
-  senior: boolean;
-  filterStr: string;
-}
+// interface InterfaceFunctionState {
+//   functions?: Array<Coordinate>;
+//   base: boolean;
+//   senior: boolean;
+//   filterStr: string;
+// }
 
 function Functions(props: InterfaceFunctionProps) {
   // initial styles
   const classes = useStyles({});
 
-  const { handleClick, handleMouseOver, functions } = props;
+  const { handleClick, handleDoubleClick, functions } = props;
 
   // initial state
   const [state, setState] = React.useState({
     filterStr: '',
     base: true,
     senior: true,
-  } as InterfaceFunctionState);
+  } as any);
 
   const _onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({
@@ -76,8 +74,8 @@ function Functions(props: InterfaceFunctionProps) {
   };
 
   const onCosClick = (k: string) => {
-    // const { [k]: value } = state;
-    // setState({ ...state, [k]: !value });
+    const { [k]: value } = state;
+    setState({ ...state, [k]: !value });
   };
 
   // filter
@@ -128,7 +126,7 @@ function Functions(props: InterfaceFunctionProps) {
                       key={`${i}-${index}`}
                       className={classes.nested}
                       onClick={handleClick.bind(this, val.value)}
-                      onMouseOver={handleMouseOver.bind(this, val.value)}
+                      onDoubleClick={handleDoubleClick.bind(this, val)}
                     >
                       <ListItemText primary={val.name} />
                     </ListItem>

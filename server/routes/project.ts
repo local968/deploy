@@ -1311,7 +1311,8 @@ wss.register('train', async (message, socket, progress) => {
 
     const processFn = async queueValue => {
       const stopIds = await getProjectField(projectId, 'stopIds') || [];
-      const { status, result, requestId: trainId } = queueValue;
+      const { status, result, requestId: trainId, abort } = queueValue;
+      if (abort) return { isAbort: true };
       if (status < 0 || status === 100) {
         await createOrUpdate(projectId, userId, { stopIds: stopIds.filter(s => s !== trainId) });
         userLogger.info({
@@ -1323,16 +1324,16 @@ wss.register('train', async (message, socket, progress) => {
         });
         return { ...queueValue, isAbort: false };
       }
-      if (!stopIds.includes(trainId)) {
-        userLogger.warn({
-          userId,
-          pid: projectId,
-          stopId: trainId,
-          message: `train aborted: ${trainId}`,
-          time: moment().unix(),
-        });
-        return { isAbort: true };
-      }
+      // if (!stopIds.includes(trainId)) {
+      //   userLogger.warn({
+      //     userId,
+      //     pid: projectId,
+      //     stopId: trainId,
+      //     message: `train aborted: ${trainId}`,
+      //     time: moment().unix(),
+      //   });
+      //   return { isAbort: true };
+      // }
       if (!result) return;
       let processValue;
       if (result.name === 'progress') {
@@ -1394,13 +1395,14 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue);
     };
-
+    console.log(`project: ${projectId} start train, command: ${_stopIds.length} `)
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
     );
+
     const count =
       commandRes.filter((cr: any) => !cr.isAbort && cr.status === 100) || [];
-
+    console.log(`project: ${projectId} train finish`)
     const statusData = {
       train2Finished: true,
       train2ing: false,

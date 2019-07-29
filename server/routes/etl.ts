@@ -29,6 +29,12 @@ wss.register('originalStats', async (message, socket) => {
   const { userId } = socket.session;
   const { index, projectId, headers } = message;
 
+  const stats = await originalStats(index, headers)
+  if (stats.status === 200) await createOrUpdate(projectId, userId, stats.result);
+  return stats
+});
+
+const originalStats = async (index, headers) => {
   const headersLn = _.get(headers, 'length');
 
   const chunkSize = _.chain(headersLn)
@@ -161,7 +167,6 @@ wss.register('originalStats', async (message, socket) => {
       etling: false,
       etlProgress: 0,
     };
-    await createOrUpdate(projectId, userId, result);
     return { status: 200, message: 'ok', result };
   } catch (e) {
     console.log({ ...e });
@@ -169,7 +174,8 @@ wss.register('originalStats', async (message, socket) => {
     if (e.response && e.response.data) error = e.response.data;
     return { status: 500, message: 'get index stats failed', error };
   }
-});
+}
+
 
 const getProject = async (message): Promise<Project> => {
   const { projectId } = message;
@@ -392,4 +398,6 @@ wss.register('getHeader', async message => {
   return { header: data.split(',').filter(k => k !== '__no') };
 });
 
-export default {};
+export default {
+  originalStats
+};

@@ -6,7 +6,7 @@ import EN from '../../../../../constant/en';
 import { Icon, Tooltip } from 'antd';
 import ModelDetail from './ModelDetail';
 import classnames from 'classnames'
-import { Hint } from 'components/Common'
+import { Hint, TrainModel } from 'components/Common'
 import { ProgressBar, Show } from '../../../../Common';
 import Model from 'stores/Model';
 import Project from 'stores/Project';
@@ -256,34 +256,7 @@ export default class ModelTable extends Component<Interface> {
             stopIds.map((stopId, k) => {
               const trainingModel = trainModel[stopId];
               if (!trainingModel) return null;
-              return (
-                <div className={styles.rowData} key={k}>
-                  <div className={styles.trainingModel}>
-                    <Tooltip title={trainingModel.actionKey || EN.TrainingNewModel}>
-                      {trainingModel.actionKey || EN.TrainingNewModel}
-                    </Tooltip>
-                  </div>
-                  <ProgressBar progress={trainingModel.value || 0} />
-                  <Show
-                    name="result_abortButton_TWO"
-                  >
-                    <div
-                      className={styles.abortButton}
-                      onClick={
-                        !isAbort
-                          ? this.abortTrain.bind(null, trainingModel.requestId)
-                          : null
-                      }
-                    >
-                      {isAbort ? (
-                        <Icon type="loading" />
-                      ) : (
-                          <span>{EN.AbortTraining}</span>
-                        )}
-                    </div>
-                  </Show>
-                </div>
-              );
+              return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_TWO' key={k} />
             })}
         </div>
       </div>

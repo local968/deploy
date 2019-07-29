@@ -30,7 +30,7 @@ const useStyles = withStyles({
 
 interface ExpressionsProps {
   classes;
-  exps: Array<Exp>;
+  exps: Exp[];
   index: number;
   setIndex: (k: number) => void;
   addLine: () => void;
@@ -72,17 +72,20 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     };
   }
 
-  // public selectOne = (k: number) => (e: React.MouseEvent<HTMLElement>) => {
-  //   const input = e.currentTarget.getElementsByTagName('input')[0];
-  //   this.props.setIndex(k);
-  //   this.setState({
-  //     el: input ? input.id : '',
-  //   });
-  //   input.focus();
-  // };
-  _onChangeLabel = () => (e: React.ChangeEvent<HTMLInputElement>) => {
+  public selectOne = (k: number) => (e: React.MouseEvent<HTMLElement>) => {
+    const input = e.currentTarget.getElementsByTagName('input')[0];
+    if (k === this.props.index) return;
+    this.props.setIndex(k);
+    this.setState({
+      el: input ? input.id : '',
+    });
+    input.focus();
+  };
+
+  public _onChangeExpLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.props.changeExpLabel(e.target.value);
   };
+
   public deleteOne = (k: number) => (
     e: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -90,8 +93,9 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     this.props.deleteIndex(k);
   };
 
-  getRecommendValue = () => {
-    const currentExp: Exp = this.props.exps[this.props.index];
+  public getRecommendValue = () => {
+    const { exps, index } = this.props;
+    const currentExp: Exp = exps[index];
     const {
       value,
       range: [start, end],
@@ -109,9 +113,10 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     }
     return obj;
   };
-  recommend: recommendObj = this.getRecommendValue();
 
-  handleClickAway = () => {
+  private recommend: recommendObj = this.getRecommendValue();
+
+  public handleClickAway = () => {
     this.setState({
       isOpen: false,
     });
@@ -124,6 +129,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
   };
 
   public onFocus = (k: number) => (e: React.MouseEvent<HTMLInputElement>) => {
+    const { setRange, setIndex } = this.props;
     const input: HTMLInputElement = e.currentTarget.getElementsByTagName(
       'input',
     )[0];
@@ -132,8 +138,8 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
       el: input ? input.id : '',
     });
     const len = this.props.exps[k]['value'].length;
-    this.props.setRange(len, len);
-    this.props.setIndex(k);
+    setRange(len, len);
+    setIndex(k);
     input.focus();
     e.stopPropagation();
   };
@@ -175,19 +181,21 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     }
   };
 
-  // input: HTMLElement | null = this.state.el
-  //   ? document.getElementById(this.state.el)
-  //   : null;
-  expSize = _.size(this.props.exps);
+  private get expSize() {
+    return _.size(this.props.exps);
+  }
 
   render() {
+    const input: HTMLElement | null = this.state.el
+      ? document.getElementById(this.state.el)
+      : null;
+
     const {
       classes,
       exps,
       index,
       setIndex,
       addLine,
-      deleteIndex,
       setRange,
       deleteExp,
       left,
@@ -214,13 +222,17 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
           </TableHead>
           <TableBody>
             {exps.map((exp: Exp, k: number) => (
-              <TableRow key={k}>
+              <TableRow
+                key={k}
+                selected={k === index}
+                onClick={e => this.selectOne(k)(e)}
+              >
                 <TableCell>
                   <TextField
-                    label={'New Name'}
-                    // className={classes.textField}
+                    label={`Name`}
+                    className={classes.textField}
                     value={exp.label}
-                    onChange={this._onChangeLabel}
+                    onChange={this._onChangeExpLabel}
                     margin={'dense'}
                     variant={'outlined'}
                   />
@@ -234,7 +246,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     left={left}
                     right={right}
                     addExp={addExp}
-                    onFocus={this.onFocus(k)}
+                    onFocus={this.onFocus.bind(this, k)}
                     sign={k}
                     setIndex={() => setIndex(k)}
                     toogleTooltip={() => this.setState({ isTipOpen: true })}
@@ -242,7 +254,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                 </TableCell>
                 <TableCell>
                   <IconButton
-                    onClick={this.deleteOne(k)}
+                    onClick={(e) => this.deleteOne(k)(e)}
                     disabled={this.expSize === 1}
                   >
                     <DeleteIcon />

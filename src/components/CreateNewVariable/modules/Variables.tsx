@@ -19,7 +19,7 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: 500,
+    height: 400,
     overflowY: 'auto',
   },
   textFiled: {
@@ -84,7 +84,12 @@ function Variables(props: VariablesProps) {
         className={classes.list}
       >
         {_.map(values, (v: Coordinate, i: number) => (
-          <ListItem component={'li'} button key={i} onClick={handleClick.bind(this, v)}>
+          <ListItem
+            component={'li'}
+            button
+            key={i}
+            onClick={handleClick.bind(this, v)}
+          >
             <ListItemText
               primary={v.name}
               secondary={v.varType}

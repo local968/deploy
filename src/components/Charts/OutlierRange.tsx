@@ -82,25 +82,29 @@ export default class OutlierRange extends PureComponent<Interface>{
 		const {rawDataView={}} = project;
 		let {min,max,low,high} = rawDataView[field];
 
-		low = low.toFixed(2);
-		high = high.toFixed(2);
+		low = low.toFixed(6);
+		high = high.toFixed(6);
 
 		if(toJS(project.outlierDictTemp)[field]){
 			const data = project.outlierDictTemp[field];
-			low = (+data[0]).toFixed(2);
-			high =(+data[1]).toFixed(2);
+			low = (+data[0]).toFixed(6);
+			high =(+data[1]).toFixed(6);
 		}
 
 		const [rs,re] = sliderValue;
 
+		const _re = re + (re - rs)/1000;
+
+
 		const interval = (re-rs) / bin;
+		const _interval = (_re-rs) / bin;
 
 		request.post({
 			url: '/graphics/outlier-range',
 			data: {
 				field:field + '.double',
 				id,
-				interval:+(interval.toFixed(3)),
+				interval:+(_interval.toFixed(3)),
 				range:sliderValue,
 			},
 		}).then((result:any) => {
@@ -154,7 +158,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 	}
 
 	getOption() {
-		const {ready,data,sliderValue:_sliderValue,selectArea} = this.state;
+		const {ready,data,sliderValue:_sliderValue,selectArea,bin} = this.state;
 		const {field,project} = this.props;
 		const {min,max,low,high} = project.rawDataView[field];
 		if(!ready){
@@ -167,12 +171,14 @@ export default class OutlierRange extends PureComponent<Interface>{
 
 		const [startValue,endValue] = sliderValue;
 
+		const _endValue = endValue + (endValue - startValue)/1000;
+
 
 		const _data = data.map(itm=>{
 			// const _min = Math.max(itm[0],min);
 			// const _max = Math.min(itm[1],max);
 			const _min = Math.max(itm[0],startValue);
-			const _max = Math.min(itm[1],endValue);
+			const _max = Math.min(itm[1],_endValue);
 			return [_min,_max,itm[2]]
 		});
 
@@ -223,48 +229,54 @@ export default class OutlierRange extends PureComponent<Interface>{
 			yAxis: {
 				nameTextStyle,
 			},
-			// tooltip:{
-			// 	trigger: 'axis',
-			// 	formatter:params=>{
-			// 		const {marker,value} = params[0];
-			// 		console.log(params);
-			// 		const [x,y,z] = value;
-			//
-			// 		return `
-			// 			${marker}[${x.toFixed(3)},${y.toFixed(3)}):${z}
-			// 		`;
-			// 	}
-			// },
+
 			toolbox:{
 				show:false,
 			},
-			series: [{
+			tooltip : {},
+			series: {
 				type: 'custom',
 				renderItem,
 				label: {
 					normal: {
-						show: false,
+						show: bin<=20,
 						position: 'top',
 					},
 				},
 				encode: {
 					x: [0, 1],
+					y: 2,
+					// tooltip: [0, 1, 2],
+					itemName: 3
 				},
 				data:_data,
-			}],
+        tooltip:{
+          trigger: 'item',
+          formatter:params=>{
+            const {marker,value} = params;
+            const [x,y,z] = value;
+            return `
+						${marker}[${x.toFixed(3)},${y.toFixed(3)}):${z}
+					`;
+          }
+        },
+			},
 			dataZoom: [{
 				type: 'inside',
 				rangeMode:['value','value'],
 				startValue,
-				endValue,
+				endValue:_endValue,
 			},{
 				type: 'slider',
 				rangeMode:['value','value'],
 				startValue,
-				endValue,
+				endValue:_endValue,
 				labelPrecision:2,
 				backgroundColor:"rgba(204,204,204,0.2)",
 				labelFormatter: (value)=> {
+					if(value === _endValue){
+						value = endValue;
+					}
 					if(!isNaN(Number(`${value}`))){
 						sliderValue.shift();
 						sliderValue.push(value);
@@ -315,19 +327,12 @@ export default class OutlierRange extends PureComponent<Interface>{
 	}
 
 	render(){
-		const {selectArea,sliderValue,interval=0,bin,min:_min,max:_max} = this.state;
+		const {selectArea,sliderValue,bin} = this.state;
     const {field,project} = this.props;
-    const {min,max,high,low} = project.rawDataView[field];
+    const {min,max} = project.rawDataView[field];
 		const [start,end] = selectArea;
 		const {closeEdit,saveEdit} = this.props;
-		const _low = Math.max(_min,start).toFixed(2);
-		const _high = Math.min(_max,end).toFixed(2);
     const [startValue,endValue] = sliderValue;
-
-		// const _interval = (high-low)/ 10;
-
-		// const __max = +(Math.max(endValue,+max+ 2 * +interval));
-		// const __min = +(Math.min(startValue,+min- 2 * +interval));
 
 		const __max = max;
 		const __min = min;
@@ -429,7 +434,7 @@ export default class OutlierRange extends PureComponent<Interface>{
           value={bin}
           style={{ width: 100 }}
           onChange={bin=>{
-            this.setState({
+	          bin&&this.setState({
               bin
             },()=>this.getData())
           }}

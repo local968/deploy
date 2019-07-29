@@ -21,6 +21,7 @@ import Show from './Show';
 import DatabaseConfig from './DatabaseConfig'
 import AutoRepeat from './AutoRepeat'
 import OneTime from './OneTime'
+import TrainModel from './TrainModel'
 
 export {
   OneTime,
@@ -46,4 +47,5 @@ export {
   ProgressBar,
   HeaderInfo,
   Show,
+  TrainModel,
 };
