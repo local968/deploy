@@ -250,15 +250,11 @@ const blockStyle = makeStyles({
   },
   default: {
     display: 'inline-flex',
-    paddingLeft: 4,
-    paddingRight: 4,
   },
-  paddingLeft: {
+  noPadding: {
     display: 'inline-flex',
-    paddingLeft: 4,
-    paddingRight: 4,
   },
-  paddingRight: {
+  padding: {
     display: 'inline-flex',
     paddingLeft: 4,
     paddingRight: 4,
@@ -278,10 +274,12 @@ function Block(props: BlockProps) {
         return classes.func;
       case Type.ID:
         return classes.id;
+      case 'SPLIT':
+        return classes.padding;
       case 'LPAREN':
-        return classes.paddingRight;
+        return classes.padding;
       case 'RPAREN':
-        return classes.paddingLeft;
+        return classes.padding;
       default:
         return classes.default;
     }
