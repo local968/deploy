@@ -1355,9 +1355,11 @@ const EN_LAN = {
   DownloadPmml: 'Export PMML',
   CannotExportPmml: 'Cannot be Exported',
   ModelProcessing: 'Processing',
-  ModelInterpretation: 'Model interpretation',
+  ModelInterpretation:'Model interpretation',
+  check:'check',
   DeploySummary: 'Data Report',
-  DeploySummaryData: 'View'
+  DeploySummaryData: 'View',
+  PictureDownload:'Picture download',
 };
 
 

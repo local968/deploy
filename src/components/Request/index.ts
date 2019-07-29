@@ -28,7 +28,7 @@ const post = params => {
         if (err || !res.ok) {
           reject(err);
         } else {
-          resolve(res.body);
+          resolve(res.body||res.text);
         }
       });
   });
