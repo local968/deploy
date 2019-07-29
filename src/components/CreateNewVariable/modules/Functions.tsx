@@ -22,7 +22,7 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: 500,
+    height: 400,
     overflowY: 'auto',
   },
   textFiled: {
@@ -46,12 +46,12 @@ interface InterfaceFunctionProps {
   functions?: { [key: string]: Array<Coordinate> };
 }
 
-interface InterfaceFunctionState {
-  functions?: Array<Coordinate>;
-  base: boolean;
-  senior: boolean;
-  filterStr: string;
-}
+// interface InterfaceFunctionState {
+//   functions?: Array<Coordinate>;
+//   base: boolean;
+//   senior: boolean;
+//   filterStr: string;
+// }
 
 function Functions(props: InterfaceFunctionProps) {
   // initial styles
@@ -64,7 +64,7 @@ function Functions(props: InterfaceFunctionProps) {
     filterStr: '',
     base: true,
     senior: true,
-  } as InterfaceFunctionState);
+  } as any);
 
   const _onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({
@@ -74,8 +74,8 @@ function Functions(props: InterfaceFunctionProps) {
   };
 
   const onCosClick = (k: string) => {
-    // const { [k]: value } = state;
-    // setState({ ...state, [k]: !value });
+    const { [k]: value } = state;
+    setState({ ...state, [k]: !value });
   };
 
   // filter

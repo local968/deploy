@@ -19,7 +19,7 @@ import { Coordinate } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   list: {
-    height: 500,
+    height: 400,
     overflowY: 'auto',
   },
   textFiled: {

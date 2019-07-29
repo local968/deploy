@@ -12,7 +12,7 @@ import FunctionTips from '../FunctionTips';
 
 const useStyles = makeStyles({
   detail: {
-    height: 526,
+    height: 426,
     overflowY: 'auto',
     overflowX: 'hidden',
     textAlign: 'left',

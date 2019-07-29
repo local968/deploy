@@ -144,6 +144,7 @@ function Expression(props: ExpressionProps) {
       <FormControl className={classes.exp}>
         <Input
           className={classes.input}
+          value={''}
           onChange={handleChange}
           onKeyDown={onKeyDown}
           // onFocus={onFocus}
@@ -152,7 +153,7 @@ function Expression(props: ExpressionProps) {
           inputProps={{
             id: 'expInput' + sign,
             style: {
-              width: 6,
+              width: 2,
               position: 'relative'
             },
           }}

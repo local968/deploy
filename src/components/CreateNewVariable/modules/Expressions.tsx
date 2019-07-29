@@ -254,7 +254,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                 </TableCell>
                 <TableCell>
                   <IconButton
-                    onClick={this.deleteOne.bind(this, k)}
+                    onClick={(e) => this.deleteOne(k)(e)}
                     disabled={this.expSize === 1}
                   >
                     <DeleteIcon />
