@@ -7,6 +7,25 @@ const concurrent = 4
 
 const test = false
 
+const autoFixHeader = (mapHeader) => {
+  const temp: any = {};
+  const header = mapHeader.map((h, i) => {
+    h = h.trim();
+    if (/^$/.test(h)) {
+      h = `Unnamed: ${i}`;
+    }
+    if (!temp[h]) {
+      temp[h] = 1;
+    } else {
+      h = h + '.' + temp[h];
+      temp[h]++;
+    }
+    return h;
+  });
+
+  return header
+}
+
 export default function EsUploader(file, option: any = {}) {
   let index = false
   let hasNextChunk = true
@@ -128,7 +147,7 @@ export default function EsUploader(file, option: any = {}) {
   }
 
   const getNextChunk = async () => {
-    const _header = header.filter(key => key !== '__no').map((k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
+    const _header = autoFixHeader(header).filter(key => key !== '__no').map((k, i) => option.mapHeader ? option.mapHeader.indexOf(k) : i)
     _header.unshift('__no')
     chunk.unshift(_header)
     const csvChunk = papa.unparse(chunk)

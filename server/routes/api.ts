@@ -15,6 +15,24 @@ import _ from 'lodash';
 
 const esServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
+const autoFixHeader = (mapHeader) => {
+  const temp: any = {};
+  const header = mapHeader.map((h, i) => {
+    h = h.trim();
+    if (/^$/.test(h)) {
+      h = `Unnamed: ${i}`;
+    }
+    if (!temp[h]) {
+      temp[h] = 1;
+    } else {
+      h = h + '.' + temp[h];
+      temp[h]++;
+    }
+    return h;
+  });
+
+  return header
+}
 // const { userDeployRestriction } = restriction;
 
 wss.register('getDeploymentToken', (message = {}, socket) => {
@@ -74,7 +92,7 @@ router.post('/deploy', async (req, res) => {
     return errorRes(10005);
   data = rawData.map((r, i) => {
     const row = {}
-    Object.keys(r).forEach(key => {
+    autoFixHeader(Object.keys(r)).forEach(key => {
       row[mapHeader.indexOf(key)] = r[key]
     })
     row['__no'] = i
