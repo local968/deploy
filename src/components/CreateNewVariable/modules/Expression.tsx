@@ -157,8 +157,22 @@ function Expression(props: ExpressionProps) {
           },
         }}
         InputProps={{
+          style: {
+            padding: 0,
+          },
           startAdornment: (
             <InputAdornment position={'start'} style={{ marginRight: 0 }}>
+              <Block
+                style={{
+                  width: '1rem',
+                  height: '1rem',
+                }}
+                key={-1}
+                index={-1}
+                data={{}}
+                inRange={false}
+                onClick={e => onClick(-1)(e)}
+              />
               {startValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
@@ -190,6 +204,17 @@ function Expression(props: ExpressionProps) {
                   onClick={e => onClick(k + end)(e)}
                 />
               ))}
+              <Block
+                style={{
+                  width: '2rem',
+                  height: '1rem',
+                }}
+                key={-1}
+                index={-1}
+                data={{}}
+                inRange={false}
+                onClick={e => onClick(endValue.length - 1 + end)(e)}
+              />
             </InputAdornment>
           ),
         }}
@@ -199,6 +224,7 @@ function Expression(props: ExpressionProps) {
 }
 
 interface BlockProps {
+  style?;
   index: number;
   data: Coordinate;
   inRange: boolean;
@@ -214,6 +240,7 @@ const blockStyle = makeStyles({
   id: {
     margin: ' 0 1px',
     display: 'inline-flex',
+    fontWeight: 'bold',
   },
   selected: {
     backgroundColor: '#3f51b5',
@@ -223,7 +250,8 @@ const blockStyle = makeStyles({
   },
   default: {
     display: 'inline-flex',
-    // padding: '6px 0 7px',
+    paddingLeft: 4,
+    paddingRight: 4,
   },
   paddingLeft: {
     display: 'inline-flex',
@@ -238,10 +266,11 @@ const blockStyle = makeStyles({
 });
 
 function Block(props: BlockProps) {
-  const { index, data, inRange, onClick } = props;
-  const { name, type } = data;
   const classes = blockStyle({});
 
+  const { index, data, inRange, onClick, style } = props;
+  const { name, type } = data;
+  console.log(data);
   const getRenderClass = () => {
     if (inRange) return classes.selected;
     switch (type) {
@@ -259,7 +288,12 @@ function Block(props: BlockProps) {
   };
 
   return (
-    <span className={getRenderClass()} data-i={index} onClick={onClick}>
+    <span
+      style={style}
+      className={getRenderClass()}
+      data-i={index}
+      onClick={onClick}
+    >
       {name}
     </span>
   );
