@@ -12,7 +12,7 @@ import {
   TableRow,
   TableCell,
   TextField,
-  IconButton,
+  IconButton, Grid,
 } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -21,11 +21,19 @@ import { Exp, Coordinate, Type } from '../types/Coordinate';
 import Expression from './Expression';
 
 import EN from '../../../constant/en';
+import { styled } from '@material-ui/styles';
 
 const useStyles = withStyles({
   table: {
     minWidth: '40rem',
   },
+  textField: {
+    backgroundColor: '#FFF',
+  },
+});
+
+const MyTableCell = styled(TableCell)({
+  paddingRight: 14,
 });
 
 interface ExpressionsProps {
@@ -130,7 +138,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
 
   public onFocus = (k: number) => (e: React.MouseEvent<HTMLInputElement>) => {
     const { setRange, setIndex } = this.props;
-    const input: HTMLInputElement = e.currentTarget.getElementsByTagName(
+    const input: HTMLInputElement = e.currentTarget.parentElement.getElementsByTagName(
       'input',
     )[0];
     this.setState({
@@ -214,10 +222,10 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: 252 }}>{EN.Variablename}</TableCell>
-              <TableCell style={{ width: 10 }} />
-              <TableCell style={{ width: 360 }}>{EN.formula}</TableCell>
-              <TableCell align={'right'} />
+              <MyTableCell style={{ width: 252 }}>{EN.Variablename}</MyTableCell>
+              <MyTableCell style={{ width: 10 }} />
+              <MyTableCell style={{ width: 360 }}>{EN.formula}</MyTableCell>
+              <MyTableCell align={'right'} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -227,18 +235,19 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                 selected={k === index}
                 onClick={e => this.selectOne(k)(e)}
               >
-                <TableCell>
+                <MyTableCell>
                   <TextField
-                    label={`Name`}
+                    autoFocus={true}
+                    placeholder={`Name`}
                     className={classes.textField}
                     value={exp.label}
                     onChange={this._onChangeExpLabel}
                     margin={'dense'}
                     variant={'outlined'}
                   />
-                </TableCell>
-                <TableCell>=</TableCell>
-                <TableCell>
+                </MyTableCell>
+                <MyTableCell>=</MyTableCell>
+                <MyTableCell>
                   <Expression
                     exp={exp}
                     setRange={setRange}
@@ -251,10 +260,10 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     setIndex={() => setIndex(k)}
                     toogleTooltip={() => this.setState({ isTipOpen: true })}
                   />
-                </TableCell>
-                <TableCell>
+                </MyTableCell>
+                <MyTableCell>
                   <IconButton
-                    onClick={(e) => this.deleteOne(k)(e)}
+                    onClick={e => this.deleteOne(k)(e)}
                     disabled={this.expSize === 1}
                   >
                     <DeleteIcon />
@@ -265,7 +274,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                   >
                     <AddIcon />
                   </IconButton>
-                </TableCell>
+                </MyTableCell>
               </TableRow>
             ))}
           </TableBody>

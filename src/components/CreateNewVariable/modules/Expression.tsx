@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { FormControl, Input } from '@material-ui/core';
+import { FormControl, TextField, InputAdornment } from '@material-ui/core';
 
 import { Exp, Coordinate, Type } from '../types/Coordinate';
 
@@ -130,9 +130,7 @@ function Expression(props: ExpressionProps) {
   };
 
   const onClick = (k: number) => (e: React.MouseEvent<HTMLSpanElement>) => {
-    const input = e.currentTarget.parentElement.getElementsByTagName(
-      'input',
-    )[0];
+    const input = e.currentTarget.parentElement.parentElement.getElementsByTagName('input')[0];
     setRange(k + 1, k + 1);
     setIndex();
     input.focus();
@@ -140,32 +138,33 @@ function Expression(props: ExpressionProps) {
   };
 
   return (
-    <>
-      <FormControl className={classes.exp}>
-        <Input
-          className={classes.input}
-          value={''}
-          onChange={handleChange}
-          onKeyDown={onKeyDown}
-          // onFocus={onFocus}
-          onClick={onFocus}
-          // onSelect={onSelect}
-          inputProps={{
-            id: 'expInput' + sign,
-            style: {
-              width: 2,
-              position: 'relative'
-            },
-          }}
-          startAdornment={
-            <>
+    <FormControl component={'div'} className={classes.exp}>
+      <TextField
+        className={classes.input}
+        value={''}
+        onChange={handleChange}
+        onKeyDown={onKeyDown}
+        onClick={onFocus}
+        margin={'dense'}
+        variant={'outlined'}
+        // onSelect={onSelect}
+        inputProps={{
+          id: 'expInput' + sign,
+          style: {
+            width: 2,
+            position: 'relative',
+          },
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
               {startValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
                   index={k}
                   data={v}
                   inRange={false}
-                  onClick={onClick(k)}
+                  onClick={e => onClick(k)(e)}
                 />
               ))}
               {rangeValue.map((v: Coordinate, k: number) => (
@@ -174,27 +173,27 @@ function Expression(props: ExpressionProps) {
                   index={k + start}
                   data={v}
                   inRange={true}
-                  onClick={onClick(k + start)}
+                  onClick={e => onClick(k + start)(e)}
                 />
               ))}
-            </>
-          }
-          endAdornment={
-            <>
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
               {endValue.map((v: Coordinate, k: number) => (
                 <Block
                   key={k}
                   index={k + end}
                   data={v}
                   inRange={false}
-                  onClick={onClick(k + end)}
+                  onClick={e => onClick(k + end)(e)}
                 />
               ))}
-            </>
-          }
-        />
-      </FormControl>
-    </>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </FormControl>
   );
 }
 
