@@ -301,7 +301,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
           </TableBody>
         </Table>
         <Popper
-          open={!!this.recommend.value}
+          open={this.state.isOpen && !!this.recommend.value}
           anchorEl={input}
           placement="bottom-start"
           className={classes.popper}
