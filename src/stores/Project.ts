@@ -106,6 +106,7 @@ export interface TrainCommand {
   showSsPlot?: boolean,
   esIndex?: string;
   settingId?: string;
+  mapHeader?: string[]
 }
 
 export interface DataView {
@@ -1462,13 +1463,15 @@ class Project {
       problemType,
       target,
       dataHeader,
-      colType
+      colType,
+      mapHeader
     } = this;
 
     let command = '';
     let trainData: TrainCommand = {}
 
     const featureLabel = dataHeader.filter(d => d !== target).filter(h => colType[h] !== 'Raw');
+    const realLabel = featureLabel.map(k => mapHeader[k])
     if (!featureLabel.length) return antdMessage.error("no feature label");
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
@@ -1514,7 +1517,8 @@ class Project {
           applyWeights: {},
           problemType,
           targetLabel: target ? [target] : [],
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         break;
       case 'Outlier':
@@ -1539,7 +1543,8 @@ class Project {
           applyWeights: {},
           problemType,
           targetLabel: target ? [target] : [],
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         break;
       case 'Classification':
@@ -1579,7 +1584,8 @@ class Project {
             'r2-logistics',
           ],
           featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1620,7 +1626,8 @@ class Project {
             'xgradient_boosting',
           ],
           featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Regression'), fe)),
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
@@ -1679,13 +1686,15 @@ class Project {
       trainHeader,
       colType,
       features,
-      standardTypeTemp
+      standardTypeTemp,
+      mapHeader
     } = this;
 
     let command = '';
     let trainData: TrainCommand = {}
 
     const featureLabel = [...dataHeader, ...newVariable].filter(d => d !== target && !trainHeader.includes(d)).filter(h => colType[h] !== 'Raw');
+    const realLabel = featureLabel.map(k => newVariable.includes(k) ? k : mapHeader[k])
     if (!featureLabel.length) return antdMessage.error("no feature label")
     const setting = this.settings.find(s => s.id === this.settingId)
     if (!setting || !setting.name) return antdMessage.error("setting error")
@@ -1712,7 +1721,8 @@ class Project {
           applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : [],
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         break;
       case 'Outlier':
@@ -1731,7 +1741,8 @@ class Project {
           applyWeights: weightsTemp,
           problemType,
           targetLabel: target ? [target] : [],
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         break;
       default:
@@ -1785,7 +1796,8 @@ class Project {
           holdoutRate: this.holdoutRate / 100,
           algorithms: this.algorithms,
           featuresPreprocessor,
-          esIndex: this.etlIndex
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
         };
         if (this.runWith === 'holdout') {
           trainData.validationRate = this.validationRate / 100
@@ -1956,7 +1968,7 @@ class Project {
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
         const aa = await this.abortTrain(si, isModeling)
-        console.log(aa , 'adasda')
+        console.log(aa, 'adasda')
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
