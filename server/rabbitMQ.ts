@@ -65,14 +65,14 @@ export default class RabbitMQ {
     const queueName = _.includes(task.command, `${config.requestQueue}.`)
       ? task.command
       : `${config.requestQueue}.${task.command}`;
-    console.log(queueName);
+    // console.log(queueName);
     const mq = await this.getAmqplib();
     const ch = await mq.createChannel();
     // 创建队列
     await ch.assertQueue(queueName);
 
     !_.isEmpty(task) &&
-    (await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task))));
+      (await ch.sendToQueue(queueName, Buffer.from(JSON.stringify(task))));
 
     await ch.close();
   };
@@ -81,11 +81,11 @@ export default class RabbitMQ {
     const ch = await mq.createChannel();
 
     const res = await ch.assertExchange('result', 'direct', { durable: true });
-    console.log('res:', res);
+    // console.log('res:', res);
 
     const queue_lists = QUEUE_RESULT && QUEUE_RESULT.split(';');
 
-    console.log('监听队列列表：', queue_lists);
+    // console.log('监听队列列表：', queue_lists);
 
     _.forEach(queue_lists, queue => {
       this.consume(ch, queue, msg => {
@@ -105,7 +105,7 @@ export default class RabbitMQ {
           resolve(msg);
 
           const content = msg && msg.content.toString();
-          console.log('收到消息: ', `queue: ${queue}`, content);
+          // console.log('收到消息: ', `queue: ${queue}`, content);
           ch.ack(msg);
 
           if (content && callBack) {

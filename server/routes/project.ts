@@ -1399,6 +1399,9 @@ wss.register('train', async (message, socket, progress) => {
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
     );
+
+    console.log(commandRes, 'commandRes')
+
     const count =
       commandRes.filter((cr: any) => !cr.isAbort && cr.status === 100) || [];
 
