@@ -617,10 +617,10 @@ const OutlierTable = observer(props => {
           </Show>
         </div>}
         {!train2Finished &&
-          stopIds.map((stopId, k) => {
+          stopIds.map(stopId => {
             const trainingModel = trainModel[stopId];
             if (!trainingModel) return null;
-            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={abortTrain} show='result_abortButton_UN_OUT' key={k} />
+            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={abortTrain} show='result_abortButton_UN_OUT' key={stopId} />
           })}
       </div>
     </div>
@@ -1054,10 +1054,10 @@ const ClusteringTable = observer(props => {
           </Show>
         </div>}
         {!train2Finished &&
-          stopIds.map((stopId, k) => {
+          stopIds.map(stopId => {
             const trainingModel = trainModel[stopId];
             if (!trainingModel) return null;
-            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={abortTrain} show='result_abortButton_UN_AGGRE' key={k} />
+            return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={abortTrain} show='result_abortButton_UN_AGGRE' key={stopId} />
           })}
       </div>
     </div>

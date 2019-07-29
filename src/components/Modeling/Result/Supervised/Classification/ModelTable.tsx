@@ -253,10 +253,10 @@ export default class ModelTable extends Component<Interface> {
             </Show>
           </div>}
           {!train2Finished &&
-            stopIds.map((stopId, k) => {
+            stopIds.map(stopId => {
               const trainingModel = trainModel[stopId];
               if (!trainingModel) return null;
-              return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_TWO' key={k} />
+              return <TrainModel trainingModel={trainingModel} isAbort={isAbort} abortTrain={this.abortTrain} show='result_abortButton_TWO' key={stopId} />
             })}
         </div>
       </div>
