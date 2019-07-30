@@ -180,7 +180,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     // setRange(len, len);
     // setIndex(index);
     // this.popperNode.focus();
-    // this.popperNode.e.stopPropagation();
+    // e.stopPropagation();
   };
 
   public getSuggestions = () => {
@@ -248,15 +248,8 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
       left,
       right,
       addExp,
-      handleFunction,
-      handleVariables,
-      changeExpLabel,
-      variables,
-      functions,
       func,
     } = this.props;
-
-    console.log(this.state.isOpen, this.popperNode);
 
     return (
       <MuiCard style={{ paddingBottom: 0 }}>
