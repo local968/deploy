@@ -755,39 +755,7 @@ wss.register('queryProject', (message, socket) => {
 
 wss.register('queryModelList', (message, socket, process) => {
   const { id } = message;
-  const key = `project:${id}:models`;
-
-  return redis.smembers(key).then(ids => {
-    let promise: Promise<void> = Promise.resolve()
-
-    ids.forEach(modelId => {
-      const curPromise: Promise<void> = new Promise(async resolve => {
-        try {
-          const result = await redis.hgetall(`project:${id}:model:${modelId}`)
-          const model = Object.entries(result).reduce((prev: {}, [key, value]: [string, string]) => {
-            prev[key] = JSON.parse(value);
-            return prev
-          }, {})
-          process({
-            status: 200,
-            message: 'ok',
-            model,
-          })
-        } catch (e) {
-          process({
-            status: 417,
-            message: `init model ${modelId} failed`
-          })
-        }
-        resolve()
-      })
-      promise = promise.then(() => curPromise)
-    });
-    return promise.then(() => ({
-      status: 200,
-      message: 'ok'
-    }))
-  });
+  return queryModelList(id, process);
 });
 
 // wss.register('etl', (message, socket, progress) => {
@@ -1639,6 +1607,41 @@ wss.register('outlierPlot', (message, socket) => {
   // })
 });
 
+function queryModelList(id: any, process: any) {
+  const key = `project:${id}:models`;
+  return redis.smembers(key).then(ids => {
+    let promise: Promise<void> = Promise.resolve();
+    ids.forEach(modelId => {
+      const curPromise: Promise<void> = new Promise(async (resolve) => {
+        try {
+          const result = await redis.hgetall(`project:${id}:model:${modelId}`);
+          const model = Object.entries(result).reduce((prev: {}, [key, value]: [string, string]) => {
+            prev[key] = JSON.parse(value);
+            return prev;
+          }, {});
+          process({
+            status: 200,
+            message: 'ok',
+            model,
+          });
+        }
+        catch (e) {
+          process({
+            status: 417,
+            message: `init model ${modelId} failed`
+          });
+        }
+        resolve();
+      });
+      promise = promise.then(() => curPromise);
+    });
+    return promise.then(() => ({
+      status: 200,
+      message: 'ok'
+    }));
+  });
+}
+
 function mapObjectToArray(obj) {
   const arr = [];
   Object.entries(obj).forEach(([k, v]) => {
@@ -1764,11 +1767,23 @@ router.get('/export', (req, res) => {
       targetLabel: [JSON.parse(p.target || '""')],
       problemType: JSON.parse(p.problemType || '""'),
       mapHeader: JSON.parse(p.mapHeader || '""'),
+      cutoff: {}
     }
-    return res.json({
-      status: 100,
-      message: 'ok',
-      data: project
+    let promise = Promise.resolve()
+    if (project.problemType === 'Classification') promise = queryModelList(id, result => {
+      const { status, model } = result
+      if (status !== 200) return
+      const { chartData, fitIndex, id } = model
+      const { roc: { Threshold } } = chartData
+      project.cutoff[id] = Threshold[fitIndex]
+    });
+
+    return promise.then(() => {
+      return res.json({
+        status: 100,
+        message: 'ok',
+        data: project
+      })
     })
   })
 })
