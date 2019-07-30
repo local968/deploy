@@ -21,7 +21,8 @@ export default class UnivariantPlots extends PureComponent<DataSampleProps>{
 
 		let {data=[],item=[]} = toJS(result);
 
-		const series = data.map((itm)=>{
+		const series = data.sort((a:any,b:any)=>a.name.charCodeAt(0) - b.name.charCodeAt(0))
+			.map((itm)=>{
 			return {
 				name:renameVariable[itm.name]||itm.name,
 				data:itm.value,
