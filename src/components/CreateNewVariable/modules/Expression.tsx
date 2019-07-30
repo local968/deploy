@@ -8,11 +8,11 @@ import { Exp, Coordinate, Type } from '../types/Coordinate';
 
 const useStyles = makeStyles({
   exp: {
-    width: 400,
+    width: 420,
     flex: '1 1',
     overflowX: 'hidden',
   },
-  input: {
+  textField: {
     flexWrap: 'wrap',
     backgroundColor: '#fff',
   },
@@ -138,7 +138,7 @@ function Expression(props: ExpressionProps) {
   return (
     <FormControl component={'div'} className={classes.exp}>
       <TextField
-        className={classes.input}
+        className={classes.textField}
         value={''}
         onChange={handleChange}
         onKeyDown={onKeyDown}
