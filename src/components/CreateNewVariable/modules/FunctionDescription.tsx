@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Typography } from '@material-ui/core';
+// import { Typography } from '@material-ui/core';
 import styles from './FuncDescription.module.css';
-import EN from '../../constant/en';
+import EN from '../../../constant/en';
 import { Table } from 'antd';
 import { chain, range, zipObject } from 'lodash';
 import config from 'config';
-import enFunctions from './DescriptionData-en';
-import zhFunctions from './DescriptionData-zh';
+import enFunctions from '../DescriptionData-en';
+import zhFunctions from '../DescriptionData-zh';
 
 const isEN = config.isEN;
 

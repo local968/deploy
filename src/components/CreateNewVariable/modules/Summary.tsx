@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { MuiCard } from './MuiModule';
 import { Paper } from '@material-ui/core'
-import Description from '../FunctionDescription';
+import Description from './FunctionDescription';
 
 const useStyles = makeStyles({
   detail: {
