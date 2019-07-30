@@ -3,12 +3,8 @@ import * as React from 'react';
 import { makeStyles } from '@material-ui/styles';
 
 import { MuiCard } from './MuiModule';
-import { Paper } from '@material-ui/core';
-
-import details from '../details';
-
-import { Detail } from '../types/Coordinate';
-import FunctionTips from '../FunctionTips';
+import { Paper } from '@material-ui/core'
+import Description from '../FunctionDescription';
 
 const useStyles = makeStyles({
   detail: {
@@ -17,7 +13,7 @@ const useStyles = makeStyles({
     overflowX: 'hidden',
     textAlign: 'left',
     margin: '.75rem 0',
-    padding: '1rem',
+    padding: '0 1.5rem',
   },
 });
 
@@ -30,19 +26,10 @@ function Summary(props: SummaryProps) {
 
   const { detailKey } = props;
 
-  const current: Detail | undefined = details.find(d => d.name === detailKey);
-
   return (
     <MuiCard>
       <Paper className={classes.detail} elevation={0} square={true}>
-        {current ? (
-          <>
-            <h3>{current.name}</h3>
-            <p dangerouslySetInnerHTML={{ __html: current.value }} />
-          </>
-        ) : (
-          <FunctionTips value={detailKey} />
-        )}
+        <Description funcName={detailKey}/>
       </Paper>
     </MuiCard>
   );

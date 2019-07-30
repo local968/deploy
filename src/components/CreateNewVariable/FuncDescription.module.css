@@ -1,0 +1,34 @@
+.title {
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem !important;
+}
+
+.label {
+  font-size: 1rem;
+  font-weight: bold;
+  min-width: 3.2rem;
+}
+
+.input {
+  display: flex;
+  flex-direction: row;
+}
+
+.grammar {
+  font-size: 1.1rem;
+  color: #F4B700;
+}
+
+.tableLabel {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.gap {
+  font-size: 1rem;
+  font-family: apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.gap > div {
+  margin-bottom: 1rem;
+}
