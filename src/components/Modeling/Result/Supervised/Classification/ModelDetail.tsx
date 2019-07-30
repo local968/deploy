@@ -57,9 +57,9 @@ export default class ModelDetail extends Component<Interface> {
       mapHeader,
       project,
     } = this.props;
-    const {linearData=false,treeData=false,modelName} = model as any;
+    const { linearData = false, treeData = false, modelName } = model as any;
 
-    const _check = linearData||treeData;
+    const _check = linearData || treeData;
 
     return (
       <div className={styles.rowBox}>
@@ -123,9 +123,9 @@ export default class ModelDetail extends Component<Interface> {
                 {EN.Compute}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.compute,_check?'':styles.disable)}>
-                <img src={icon_check} alt="" style={{width:15}} />
-                <span onClick={_check&&this.toggleImpact.bind(this, 'check')}>
+            <div className={classnames(styles.cell, styles.compute, _check ? '' : styles.disable)}>
+              <img src={icon_check} alt="" style={{ width: 15 }} />
+              <span onClick={_check ? this.toggleImpact.bind(this, 'check') : () => { }}>
                 {EN.check}
               </span>
             </div>
@@ -147,7 +147,7 @@ export default class ModelDetail extends Component<Interface> {
         {this.visible && this.type === 'process' && (
           <MPF modelId={model.id} project={project} model={model} />
         )}
-        {this.visible && this.type === 'check' && <ModelInterpretation treeData={treeData} linearData={linearData} modelName={modelName}/>}
+        {this.visible && this.type === 'check' && <ModelInterpretation treeData={treeData} linearData={linearData} modelName={modelName} />}
 
       </div>
     );
