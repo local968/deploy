@@ -2072,9 +2072,8 @@ class Project {
   }
 
   preTrainImportance = () => {
-   // if (this.preImportanceLoading) return Promise.resolve()
+    if (this.preImportanceLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
-
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
       const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
       const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
@@ -2102,18 +2101,18 @@ class Project {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
       //   command.csvScript = variables.map(v => this.expression[v]).filter(n => !!n).join(";").replace(/\|/g, ",")
       // }
-     // this.preImportanceLoading = true
+      this.preImportanceLoading = true
       return api.preTrainImportance(command)
         .then((returnValue: BaseResponse) => {
           const { status, result } = returnValue
-          console.log(returnValue , 'returnValue',result)
           if (status < 0) {
             return antdMessage.error(result['processError'])
           }
-          this.setProperty({
-            preImportance: result.preImportance,
-            informativesLabel: result.informativesLabel,
-          })
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
         })
     })
   }
