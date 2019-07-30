@@ -16,21 +16,27 @@ export default function ModelInterpretation(props){
         url:linearData||treeData,
       }
     }).then((result:any)=>{
-      if(typeof result === 'object'){
+      if(linearData){
         let {data,intercept} = result;
 
         if(intercept>0){
           intercept = '+' + intercept;
         }
         let list = '';
-        data.forEach(itm=>list+=`${itm[0]}*${itm[1]}\\\\`);
+        data.forEach((itm,ind)=>{
+          const dt = itm[1].replace(/_/g,'\\_');
+          if(ind>1000)return;
+          list+=`${itm[0]}*${dt}\\\\`
+        });
+        console.log(11,list)
         katex.render(`Z=\\Sigma \\allowbreak\t
       \\begin{Bmatrix} 
          ${list}
       \\end{Bmatrix}
      \\allowbreak\t ${intercept}`,
           dom.current, {
-            throwOnError: false
+            throwOnError: false,
+            maxExpand:Infinity,
           });
       }else{
         setUrl(result)

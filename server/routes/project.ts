@@ -78,7 +78,7 @@ async function query(key, offset, limit, userId) {
   const projectIdList = await projectService.list(userId) || [];
   const count = projectIdList.length;
   const result = { count, list: [] };
-  const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName'];
+  const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName', 'problemType', 'train2ing'];
 
   const promiseArray = projectIdList.splice(offset, limit).map(r => {
     return redis.hmget("project:" + r, Field)
@@ -1763,6 +1763,7 @@ router.get('/export', (req, res) => {
       featureLabel: JSON.parse(p.dataHeader || '""'),
       targetLabel: [JSON.parse(p.target || '""')],
       problemType: JSON.parse(p.problemType || '""'),
+      mapHeader: JSON.parse(p.mapHeader || '""'),
     }
     return res.json({
       status: 100,

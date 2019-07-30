@@ -124,6 +124,10 @@ body {
   border-bottom: 0 !important;
 }
 
+.katex {
+  font-size: 1.1em;
+}
+
 
 .katex-html{
   display: flex !important;
@@ -131,8 +135,10 @@ body {
 }
 
 .katex-html >:nth-child(3){
-  /*display: none;*/
-  /*color:red;*/
   overflow: auto;
   max-height: 300px;
+}
+.katex .mathdefault{
+  /*font-family: unset;*/
+  /*font-style: normal;*/
 }

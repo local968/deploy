@@ -417,7 +417,7 @@ class SchedulePerformance extends Component<SchedulePerformanceProps> {
           className={styles.results}><span className={styles.status}>{EN.DeploySummaryData}</span>
         </a> : <span className={styles.emptyResults}> - </span>}
         {<Modal
-          content={<Summary summary={this.summary} onClose={this.onClose} loading={this.loading} />}
+          content={<Summary summary={this.summary} onClose={this.onClose} loading={this.loading} hasTarget={!['Clustering', 'Outlier'].includes(s.deployment.modelType)} />}
           visible={this.visible}
           width="12em"
           title={EN.DeploySummary}

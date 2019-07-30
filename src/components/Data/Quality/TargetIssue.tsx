@@ -254,7 +254,7 @@ class TargetIssue extends Component<TargetIssueProps> {
               <div
                 className={classnames(styles.typeBlock, styles.outlier)}
               />
-              <span>{EN.Outlier}</span>
+              <span>{EN.OutlierDetection}</span>
             </div>
           )}
           <div className={styles.issueTabs}>

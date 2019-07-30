@@ -90,7 +90,7 @@ export default class MPF_UL extends Component<Interface> {
 
 		const mv = this.DQFData(nfm,EN.MissingValue,nullLineCounts[target]);//缺失值
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
-		const out = this.DQFData(outlierFillMethod,`${EN.Outlier}`,outlierLineCounts[target],true);
+		const out = this.DQFData(outlierFillMethod,`${EN.OutlierDetection}`,outlierLineCounts[target],true);
 
 		const dqft = problemType==='Classification'&&this.DQFT();
 

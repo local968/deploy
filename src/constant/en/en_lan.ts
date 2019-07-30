@@ -1359,6 +1359,9 @@ const EN_LAN = {
   check:'check',
   DeploySummary: 'Data Report',
   DeploySummaryData: 'View',
+  HomeTraining: 'Training',
+  Classification: 'Classification',
+  Regression: 'Regression',
   PictureDownload:'Picture download',
 };
 

@@ -189,7 +189,7 @@ class ScheduleOperation extends Component {
         className={styles.results}><span className={styles.status}>{EN.DeploySummaryData}</span>
       </a> : <span className={styles.emptyResults}> - </span>}
       {<Modal
-        content={<Summary summary={this.summary} onClose={this.onClose} loading={this.loading} />}
+        content={<Summary summary={this.summary} onClose={this.onClose} loading={this.loading} hasTarget={false} />}
         visible={this.visible}
         width="12em"
         title={EN.DeploySummary}

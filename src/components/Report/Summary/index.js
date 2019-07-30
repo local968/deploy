@@ -93,7 +93,7 @@ class Summary extends Component {
           </div>}
           {(problemType !== 'Classification' && (!!targetIssuesCountsOrigin.outlierRow || !!outlierCount)) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
-            <span>{EN.Outlier}</span>
+            <span>{EN.OutlierDetection}</span>
           </div>}
         </div>
         <div className={styles.summaryTable}>

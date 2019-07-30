@@ -33,7 +33,7 @@ function Main(props: MainProps) {
       }
       _autorun = autorun(() => {
         if (!project || !project.init) return
-        const { curStep = 0, id = '', problemType = '' } = project || {};
+        const { curStep = 0, id = '' } = project || {};
         if (curStep === step) return
         step = curStep
         let url = ''
@@ -52,7 +52,7 @@ function Main(props: MainProps) {
             break
           default:
         }
-        if (!url) routing.push('/')
+        if (!url) return routing.push('/')
         if (!routing.location.pathname.startsWith(`/project/${id}`)) return
         if (routing.location.pathname.includes(url)) return
         return routing.push(url)
@@ -70,8 +70,9 @@ function Main(props: MainProps) {
   React.useEffect(() => {
     return () => {
       _autorun && _autorun()
+      projectStore.clean()
     }
-  })
+  }, [])
 
   const exit = () => {
     routing.push("/")

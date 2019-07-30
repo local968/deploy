@@ -397,7 +397,7 @@ class FixIssue extends Component<FixIssueProps> {
           <div className={styles.typeBox}>
             <div className={styles.type}>
               <div className={classnames(styles.typeBlock, styles.outlier)} />
-              <span>{EN.Outlier}</span>
+              <span>{EN.OutlierDetection}</span>
             </div>
             {Object.keys(outlierRow).length > 1 && <div className={styles.batch}>
               <Select className={styles.batchSelect} placeholder={EN.BatchFix} value={undefined} onSelect={this.handleSelect('outlier')}>
@@ -477,7 +477,7 @@ class FixIssue extends Component<FixIssueProps> {
           closeByMask={true}
           showClose={true}
           visible={this.visible}
-          title={EN.Outlier}
+          title={EN.OutlierDetection}
           onClose={this.closeEdit}
           content={
             <OutlierRange

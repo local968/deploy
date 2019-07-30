@@ -1431,7 +1431,7 @@ export class NewVariableView extends React.Component<
     // console.log(`NewVariableView`);
     const { exps, index, detailKey, loading } = this.state;
     const { functions } = this.props;
-console.log(this.newVariables)
+
     return (
       <>
         <Container component={MyContainer}>

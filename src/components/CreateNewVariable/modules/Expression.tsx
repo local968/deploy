@@ -32,7 +32,7 @@ interface ExpressionProps {
   right: () => void;
   addExp: (s: string) => void;
   toogleTooltip: () => void;
-  onFocus: (e: React.MouseEvent<HTMLInputElement>) => void;
+  onFocus: (el) => void;
   setIndex: () => void;
 }
 
@@ -59,7 +59,10 @@ function Expression(props: ExpressionProps) {
   const startValue: Array<Coordinate> = value.slice(0, start);
   const rangeValue: Array<Coordinate> = value.slice(start, end);
   const endValue: Array<Coordinate> = value.slice(end);
+
   const classes = useStyles({});
+
+  let popperNode: HTMLDivElement | null | undefined;
 
   const onSelect = () => {
     const selection: any = getSelection();
@@ -118,6 +121,7 @@ function Expression(props: ExpressionProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFocus(popperNode);
     toogleTooltip();
     const value: string = e.target.value.trim();
     if (!value) return;
@@ -125,12 +129,9 @@ function Expression(props: ExpressionProps) {
   };
 
   const onClick = (k: number) => (e: React.MouseEvent<HTMLSpanElement>) => {
-    const input = e.currentTarget.parentElement.parentElement.getElementsByTagName(
-      'input',
-    )[0];
     setRange(k + 1, k + 1);
     setIndex();
-    input.focus();
+    popperNode.focus();
     e.stopPropagation();
   };
 
@@ -141,7 +142,6 @@ function Expression(props: ExpressionProps) {
         value={''}
         onChange={handleChange}
         onKeyDown={onKeyDown}
-        onClick={onFocus}
         margin={'dense'}
         variant={'outlined'}
         // onSelect={onSelect}
@@ -155,6 +155,9 @@ function Expression(props: ExpressionProps) {
         InputProps={{
           style: {
             padding: 0,
+          },
+          inputRef: el => {
+            popperNode = el;
           },
           startAdornment: (
             <InputAdornment position={'start'} style={{ marginRight: 0 }}>

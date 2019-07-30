@@ -2512,7 +2512,9 @@ class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model: any) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader } = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader,informativesLabel } = this;
+
+    console.log(informativesLabel , 'informativesLabel')
 
     const list = [];
     list.push(this.histogram(target));
@@ -2585,6 +2587,8 @@ class Project {
     // aaa.routing.history.push('/report')
     console.log(this, 'ttttttttttttttttttttttt')
 
+
+
     // const data = {
     //   field: "sex",
     //   id: this.etlIndex,
@@ -2617,6 +2621,7 @@ class Project {
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
     model.graphicList = await this.allVariableList(model);
+    // await this.preTrainImportance()
     // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
 
@@ -2732,7 +2737,7 @@ function formatFeature(pt: 'Classification' | 'Regression') {
       'Polynomial': 'polynomial',
       'Feature Agglomeration': 'feature_agglomeration',
       'Kitchen Sinks': 'kitchen_sinks',
-      'Linear SVM': 'linear_svc_preprocessor',
+      'Linear SVM': 'liblinear_svc_preprocessor',
       'Nystroem Sampler': 'nystroem_sampler',
       'Select Percentile': 'select_percentile_classification',
       'Select Rates': 'select_rates',
@@ -2746,7 +2751,7 @@ function formatFeature(pt: 'Classification' | 'Regression') {
       'Polynomial': 'polynomial',
       'Feature Agglomeration': 'feature_agglomeration',
       'Kitchen Sinks': 'kitchen_sinks',
-      'Linear SVM': 'linear_svc_preprocessor',
+      'Linear SVM': 'liblinear_svc_preprocessor',
       'Nystroem Sampler': 'nystroem_sampler',
       'Select Percentile': 'select_percentile_regression',
       'Select Rates': 'select_rates',

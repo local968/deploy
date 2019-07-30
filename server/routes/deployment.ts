@@ -273,7 +273,6 @@ wss.register('getScheduleSummary', async (message) => {
     const modelStats = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'stats'))
     const featureLabel = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'featureLabel'))
     const target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
-    const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
 
     const {
       data: { totalFixedCount, deletedCount },
@@ -295,7 +294,6 @@ wss.register('getScheduleSummary', async (message) => {
     result.dataView = originResult.rawDataView
     result.totalCount = count
     result.target = target
-    result.problemType = problemType
   } catch (e) {
     console.log(e, 'sss')
   }

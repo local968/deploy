@@ -358,7 +358,7 @@ class VariableIssue extends Component<VariableIssueProps> {
               <div
                 className={classnames(styles.typeBlock, styles.outlier)}
               />
-              <span>{EN.Outlier}</span>
+              <span>{EN.OutlierDetection}</span>
             </div>
           )}
           {(!!mismatchCount || !!nullCount || !!outlierCount) && <div className={styles.multiMode}>

@@ -284,6 +284,8 @@ class ProjectStore {
                 createTime: data.createTime,
                 updateTime: data.updateTime,
                 name: data.name,
+                problemType: data.problemType,
+                train2ing: data.train2ing,
                 visiable: false
               })
               this.list.push(hiddenProject)
@@ -352,6 +354,8 @@ class ProjectStore {
         createTime: this.list[projectIndex].createTime,
         updateTime: this.list[projectIndex].updateTime,
         name: this.list[projectIndex].name,
+        problemType: this.list[projectIndex].problemType,
+        train2ing: this.list[projectIndex].train2ing
       })
     }
     this.currentId = ''
