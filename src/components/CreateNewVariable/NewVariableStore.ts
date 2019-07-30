@@ -42,13 +42,6 @@ export class NewVariableStore {
         params: 2,
       },
       {
-        name: 'Ln',
-        value: 'Ln',
-        type: Type.Func,
-        grammar: `${EN.Syntax}ln(@var)`,
-        params: 1,
-      },
-      {
         name: 'Eq',
         value: 'Eq',
         type: Type.Func,
@@ -207,7 +200,7 @@ export class NewVariableStore {
 
   @action setIndex = (k) => {
     this.index = k;
-  }
+  };
 }
 
 export default new NewVariableStore();
