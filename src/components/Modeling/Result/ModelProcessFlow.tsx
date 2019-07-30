@@ -368,7 +368,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 						<label>{EN.CreateTheseVariables}:</label>
 						<ul>
 							{
-								create.map(it=><li title={it}>{it}</li>)
+								create.map((it,ind)=><li key={ind} title={it}>{it}</li>)
 							}
 						</ul>
 					</dt>
