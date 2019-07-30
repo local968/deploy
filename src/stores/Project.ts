@@ -2085,7 +2085,7 @@ class Project {
       const feature_label = [...data_label, ...new_label]
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
-      let cmd = 'preTrainImportance'
+      let cmd = 'clfreg.preTrainImportance'
       // switch (this.problemType) {
       //   case 'Clustering':
       //     cmd = 'clustering.train';
