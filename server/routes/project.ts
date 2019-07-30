@@ -1763,6 +1763,7 @@ router.get('/export', (req, res) => {
       featureLabel: JSON.parse(p.dataHeader || '""'),
       targetLabel: [JSON.parse(p.target || '""')],
       problemType: JSON.parse(p.problemType || '""'),
+      mapHeader: JSON.parse(p.mapHeader || '""'),
     }
     return res.json({
       status: 100,
