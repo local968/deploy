@@ -104,7 +104,7 @@ export default class ModelDetail extends Component<Interface>{
             </div>
             <div className={classnames(styles.cell, styles.compute,_check?'':styles.disable)}>
               <i className={classnames(styles.check,_check?'':styles.uncheck)}/>
-              <span onClick={_check&&this.toggleImpact.bind(this, 'check')}>
+              <span onClick={()=>_check&&this.toggleImpact( 'check')}>
                 {EN.check}
               </span>
             </div>

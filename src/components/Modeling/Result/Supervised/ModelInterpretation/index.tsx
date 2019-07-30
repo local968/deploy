@@ -23,17 +23,20 @@ export default function ModelInterpretation(props){
           intercept = '+' + intercept;
         }
         let list = '';
-        data.forEach(itm=>{
+        data.forEach((itm,ind)=>{
           const dt = itm[1].replace(/_/g,'\\_');
+          if(ind>1000)return;
           list+=`${itm[0]}*${dt}\\\\`
         });
+        console.log(11,list)
         katex.render(`Z=\\Sigma \\allowbreak\t
       \\begin{Bmatrix} 
          ${list}
       \\end{Bmatrix}
      \\allowbreak\t ${intercept}`,
           dom.current, {
-            throwOnError: false
+            throwOnError: false,
+            maxExpand:Infinity,
           });
       }else{
         setUrl(result)
