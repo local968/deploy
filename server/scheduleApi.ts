@@ -170,7 +170,7 @@ const api = {
     const source = deployment[`${type}Options`].source;
     const fileId =
       source === 'database'
-        ? await api.getDatabaseData(options, async ({ count }) => {
+        ? await api.getDatabaseData(options, schedule, async ({ count }) => {
             schedule.status = `${count} downloaded.`;
             await api.upsertSchedule(schedule);
           })
@@ -279,19 +279,20 @@ const api = {
   getCleanIndex: async (schedule, index, projectId, modelName) => {
     const result = await redis.hmget(
       `project:${projectId}:model:${modelName}`,
-      'stats'
+      'stats',
+      'problemType'
     );
     const mapHeaderResult = await redis.hmget(`project:${projectId}`,
       'mapHeader')
-    let [stats] = result;
+    let [stats, problemType] = result;
     let [mapHeader] = mapHeaderResult
     mapHeader = JSON.parse(mapHeader)
     stats = JSON.parse(stats);
 
-    return await etl(schedule, index, stats, mapHeader);
+    return await etl(schedule, index, stats, mapHeader, problemType);
   },
 
-  getDatabaseData: async (message, onProgress) => {
+  getDatabaseData: async (message, schedule, onProgress) => {
     const databaseConfig = {
       type: message.databaseType,
       host: message.sqlHostName,
@@ -302,6 +303,7 @@ const api = {
       table: message.sqlTable,
       sql: message.sqlQueryStr,
       encode: message.sqlEncoding,
+      mapHeader: message.mapHeader
     };
 
     const indexResponse = await axios.get(`${esServicePath}/etls/createIndex`);
@@ -314,6 +316,9 @@ const api = {
     );
     if (uploadResponse.data.status !== 200) return uploadResponse.data;
     const opaqueId = uploadResponse.data.opaqueId;
+    const mapHeader = uploadResponse.data.mapHeader;
+    schedule.mapHeader = mapHeader
+    await api.upsertSchedule(schedule)
 
     return await new Promise((resolve, reject) => {
       let emptyCount = 0;
@@ -348,16 +353,16 @@ const api = {
   },
 };
 
-const etl = async (schedule, index, stats, mapHeader) => {
-  if (schedule.type === 'deployment') {
-    Object.keys(stats).forEach(key => {
-      if (stats[key].isTarget) delete stats[key];
-    });
-  }
+const etl = async (schedule, index, stats, mapHeader, problemType) => {
   const mappingResponse = await
   axios.get(`${esServicePath}/etls/${index}/header`)
   const dataHeader = mappingResponse.data.split(',')
   const headerArray = dataHeader.filter(h => h !== '__no')
+  if (schedule.type === 'deployment' || problemType === 'Outlier' || problemType === 'Clustering') {
+    Object.keys(stats).forEach(key => {
+      if (stats[key].isTarget && headerArray.indexOf(key) !== -1) delete stats[key];
+    });
+  }
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
     === -1)
   if(lackHeaders.length > 0) {

@@ -23,9 +23,11 @@ async function scheduleHandler() {
 
     let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return;
-    schedule.mapHeader = deployment[`${schedule.type}Options`].mapHeader
-    await api.upsertSchedule(schedule)
-
+    if( deployment[`${schedule.type}Options`].source === 'file' ) {
+      schedule.mapHeader = deployment[`${schedule.type}Options`].mapHeader
+      await api.upsertSchedule(schedule)
+    }
+    // database download in checkUserFileRestriction
     let restrictQuery;
     try {
       restrictQuery = await api.checkUserFileRestriction(schedule);
@@ -50,7 +52,7 @@ async function scheduleHandler() {
           schedule,
           deployment[`${schedule.type}Options`].fileId,
           deployment.projectId,
-          deployment.modelName,
+          deployment.modelName
         );
       }catch(e) {
         console.error(e)

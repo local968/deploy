@@ -341,6 +341,7 @@ export default class Deployment extends Component<Interface> {
           visible={this.dialog === 'databasesource'}
           onClose={this.closeDialog}
           title={EN.DataSourceDatabase}
+          mapHeader={cd.mapHeader}
           projectId={cd.projectId}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;

@@ -306,6 +306,7 @@ export default class Performance extends Component {
           visible={this.dialog === 'databasesource'}
           validation
           projectId={cd.projectId}
+          mapHeader={cd.mapHeader}
           onClose={this.closeDialog}
           title={EN.ValidationDataSource + " - " + EN.Database}
           onSubmit={action(options => {

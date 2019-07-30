@@ -135,12 +135,12 @@ export default class DatabaseConfig extends Component {
   }
 
   render() {
-    const { visible, onClose, onSubmit: submit, title, projectId } = this.props;
+    const { visible, onClose, mapHeader, onSubmit: submit, title, projectId } = this.props;
     const _onClose = (...args) => {
       this.loading = false
       onClose(...args)
     }
-    const state = { ...this.localState };
+    const state = { ...this.localState, mapHeader };
     const onSubmit = () => {
       if (!this.allowSubmit) return;
       if (this.checkForm()) return;
