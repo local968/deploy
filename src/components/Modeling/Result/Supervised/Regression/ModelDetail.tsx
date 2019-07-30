@@ -56,6 +56,8 @@ export default class ModelDetail extends Component<Interface>{
       project,
     } = this.props;
     const {linearData=false,treeData=false,modelName} = model as any;
+    const _check = linearData||treeData;
+
     return (
       <div className={styles.rowBox}>
         <Tooltip
@@ -101,17 +103,12 @@ export default class ModelDetail extends Component<Interface>{
                 {EN.Compute}
               </span>
             </div>
-            {
-              (linearData||treeData)?<div className={classnames(styles.cell, styles.compute)}>
-                <img src={icon_check} alt="" style={{width:15}} />
-                <span onClick={this.toggleImpact.bind(this, 'check')}>
+            <div className={classnames(styles.cell, styles.compute,_check?'':styles.disable)}>
+              <img src={icon_check} alt="" style={{width:15}} />
+              <span onClick={_check&&this.toggleImpact.bind(this, 'check')}>
                 {EN.check}
               </span>
-              </div>:<div
-                style={{cursor:'default'}}
-                className={classnames(styles.cell, styles.compute)}/>
-            }
-
+            </div>
             <div className={classnames(styles.cell, styles.compute)}>
               <img src={Process} alt="" />
               <span onClick={this.toggleImpact.bind(this, 'process')}>
