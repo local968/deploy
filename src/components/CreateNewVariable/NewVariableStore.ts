@@ -137,7 +137,7 @@ export class NewVariableStore {
         name: 'Median',
         value: 'Median',
         type: Type.Func,
-        grammar: `${EN.Syntax}Max(@var1, @var2, @var3，...)`,
+        grammar: `${EN.Syntax}Median(@var1, @var2, @var3，...)`,
       },
       {
         name: 'Custom_Quantile_bin',

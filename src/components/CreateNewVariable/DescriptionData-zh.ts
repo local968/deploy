@@ -182,7 +182,7 @@ const Max = {
 const Median = {
   name: 'Median',
   describe: '输入单个变量时，返回该变量的最大值；输入多个变量时，返回行的中间值。',
-  grammar: 'Max( var1, var2, var3, … )',
+  grammar: 'Median( var1, var2, var3, … )',
   input: ['var1, var2, var3, ….- 连续变量'],
   output: '连续变量',
 };

@@ -186,7 +186,7 @@ const Max = {
 const Median  = {
   name: "Median",
   describe: "When input one variable, output the median of this variable; when input multiple variables, output the median of these variables according to the rows.",
-  grammar: "Max( var1, var2, var3, … )",
+  grammar: "Median( var1, var2, var3, … )",
   input: ["var1, var2, var3, ….- numerical variable"],
   output: "numerical variable"
 }
