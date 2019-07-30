@@ -288,6 +288,7 @@ const api = {
     let [mapHeader] = mapHeaderResult
     mapHeader = JSON.parse(mapHeader)
     stats = JSON.parse(stats);
+    problemType = JSON.parse(problemType)
 
     return await etl(schedule, index, stats, mapHeader, problemType);
   },
@@ -360,7 +361,7 @@ const etl = async (schedule, index, stats, mapHeader, problemType) => {
   const headerArray = dataHeader.filter(h => h !== '__no')
   if (schedule.type === 'deployment' || problemType === 'Outlier' || problemType === 'Clustering') {
     Object.keys(stats).forEach(key => {
-      if (stats[key].isTarget && headerArray.indexOf(key) !== -1) delete stats[key];
+      if (stats[key].isTarget && headerArray.indexOf(key) === -1) delete stats[key];
     });
   }
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
