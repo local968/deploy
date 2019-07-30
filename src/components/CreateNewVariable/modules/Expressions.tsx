@@ -192,8 +192,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         ...toJS(this.props.variables),
       ];
 
-      console.log(_v, toJS(this.props.functions), toJS(this.props.variables));
-
       if (this.recommend.value.indexOf('@') === 0) {
         _v = this.recommend.value.slice(1);
         list = [...this.props.variables];
@@ -203,7 +201,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
           i.value &&
           i.value.toLocaleUpperCase().indexOf(_v.toLocaleUpperCase()) === 0,
       );
-      console.log('suggestions', suggestions);
     }
     return suggestions;
   };
