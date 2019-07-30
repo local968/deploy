@@ -15,7 +15,6 @@ import PredictedProgress from './PredictedProgress'
 import Model from 'stores/Model';
 import Project from 'stores/Project';
 import ModelInterpretation from '../ModelInterpretation';
-const icon_check = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAACb0lEQVQ4EZWUT0gVURTGv3PvaCpli3CRqAThJloUBUUSbWphmE9fuGjRfyNqU5pmuHoRGJo+2wRBENGmhWmvCHXlKgrJVUVQFoT6jDCCzDR5M+fEmfduOITxmsWcmfN98ztnzr1cAoBDidkSu46PW5ibIBRqLp9LwG1L80t3RhLV86SQgvWSIqZtAnkBIMgHAsCCsIuE3i/++Fnn2bUSA9PuIPC3py5XfcwTEtri3TMVUoCJ4tLiM8aAtoDozf9ClDTUUTEDwTiErnkhWkQ0NnV9LvOL/B1GYML8KjcmsAe8HmitTOsoCGSzoNwHmUKpMTC3hVYh5NIqZxgtAB7orARYjoBSbeWp2sTk2L8xWVVXSp8IMEKyGAGp4Az5wJyHQL8ioPruqZ3WMxcMjFUTgwPDcmOwvfJVvD+9H4x6EK1hxoh2H4KIrAj+7shVWRkbe6evgtEOg2fEsmyI7sf7Zx99+/7utPNFOnrSUTUB4KgTNcZ6pvZ6xrsCBI2DLZXDmtPOPc8bKy2pfgoRXbWvEZCaahOTpQ6k87LWNgEYH7yUhaimBeO96YeepSM+Mtc9tgsR0OG+6YNC5q6adYBNyemaQAAx8svB/0RDGQKKHrdueq65yMYzy95LAZ8g4VNC0jw3/+GLEA8T075Y36c9DtLQM7UZkJgPGXC5bEdE4RYc6Nw4B2DUibk4Gk/O3rNSOKoDRiABEdUBKCPhIuc1DHkLka3ZKi4djUOt5WdZcIwYBSBsECOdgfB5PXYa+mbOqTvvY0RnlvH9ZG5lw0rx/nQzMd0KwBfDX3IHmzC6or1E34T5wEqQqrFk+qT4svAbFCEGfyvY0IsAAAAASUVORK5CYII=';
 
 interface Interface {
   model: Model
@@ -123,9 +122,9 @@ export default class ModelDetail extends Component<Interface> {
                 {EN.Compute}
               </span>
             </div>
-            <div className={classnames(styles.cell, styles.compute, _check ? '' : styles.disable)}>
-              <img src={icon_check} alt="" style={{ width: 15 }} />
-              <span onClick={_check ? this.toggleImpact.bind(this, 'check') : () => { }}>
+            <div className={classnames(styles.cell, styles.compute,_check?'':styles.disable)}>
+                <i className={classnames(styles.check,_check?'':styles.uncheck)}/>
+                <span onClick={_check&&this.toggleImpact.bind(this, 'check')}>
                 {EN.check}
               </span>
             </div>

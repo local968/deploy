@@ -16,14 +16,17 @@ export default function ModelInterpretation(props){
         url:linearData||treeData,
       }
     }).then((result:any)=>{
-      if(typeof result === 'object'){
+      if(linearData){
         let {data,intercept} = result;
 
         if(intercept>0){
           intercept = '+' + intercept;
         }
         let list = '';
-        data.forEach(itm=>list+=`${itm[0]}*${itm[1]}\\\\`);
+        data.forEach(itm=>{
+          const dt = itm[1].replace(/_/g,'\\_');
+          list+=`${itm[0]}*${dt}\\\\`
+        });
         katex.render(`Z=\\Sigma \\allowbreak\t
       \\begin{Bmatrix} 
          ${list}
