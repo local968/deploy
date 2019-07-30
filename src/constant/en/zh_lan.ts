@@ -1214,11 +1214,13 @@ const ZH_LAN = {
   CannotExportPmml: '无法导出',
   ModelProcessing: '模型训练中',
   ModelInterpretation: '模型解释',
+  check: '查看',
   DeploySummary: '数据报告',
   DeploySummaryData: '查看',
   HomeTraining: '训练中',
   Classification: '二分类',
-  Regression: '回归'
+  Regression: '回归',
+  PictureDownload: '图片下载',
 };
 
 export default ZH_LAN;

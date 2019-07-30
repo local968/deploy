@@ -203,6 +203,9 @@ export default class ModelTable extends Component<Interface> {
               <span>{EN.VariableImpact}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>
+              <span>{EN.ModelInterpretation}</span>
+            </div>
+            <div className={classnames(styles.cell, styles.cellHeader)}>
               <span>{EN.ModelProcessFlow}</span>
             </div>
             <div className={classnames(styles.cell, styles.cellHeader)}>

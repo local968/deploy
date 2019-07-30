@@ -112,12 +112,18 @@ export default function EsUploader(file, option: any = {}) {
     while (processors.length > 0) {
       await handleChunkDOne()
     }
+    const rawHeader = option.mapHeader || header.filter(h => h !==  '__no')
+    if(option.mapHeader) {
+      header.filter(h => h !== '__no').forEach(h => {
+        if(option.mapHeader.indexOf(h) === -1) rawHeader.push(h)
+      })
+    }
     if (!isPause)
       // const _header = header.map( (k, i) => i.toString() )
       onFinished({
         originalIndex: index,
         totalRawLines: no,
-        rawHeader: header.filter(h => h !== '__no'),
+        rawHeader,
         fileName: file.name
       }, file)
   }
@@ -148,10 +154,12 @@ export default function EsUploader(file, option: any = {}) {
 
   const getNextChunk = async () => {
     let plus = 0
-    const _header = autoFixHeader(header).filter(key => key !== '__no').map((k, i) => {
-      let key = option.mapHeader ? option.mapHeader.indexOf(k) : i
-      if(option.mapHeader && key === -1) return option.mapHeader.length + plus++
-      return key
+    const _header = autoFixHeader(header.filter(key => key !== '__no')).map((k, i) => {
+      if(option.mapHeader) {
+        const index = option.mapHeader.indexOf(k)
+        if(index === -1) return option.mapHeader.length + plus++
+        return index
+      }else return i
     })
     _header.unshift('__no')
     chunk.unshift(_header)

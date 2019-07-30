@@ -130,9 +130,11 @@ function Expression(props: ExpressionProps) {
     )[0];
     setRange(k + 1, k + 1);
     setIndex();
-    input.focus();
+    popperNode.focus();
     e.stopPropagation();
   };
+
+  let popperNode: HTMLDivElement | null | undefined;
 
   return (
     <FormControl component={'div'} className={classes.exp}>
@@ -155,6 +157,9 @@ function Expression(props: ExpressionProps) {
         InputProps={{
           style: {
             padding: 0,
+          },
+          inputRef: el => {
+            popperNode = el
           },
           startAdornment: (
             <InputAdornment position={'start'} style={{ marginRight: 0 }}>
