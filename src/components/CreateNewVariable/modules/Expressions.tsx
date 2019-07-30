@@ -27,6 +27,7 @@ import Expression from './Expression';
 
 import EN from '../../../constant/en';
 import { styled } from '@material-ui/styles';
+import { toJS } from 'mobx';
 
 const useStyles = withStyles({
   table: {
@@ -39,6 +40,25 @@ const useStyles = withStyles({
   suggestPaper: {
     maxHeight: '300px',
     overflowY: 'auto',
+  },
+  popper: {
+    marginLeft: '5px',
+    zIndex: 1111,
+  },
+  list: {
+    maxHeight: '300px',
+    overflowY: 'auto',
+    backgroundColor: '#fff',
+  },
+  suggPape: {
+    maxHeight: '300px',
+    overflowY: 'auto',
+  },
+  grammar: {
+    padding: '8px 12px',
+    maxWidth: '300px',
+    wordWrap: 'break-word',
+    backgroundColor: '#f0f4f8',
   },
 });
 
@@ -82,9 +102,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     [key: string]: HTMLDivElement | null | undefined;
   } = {};
 
-  private popperNode?: {
-    [key: string]: HTMLDivElement | null | undefined;
-  } = {};
+  private popperNode?: HTMLDivElement | null | undefined;
 
   constructor(props) {
     super(props);
@@ -150,19 +168,17 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     });
   };
 
-  public onFocus = (k: number) => (e: React.MouseEvent<HTMLInputElement>) => {
-    const { setRange, setIndex } = this.props;
-    const input: HTMLInputElement = e.currentTarget.parentElement.getElementsByTagName(
-      'input',
-    )[0];
+  public onFocus = (el: HTMLInputElement | null | undefined) => {
+    // const { setRange, setIndex, index } = this.props;
+    this.popperNode = el;
     this.setState({
       isOpen: true,
     });
-    const len = this.props.exps[k]['value'].length;
-    setRange(len, len);
-    setIndex(k);
-    input.focus();
-    e.stopPropagation();
+    // const len = this.props.exps[index]['value'].length;
+    // setRange(len, len);
+    // setIndex(index);
+    // this.popperNode.focus();
+    // this.popperNode.e.stopPropagation();
   };
 
   public getSuggestions = () => {
@@ -170,16 +186,22 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     if (this.recommend.value) {
       let _v: string = this.recommend.value;
       let list: Array<Coordinate> = [
-        ...this.props.functions,
-        ...this.props.variables,
+        ...toJS(this.props.functions),
+        ...toJS(this.props.variables),
       ];
+
+      console.log(_v, toJS(this.props.functions), toJS(this.props.variables));
+
       if (this.recommend.value.indexOf('@') === 0) {
         _v = this.recommend.value.slice(1);
         list = [...this.props.variables];
       }
       suggestions = list.filter(
-        (i: Coordinate) => (i.value || '').indexOf(_v) > -1,
+        (i: Coordinate) =>
+          i.value &&
+          i.value.toLocaleUpperCase().indexOf(_v.toLocaleUpperCase()) === 0,
       );
+      console.log('suggestions', suggestions);
     }
     return suggestions;
   };
@@ -189,7 +211,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     return !label || !_.size(value) || k + 1 != expSize;
   };
 
-  public selectItem = (v: Coordinate) => () => {
+  public selectItem = (v: Coordinate) => {
     switch (v.type) {
       case Type.Func:
         this.props.handleFunction(v, this.recommend.start);
@@ -213,9 +235,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
   }
 
   render() {
-    const input = this.selectedNodes[this.props.index];
-    console.log(input)
-
     const {
       classes,
       exps,
@@ -234,6 +253,8 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
       functions,
       func,
     } = this.props;
+
+    console.log(this.state.isOpen, this.popperNode);
 
     return (
       <MuiCard style={{ paddingBottom: 0 }}>
@@ -276,7 +297,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     left={left}
                     right={right}
                     addExp={addExp}
-                    onFocus={() => this.onFocus(k)}
+                    onFocus={this.onFocus.bind(k)}
                     sign={k}
                     setIndex={() => setIndex(k)}
                     toogleTooltip={() => this.setState({ isTipOpen: true })}
@@ -302,7 +323,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         </Table>
         <Popper
           open={this.state.isOpen && !!this.recommend.value}
-          anchorEl={input}
+          anchorEl={this.popperNode}
           placement="bottom-start"
           className={classes.popper}
         >
@@ -312,6 +333,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                 {this.getSuggestions().map((item: Coordinate, k: number) => {
                   return (
                     <MenuItem
+                      button={false}
                       component={'li'}
                       key={k}
                       onClick={this.selectItem.bind(this, item)}
@@ -326,7 +348,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         </Popper>
         <Popper
           open={!!func && this.state.isTipOpen}
-          anchorEl={input}
+          anchorEl={this.popperNode}
           placement="bottom-end"
           className={classes.popper}
         >
