@@ -28,7 +28,7 @@
 	flex: none;
 }
 
-.summaryTitle span {
+#summaryTitleSpan {
 	font-family: 'Source Han Sans SC';
 	font-size: 1.125rem;
 	color: #4a4a4a;
@@ -57,7 +57,7 @@
 	margin-right: .05em;
 }
 
-.summaryType span {
+#summaryTypeSpan {
 	font-family: Arial;
 	font-size: 0.75rem;
 	color: #4a4a4a;
@@ -101,7 +101,7 @@
 	max-width: 55%;
 }
 
-.summaryCell span {
+#summaryCellSpan {
 	font-family: Arial;
 	font-size: 0.875rem;
 	color: #595959;
@@ -126,19 +126,6 @@
 	height: 10px;
 }
 
-.summaryText {
-	display: flex;
-	flex: none;
-	margin-top: .3em;
-}
-
-.summaryText span {
-	font-family: 'Source Han Sans SC';
-	font-size: 0.875rem;
-	color: #4a4a4a;
-	line-height: 1.2;
-}
-
 .summaryBottom {
 	display: flex;
 	flex: auto;
@@ -154,29 +141,21 @@
 	width: 85%;
 	border-radius: 5px;
 	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-	background-image: linear-gradient(to bottom, #ffffff, #f1f3f5);
+	background-image: linear-gradient(to bottom, #5b657b, #243448);
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
 }
 
-.summaryButton span {
+#summaryButtonSpan {
 	font-family: 'Source Han Sans SC';
 	font-size: 1rem;
 	/* font-weight: bold; */
 	text-align: left;
-	color: #1d2b3c;
+	color: #fff;
 	line-height: 1.3;
-}
-
-.summaryConfirm {
-	background-image: linear-gradient(to bottom, #5b657b, #243448);
-}
-
-.summaryConfirm span {
-  color: #fff;
-  margin: 0;
-  text-align: center;
+	margin: 0;
+	text-align: center;
 }
 
 .disabled {
@@ -222,7 +201,7 @@
 	align-items: center;
 }
 
-.summaryPartText span {
+#summaryPartTextSpan {
 	font-family: Arial;
 	font-size: 0.875rem;
 	color: #595959;

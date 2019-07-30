@@ -83,7 +83,7 @@ class Summary extends Component<SummaryProps> {
           </div>}
           {(!!targetPercent.outlier || !!outlierCount) && <div className={styles.summaryType}>
             <div className={styles.summaryCube} style={{ backgroundColor: '#f9cf37' }} />
-            <span>{EN.Outlier}</span>
+            <span>{EN.OutlierDetection}</span>
           </div>}
         </div>
         {!isUnsupervised && <div className={styles.summaryTable}>

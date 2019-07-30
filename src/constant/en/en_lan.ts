@@ -1357,7 +1357,10 @@ const EN_LAN = {
   ModelProcessing: 'Processing',
   ModelInterpretation: 'Model interpretation',
   DeploySummary: 'Data Report',
-  DeploySummaryData: 'View'
+  DeploySummaryData: 'View',
+  HomeTraining: 'Training',
+  Classification: 'Classification',
+  Regression: 'Regression'
 };
 
 

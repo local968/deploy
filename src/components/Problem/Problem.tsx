@@ -26,7 +26,7 @@ const Unsupervised = [
   { value: 'Clustering', type: EN.Clustering, detail: EN.ClusteringHint },
   {
     value: 'Outlier',
-    type: EN.OutlierDetection,
+    type: EN.Outlier,
     detail: EN.OutlierDetectionHint,
   },
 ];

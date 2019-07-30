@@ -10,11 +10,11 @@ import classnames from 'classnames'
 import { Show } from 'components/Common';
 
 interface Interface {
-  selectId:any
-  selected:any
-  project:any
-  actions:any
-  routing?:any
+  selectId: any
+  selected: any
+  project: any
+  actions: any
+  routing?: any
 }
 
 @inject('routing')
@@ -49,7 +49,10 @@ export default class Project extends Component<Interface> {
       >
         <div className={styles.info}>
           <div className={styles.name}>{project.name}</div>
-          <div className={styles.description}>{project.description}</div>
+          <div className={styles.description}>
+            {!!project.problemType && <div className={styles.problemType}>{EN.ProblemType}:{EN[project.problemType]}</div>}
+            {!!project.train2ing && <div className={styles.train}>{EN.Status}:{EN.HomeTraining}</div>}
+          </div>
         </div>
         <div className={styles.sub}>
           <div className={styles.partner}>
@@ -65,7 +68,7 @@ export default class Project extends Component<Interface> {
           })}
         >
           <Show
-            name = 'main_delete'
+            name='main_delete'
           >
             <div
               className={styles.actionBox}
@@ -79,8 +82,8 @@ export default class Project extends Component<Interface> {
                     alt="checked"
                   />
                 ) : (
-                  <div className={styles.circle} onClick={this.toggleSelect} />
-                )}
+                    <div className={styles.circle} onClick={this.toggleSelect} />
+                  )}
               </div>
               <div className={styles.action}>
                 <img
