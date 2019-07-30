@@ -1067,6 +1067,14 @@ span.performanceScore {
     background-image: none;
 }
 
+.disable{
+    cursor: not-allowed;
+}
+
+.disable span{
+    color: #aaaaaa;
+}
+
 .costButton {
     display: flex;
     flex: none;

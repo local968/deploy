@@ -8,10 +8,6 @@ import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
-import wss from "../../server/webSocket";
-import command from "../../server/command";
-import moment, {createOrUpdate, getProjectField} from "../../server/routes/project";
-import {redis} from "../../server/redis";
 
 export interface Stats {
   took: number,
@@ -2626,7 +2622,7 @@ class Project {
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)
     model.graphicList = await this.allVariableList(model);
-    await this.preTrainImportance()
+    // await this.preTrainImportance()
     // changeReportProgress('preparing univariate plot.', 100)
     const json = JSON.stringify([{ ...this, ...{ models: [model] } }]);
 
