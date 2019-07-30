@@ -72,10 +72,16 @@ export class NewVariableStore {
         grammar: `${EN.Syntax}mean(@var1, @var2, @var3, ...)`,
       },
       {
+        name: 'Median',
+        value: 'Median',
+        type: Type.Func,
+        grammar: `${EN.Syntax}Median(@var1, @var2, @var3，...)`,
+      },
+      {
         name: 'Std',
         value: 'Std',
         type: Type.Func,
-        grammar: `${EN.Syntax}Std(@var) | ${EN.Syntax}(@var1, @var2, @var3, ...)`,
+        grammar: `${EN.Syntax}(@var1, @var2, @var3, ...)`,
       },
     ],
     senior: [
@@ -132,12 +138,6 @@ export class NewVariableStore {
         value: 'Substring',
         type: Type.Func,
         grammar: `${EN.Syntax}Substring(@var, [position1, position2])`,
-      },
-      {
-        name: 'Median',
-        value: 'Median',
-        type: Type.Func,
-        grammar: `${EN.Syntax}Median(@var1, @var2, @var3，...)`,
       },
       {
         name: 'Custom_Quantile_bin',
