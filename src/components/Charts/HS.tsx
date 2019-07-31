@@ -11,14 +11,14 @@ import { Icon } from 'antd';
 import styles from './charts.module.css';
 
 
-interface DataSampleProps {
+interface Interface {
 	x_name:string
 	y_name:string
 	data:any
 	result?:any
 }
 
-export default class HS extends Component<DataSampleProps>{
+export default class HS extends Component<Interface>{
 	private chart: any;
 	minLength=1;
 	state:{
@@ -81,7 +81,7 @@ export default class HS extends Component<DataSampleProps>{
 	}
 
 	getOption() {
-		const {ready,step,sliderValue:_sliderValue,data,min,max,interval,_max,_min} = this.state;
+		const {ready,step,sliderValue:_sliderValue,data,interval,_max,_min} = this.state;
 		let {x_name,y_name} = this.props;
 		let title = `Feature:${x_name}`;
 		if(!ready){
@@ -178,9 +178,9 @@ export default class HS extends Component<DataSampleProps>{
 			},
 			tooltip : {
 				trigger: 'axis',
-				axisPointer : {
-					type : 'shadow',
-				},
+				// axisPointer : {
+				// 	type : 'shadow',
+				// },
 				formatter: params=> {
 					const {marker,value,axisValue} = params[0];
 					return `

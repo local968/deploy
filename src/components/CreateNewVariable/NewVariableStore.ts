@@ -34,6 +34,13 @@ export class NewVariableStore {
         params: 1,
       },
       {
+        name: 'Ln',
+        value: 'Ln',
+        type: Type.Func,
+        grammar: `${EN.Syntax}ln(@var)`,
+        params: 1,
+      },
+      {
         name: 'Pow',
         value: 'Pow',
         type: Type.Func,
