@@ -422,18 +422,23 @@ export class NewVariableView extends React.Component<
   };
 
   public processAndSave = () => {
-    if (this.state.loading) return;
+
+    if (this.state.loading) return false;
+
     const { exps } = this.state;
-    const checkd = exps.map(exp => this.checkExp(exp.value));
-    const error = checkd.find(c => !c.isPass);
+
+    const exps_checked = exps.map((exp, index) => this.checkExp(exp, index));
+
+    const error = exps_checked.find(c => !c.isPass);
     if (error) {
       return alert(error.message);
     }
+
     const newType: StringObject = {};
     // const variables: string[] = [...newVariable]
     const newExps: NewVariable[] = [];
-    for (let i = 0; i < checkd.length; i++) {
-      const { num, type } = checkd[i] as any;
+    for (let i = 0; i < exps_checked.length; i++) {
+      const { num, type } = exps_checked[i] as any;
       const name = exps[i].label;
       if (!name) return message.error(EN.Nameisempty);
       if (this.props.expression.hasOwnProperty(name))
@@ -1331,9 +1336,19 @@ export class NewVariableView extends React.Component<
       .join('');
 
   // 校验总表达式
-  public checkExp = (_expression: Coordinate[]) => {
+  public checkExp = (exp: Exp, index: number) => {
+    const label_checked = this.checkLabel(exp.label, index);
+    if (!label_checked.isPass) return label_checked;
+    return this.checkValue(exp.value, index);
+  };
+
+  public checkLabel = (label: string, index?: number) => {
+    return { isPass: !!label, message: `${EN.NAMEMUSTBESET}, line_number: ${index + 1}` };
+  };
+
+  public checkValue = (_expression: Coordinate[], index?: number) => {
     if (!_expression.length)
-      return { isPass: true, message: EN.Emptyparameter, num: 0 };
+      return { isPass: false, message: `${EN.EXPRESSIONMUSTBESET}, line_number: ${index + 1}`, num: 0 };
     // if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
     const {
@@ -1389,7 +1404,10 @@ export class NewVariableView extends React.Component<
     const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
     if (func) {
       const { name } = func;
-      variables = _.filter(this.variables, ({ varType }: any) => varType !== 'raw');
+      variables = _.filter(
+        this.variables,
+        ({ varType }: any) => varType !== 'raw',
+      );
       if (
         !_.includes(
           [
