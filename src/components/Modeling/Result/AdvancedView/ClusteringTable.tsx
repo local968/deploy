@@ -149,7 +149,7 @@ const ClusteringTable = (props: ClusteringTableProps) => {
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const modelElements = useMemo(() => {
-    return models.reduce((els, m, i) => ({ ...els, [m.id]: <ClusteringTableRow model={m} project={project} key={i} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} /> }), {})
+    return models.reduce((els, m) => ({ ...els, [m.id]: <ClusteringTableRow model={m} project={project} key={m.id} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} /> }), {})
   }, [detailArr])
 
   return <div className={styles.main}>

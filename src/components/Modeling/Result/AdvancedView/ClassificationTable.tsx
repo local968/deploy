@@ -195,8 +195,8 @@ const ClassificationTable = (props: ClassificationTableProps) => {
     return setDetail([...detailArr, s])
   }
   const modelElements = useMemo(() => {
-    return models.reduce((els, m, i) => ({ ...els, [m.id]: <Row model={m} metric={metric} project={project} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
-  }, [detailArr])
+    return models.reduce((els, m) => ({ ...els, [m.id]: <Row model={m} metric={metric} project={project} key={m.id} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
+  }, [detailArr, metric])
 
   return <div className={styles.main}>
     <div className={styles.header}>
