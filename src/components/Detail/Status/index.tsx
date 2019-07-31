@@ -209,7 +209,7 @@ class SchedulePerformance extends Component<SchedulePerformanceProps> {
     socketStore.ready()
       .then(api => api.getScheduleSummary({ sid: schedule.schedule.id, pid: schedule.deployment.projectId }))
       .then(result => {
-        this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader }
+        this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader, problemType: schedule.deployment.modelType }
         this.loading = false
         this.finished = true
       })

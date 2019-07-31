@@ -994,7 +994,7 @@ export class NewVariableView extends React.Component<
             vList.exp.slice(1, -1),
             bracketExps,
             ({ item, isVariable }) => {
-              console.log(item, isVariable, 'vListchecked');
+              // console.log(item, isVariable, 'vListchecked');
               if (!item)
                 return {
                   isPass: false,
@@ -1032,13 +1032,13 @@ export class NewVariableView extends React.Component<
           paramList[0].type === 'Numerical'
             ? ['sum', 'mean', 'min', 'max', 'std', 'median']
             : ['mode'];
-        console.log(nExp, nList, 'nExp');
+        // console.log(nExp, nList, 'nExp');
         if (nList.type === 'Array') {
           const nListchecked = this.checkArrayParams(
             nList.exp.slice(1, -1),
             bracketExps,
             ({ item, isVariable }) => {
-              console.log(item, isVariable, 'nListchecked');
+              // console.log(item, isVariable, 'nListchecked');
               if (!item)
                 return {
                   isPass: false,

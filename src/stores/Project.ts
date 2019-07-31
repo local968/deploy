@@ -1849,6 +1849,8 @@ class Project {
       kValue: this.kValue,
       algorithms: this.algorithms,
       standardType: standardTypeTemp,
+      trainHeader: [...this.trainHeader],
+      customHeader: [...this.customHeader],
       // searchTime: this.searchTime,
       measurement: this.measurement,
       randSeed: this.randSeed,
@@ -2512,9 +2514,9 @@ class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = (model: any) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader,informativesLabel } = this;
+    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader, informativesLabel } = this;
 
-    console.log(informativesLabel , 'informativesLabel')
+    console.log(informativesLabel, 'informativesLabel')
 
     const list = [];
     list.push(this.histogram(target));

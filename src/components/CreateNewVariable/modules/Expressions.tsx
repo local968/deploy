@@ -38,12 +38,13 @@ const useStyles = withStyles({
     backgroundColor: '#FFF',
   },
   suggestPaper: {
-    maxHeight: '300px',
+    minWidth: 200,
+    maxWidth: 400,
+    maxHeight: 400,
     overflowY: 'auto',
   },
   popper: {
-    marginLeft: '5px',
-    zIndex: 1111,
+    zIndex: 900,
   },
   list: {
     maxHeight: '300px',
@@ -55,8 +56,9 @@ const useStyles = withStyles({
     overflowY: 'auto',
   },
   grammar: {
-    padding: '8px 12px',
-    maxWidth: '300px',
+    padding: '.5rem 0.75rem',
+    minWidth: 200,
+    maxWidth: 300,
     wordWrap: 'break-word',
     backgroundColor: '#f0f4f8',
   },
@@ -178,7 +180,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     // setRange(len, len);
     // setIndex(index);
     // this.popperNode.focus();
-    // this.popperNode.e.stopPropagation();
+    // e.stopPropagation();
   };
 
   public getSuggestions = () => {
@@ -190,8 +192,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         ...toJS(this.props.variables),
       ];
 
-      console.log(_v, toJS(this.props.functions), toJS(this.props.variables));
-
       if (this.recommend.value.indexOf('@') === 0) {
         _v = this.recommend.value.slice(1);
         list = [...this.props.variables];
@@ -201,7 +201,6 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
           i.value &&
           i.value.toLocaleUpperCase().indexOf(_v.toLocaleUpperCase()) === 0,
       );
-      console.log('suggestions', suggestions);
     }
     return suggestions;
   };
@@ -246,15 +245,8 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
       left,
       right,
       addExp,
-      handleFunction,
-      handleVariables,
-      changeExpLabel,
-      variables,
-      functions,
       func,
     } = this.props;
-
-    console.log(this.state.isOpen, this.popperNode);
 
     return (
       <MuiCard style={{ paddingBottom: 0 }}>
@@ -324,17 +316,17 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
         <Popper
           open={this.state.isOpen && !!this.recommend.value}
           anchorEl={this.popperNode}
-          placement="bottom-start"
+          placement={'bottom-start'}
           className={classes.popper}
         >
-          <Paper className={classes.suggestPaper}>
+          <Paper square className={classes.suggestPaper}>
             <ClickAwayListener onClickAway={this.handleClickAway}>
-              <MenuList>
+              <div>
                 {this.getSuggestions().map((item: Coordinate, k: number) => {
                   return (
                     <MenuItem
-                      button={false}
-                      component={'li'}
+                      button={true}
+                      component={'div'}
                       key={k}
                       onClick={this.selectItem.bind(this, item)}
                     >
@@ -342,17 +334,18 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
                     </MenuItem>
                   );
                 })}
-              </MenuList>
+              </div>
             </ClickAwayListener>
           </Paper>
         </Popper>
         <Popper
           open={!!func && this.state.isTipOpen}
           anchorEl={this.popperNode}
-          placement="bottom-end"
+          placement={'bottom-end'}
+          transition
           className={classes.popper}
         >
-          <Paper>
+          <Paper square>
             <ClickAwayListener onClickAway={this.hideGrammarTip}>
               <div className={classes.grammar}>
                 {func ? func.grammar : null}
