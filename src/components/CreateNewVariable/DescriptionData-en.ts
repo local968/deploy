@@ -130,7 +130,7 @@ const Groupby = {
         ['141', '0', '1', '261.25', '4'],
       ],
     }, {
-      length: 4,
+      length: 3,
       input: 'Groupby(job, [education])',
       output: [
         ['job', 'education', 'job_mode'],
@@ -163,13 +163,13 @@ const Log10 = {
 };
 
 const Ln = {
-  name: "Ln",
-  describe: "Logarithmic tranformation with e as the base. ",
-  grammar: "Ln( var )",
-  input: ["var- numerical variable"],
-  output: "numerical variable",
-  output_desc: ["All negative values will be replaced with 0."]
-}
+  name: 'Ln',
+  describe: 'Logarithmic tranformation with e as the base. ',
+  grammar: 'Ln( var )',
+  input: ['var- numerical variable'],
+  output: 'numerical variable',
+  output_desc: ['All negative values will be replaced with 0.'],
+};
 
 const Pow = {
   name: 'Pow',
@@ -212,13 +212,13 @@ const Max = {
   output: 'numerical variable',
 };
 
-const Median  = {
-  name: "Median",
-  describe: "When input one variable, output the median of this variable; when input multiple variables, output the median of these variables according to the rows.",
-  grammar: "Median( var1, var2, var3, … )",
-  input: ["var1, var2, var3, ….- numerical variable"],
-  output: "numerical variable"
-}
+const Median = {
+  name: 'Median',
+  describe: 'When input one variable, output the median of this variable; when input multiple variables, output the median of these variables according to the rows.',
+  grammar: 'Median( var1, var2, var3, … )',
+  input: ['var1, var2, var3, ….- numerical variable'],
+  output: 'numerical variable',
+};
 
 const Mean = {
   name: 'Mean',

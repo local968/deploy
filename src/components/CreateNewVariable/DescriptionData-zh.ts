@@ -129,7 +129,7 @@ const Groupby = {
         ['141', '0', '1', '261.25', '4'],
       ],
     }, {
-      length: 4,
+      length: 3,
       input: 'Groupby(job, [education])',
       output: [
         ['job', 'education', 'job_mode'],
