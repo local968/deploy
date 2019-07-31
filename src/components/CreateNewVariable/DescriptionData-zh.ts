@@ -108,6 +108,7 @@ const Groupby = {
   examples: [
     {
       length: 4,
+      created: 2,
       input: 'Groupby( duration, [job], [sum, median] )',
       output: [
         ['duration', 'job', 'duration_sum', 'duration_median'],
@@ -115,6 +116,27 @@ const Groupby = {
         ['199', '0', '252275', '176.0'],
         ['266', '1', '263141', '204.0'],
         ['141', '0', '252275', '176.0'],
+      ],
+    }, {
+      length: 5,
+      created: 2,
+      input: 'Groupby(duration, [job, education], [mean, min])',
+      output: [
+        ['duration', 'job', 'education', 'duration_mean', 'duration_min'],
+        ['79', '8', '2', '392.08', '25'],
+        ['199', '0', '1', '261.25', '4'],
+        ['266', '1', '0', '301.20', '5'],
+        ['141', '0', '1', '261.25', '4'],
+      ],
+    }, {
+      length: 4,
+      input: 'Groupby(job, [education])',
+      output: [
+        ['job', 'education', 'job_mode'],
+        ['8', '2', '1'],
+        ['0', '1', '0'],
+        ['1', '0', '1'],
+        ['0', '1', '0'],
       ],
     },
   ],
@@ -336,7 +358,7 @@ const Concat = {
   examples: [
     {
       length: 3,
-      isIndividual: true,
+      created: 0,
       input: 'Concat ( color, theme, size, 2 )',
       inputData: [
         ['color', 'theme', 'size'],
@@ -351,7 +373,7 @@ const Concat = {
       ],
     }, {
       length: 4,
-      isIndividual: true,
+      created: 0,
       input: 'Concat( color, theme, size, 2, 3 )',
       output: [
         ['color_theme', 'color_size', 'theme_size', 'color_theme_size'],
