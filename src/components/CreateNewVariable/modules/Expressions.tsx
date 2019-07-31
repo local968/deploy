@@ -249,7 +249,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     } = this.props;
 
     return (
-      <MuiCard style={{ paddingBottom: 0 }}>
+      <MuiCard style={{ paddingBottom: 0, maxHeight: 276, overflowY: 'auto' }}>
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
