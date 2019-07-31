@@ -266,7 +266,9 @@ router.post('/signin', async (req, res) => {
     from:"数尊",
   });
 
-  return res.send('success');
+  return res.send({
+    success:'注册成功'
+  });
 });
 
 /**
@@ -280,7 +282,9 @@ router.delete('/signout/:token', async (req, res) => {
     await userService.update(user.id,{
       token:'',
     });
-    return res.send('signout success');
+    return res.send({
+      message:'signout success'
+    });
   }
 
   return res.send({ status:500, message: 'token error'});
