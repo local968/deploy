@@ -49,14 +49,15 @@ const generateData = (data, length) => {
 
 const generateSource = (data, length) => data ? generateData(data, length) : null;
 
-const generateColumns = (length, isIndividual, input) => {
+const generateColumns = (length, created, input) => {
   const InputVariable = EN.InputVariable;
   const CreatedVariable = EN.CreatedVariable;
   let values;
-  if (isIndividual) {
+  if (!created) {
     values = chain(length).range().fill(input ? InputVariable : CreatedVariable).value();
   } else {
-    values = chain(length - 1).range().fill(InputVariable).concat(CreatedVariable).value();
+    const createdList = chain(created).range().fill(CreatedVariable).value();
+    values = chain(length - created).range().fill(InputVariable).concat(createdList).flatten().value();
   }
   return chain(length).range().map((v, k) => {
     return { dataIndex: k + '', title: values[k] };
@@ -64,20 +65,20 @@ const generateColumns = (length, isIndividual, input) => {
 };
 
 const Example = ({ example }) => {
-  const { length, input, output, inputData, isIndividual } = example;
+  const { length, input, output, inputData, created = 1 } = example;
   const inputSource = generateSource(inputData, length);
   const outputSource = generateSource(output, length);
-  const inputColumns = generateColumns(length, isIndividual, true);
-  const outputColumns = generateColumns(length, isIndividual, false);
+  const inputColumns = generateColumns(length, created, true);
+  const outputColumns = generateColumns(length, created, false);
   return (
     <div>
       <div className={styles.tableLabel}>{EN.Input + input}</div>
       {inputData ?
-        <Table dataSource={inputSource} columns={inputColumns} pagination={false}/>
+        <Table size="small" dataSource={inputSource} columns={inputColumns} pagination={false}/>
         : null}
       <div className={styles.tableLabel}>{EN.Output}</div>
       {input ?
-        <Table dataSource={outputSource} columns={outputColumns} pagination={false}/>
+        <Table size="small" dataSource={outputSource} columns={outputColumns} pagination={false}/>
         : null}
     </div>
   );
