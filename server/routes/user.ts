@@ -267,7 +267,7 @@ router.post('/signin', async (req, res) => {
   });
 
   return res.send({
-    success:'注册成功'
+    message:'success'
   });
 });
 
