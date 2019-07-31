@@ -138,6 +138,15 @@ const Log10 = {
   output_desc: ['变量中存在负数将被自动替换成0。'],
 };
 
+const Ln = {
+  name: 'Ln',
+  describe: '以e为底数，对所选变量进行Log转换。',
+  grammar: 'Ln( var )',
+  input: ['var- 连续变量'],
+  output: '连续变量',
+  output_desc: ['变量中存在负数将被自动替换成0。'],
+};
+
 const Pow = {
   name: 'Pow',
   describe: '计算所选变量的n次方。',
@@ -361,6 +370,7 @@ export default {
   Groupby,
   Log2,
   Log10,
+  Ln,
   Pow,
   Eq,
   Sum,

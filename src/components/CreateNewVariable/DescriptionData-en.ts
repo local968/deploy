@@ -142,6 +142,15 @@ const Log10 = {
   output_desc: ["All negative values will be replaced with 0."]
 }
 
+const Ln = {
+  name: "Ln",
+  describe: "Logarithmic tranformation with e as the base. ",
+  grammar: "Ln( var )",
+  input: ["var- numerical variable"],
+  output: "numerical variable",
+  output_desc: ["All negative values will be replaced with 0."]
+}
+
 const Pow = {
   name: "Pow",
   describe: "Exponential funcion with var as the base and n as the exponent.",
@@ -366,6 +375,7 @@ export default {
   Groupby,
   Log2,
   Log10,
+  Ln,
   Pow,
   Eq,
   Sum,
