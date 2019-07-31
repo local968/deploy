@@ -1,9 +1,8 @@
-import { action, observable } from 'mobx';
-import * as _ from 'lodash';
+import { observable } from 'mobx';
 
 import EN from '../../constant/en';
 
-import { Exp, Type, Coordinate } from './types/Coordinate';
+import { Exp, Type } from './types/Coordinate';
 
 export interface InterfaceFunctions {
   base: any;
@@ -38,7 +37,7 @@ export class NewVariableStore {
         name: 'Pow',
         value: 'Pow',
         type: Type.Func,
-        grammar: `${EN.Syntax}pow(@var, base)`,
+        grammar: `${EN.Syntax}pow(@var, n)`,
         params: 2,
       },
       {
@@ -72,6 +71,18 @@ export class NewVariableStore {
         type: Type.Func,
         grammar: `${EN.Syntax}mean(@var1, @var2, @var3, ...)`,
       },
+      {
+        name: 'Median',
+        value: 'Median',
+        type: Type.Func,
+        grammar: `${EN.Syntax}Median(@var1, @var2, @var3，...)`,
+      },
+      {
+        name: 'Std',
+        value: 'Std',
+        type: Type.Func,
+        grammar: `${EN.Syntax}(@var1, @var2, @var3, ...)`,
+      },
     ],
     senior: [
       {
@@ -90,7 +101,7 @@ export class NewVariableStore {
         name: 'Accumulate',
         value: 'Accumulate',
         type: Type.Func,
-        grammar: `${EN.Syntax}Accumulate(@var1, @var2, @var3,...)`,
+        grammar: `${EN.Syntax}Accumulate(@var)`,
       },
       {
         name: 'Quantile_bin',
@@ -128,78 +139,13 @@ export class NewVariableStore {
         type: Type.Func,
         grammar: `${EN.Syntax}Substring(@var, [position1, position2])`,
       },
+      {
+        name: 'Custom_Quantile_bin',
+        value: 'Custom_Quantile_bin',
+        type: Type.Func,
+        grammar: `${EN.Syntax}Custom_Quantile_bin(@var, [range_list])`,
+      },
     ],
-  };
-
-  private initExp = { value: [], label: '', range: [0, 0] };
-
-  @observable detailKey = '';
-  @observable exps = [this.initExp];
-  @observable index = 0;
-  @observable func = '';
-
-  @action public handleVariables = (
-    v: Coordinate,
-    startIndex: number | null,
-  ) => {
-    const { exps, index } = this;
-    const newExp = exps[index];
-    const {
-      range: [start, end],
-      value,
-    } = newExp;
-    const curStart: number =
-      typeof startIndex === 'number' ? startIndex : start;
-
-    const splitValue: Coordinate = {
-      name: ',',
-      value: ',',
-      type: Type.Split,
-    };
-    const preList = [...value.slice(0, curStart)];
-    const pre: Coordinate | undefined = preList.pop();
-    const next: Coordinate | undefined = [...value.slice(end)].shift();
-    let before: Coordinate | undefined, after: Coordinate | undefined;
-    // const aaa = pre
-    if (
-      !!pre &&
-      (pre.type === Type.ID ||
-        pre.type === Type.Number ||
-        pre.type === Type.Char)
-    )
-      before = splitValue;
-    if (
-      !!next &&
-      (next.type === Type.ID ||
-        next.type === Type.Number ||
-        next.type === Type.Char)
-    )
-      after = splitValue;
-    // const furtherPre: Coordinate | undefined = (preList || []).pop();
-    // console.log(furtherPre, 'furtherPre')
-    // if (!!pre && pre.value === '@' && (!furtherPre || furtherPre.type === Type.Lparen || furtherPre.type === Type.Op)) before = undefined;
-    // console.log(before, 'before')
-    const arr: Array<Coordinate> = [];
-    if (before) arr.push(before);
-    arr.push(v);
-    if (after) arr.push(after);
-    const n: number = 1 + (!!before ? 1 : 0);
-
-    newExp.value = [...value.slice(0, curStart), ...arr, ...value.slice(end)];
-    newExp.range = [curStart + n, curStart + n];
-    exps[index] = newExp;
-  };
-
-  @action changeExpLabel(v: string) {
-    this.exps[this.index].label = v;
-  }
-
-  @action setDetailKey = v => {
-    this.detailKey = v;
-  };
-
-  @action setIndex = (k) => {
-    this.index = k;
   };
 }
 
