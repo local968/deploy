@@ -105,8 +105,7 @@ const Groupby = {
     'when var is a numerical variable, functions [sum, mean, min, max, std, median] are supported;',
     'when var is a categorical variable, function [mode] is supported by default.',
   ],
-  output: '[]',
-  output_desc: ['When the variable contains multiple interval numbers, the extracted numbers will be merged.'],
+  output: 'numerical or categorical variable.',
   example: [
     {
       length: 4,

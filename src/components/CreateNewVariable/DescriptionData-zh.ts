@@ -104,7 +104,6 @@ const Groupby = {
     'var为离散变量时，默认支持 mode（众数）统计。',
   ],
   output: '连续变量或离散变量',
-  output_desc: ['当变量中含有多个间隔数字时，提取后数字将被合并。'],
   examples: [
     {
       length: 4,
