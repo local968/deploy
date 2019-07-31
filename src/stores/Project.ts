@@ -1317,7 +1317,7 @@ class Project {
         }
         const variablenames = variables.reduce((prev, _v) => [...prev, ..._v.nameArray], [])
         const newVariable = [...this.newVariable, ...variablenames]
-        // const trainHeader = [...this.trainHeader, ...variablenames]
+        const trainHeader = [...this.trainHeader, ...variablenames]
         const newType = Object.assign({}, this.newType, type)
         const variableExp = variables.reduce((prev, _v) => {
           prev[_v.name] = _v
@@ -1326,7 +1326,7 @@ class Project {
         const expression = Object.assign({}, this.expression, variableExp)
         return this.updateProject({
           newVariable,
-          // trainHeader,
+          trainHeader,
           expression,
           newType,
         }).then(() => true)
