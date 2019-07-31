@@ -317,7 +317,7 @@ const api = {
     );
     if (uploadResponse.data.status !== 200) return uploadResponse.data;
     const opaqueId = uploadResponse.data.opaqueId;
-    const mapHeader = uploadResponse.data.mapHeader;
+    const mapHeader = uploadResponse.data.rawHeader;
     schedule.mapHeader = mapHeader
     await api.upsertSchedule(schedule)
 

@@ -121,6 +121,8 @@ async function scheduleHandler() {
       if (deployment.csvScript && deployment.csvScript !== '')
         request.csvScript = deployment.csvScript;
       let result = {};
+      schedule.status = 'Progressing..'
+      api.upsertSchedule(schedule)
       await command(request, data => {
         result = { ...result, ...data.result };
         return data.status === 100 || data.status < 0;
