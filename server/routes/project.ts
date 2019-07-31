@@ -1157,18 +1157,18 @@ wss.register('abortTrain', (message, socket) => {
           trainModel,
           stopIds: curStopIds,
         };
-        const modelCounts = await getModelCount(projectId);
+        // const modelCounts = await getModelCount(projectId);
         if (!curStopIds.length) {
           statusData.trainModel = {};
           statusData.stopIds = [];
           statusData.train2Finished = true
           statusData.train2ing = false
-          if (isModeling && !modelCounts) {
-            statusData.mainStep = 3;
-            statusData.curStep = 3;
-            statusData.lastSubStep = 1;
-            statusData.subStepActive = 1;
-          }
+          // if (isModeling && !modelCounts) {
+          //   statusData.mainStep = 3;
+          //   statusData.curStep = 3;
+          //   statusData.lastSubStep = 1;
+          //   statusData.subStepActive = 1;
+          // }
         }
         return createOrUpdate(projectId, userId, statusData);
       });
@@ -1188,7 +1188,7 @@ wss.register('train', async (message, socket, progress) => {
   Reflect.deleteProperty(message, 'algorithms');
   // const stopId = uuid.v4()
   // const data = { ...message, userId, requestId, stopId: requestId };
-  // let hasModel = false;
+  let curModel = 0;
   try {
     await checkTraningRestriction(user);
 
@@ -1320,6 +1320,7 @@ wss.register('train', async (message, socket, progress) => {
         // await createOrUpdate(projectId, userId, { trainModel: result })
         processValue = { ...result };
       } else if (result.score) {
+        curModel++
         const {
           chartData: chartDataUrl,
           holdoutChartData: holdoutChartDataUrl,
@@ -1356,14 +1357,6 @@ wss.register('train', async (message, socket, progress) => {
           modelName,
           modelData,
         );
-        // const modelResult = await createModel(
-        //   userId,
-        //   projectId,
-        //   modelName,
-        //   modelData,
-        // );
-        // processValue = await addSettingModel(userId, projectId, settingId)(modelResult);
-        // return progress(model)
       }
       return progress(processValue);
     };
@@ -1371,11 +1364,18 @@ wss.register('train', async (message, socket, progress) => {
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
     );
-
-    const count =
-      commandRes.filter((cr: any) => !cr.isAbort && cr.status === 100) || [];
-    console.log(`project: ${projectId} train finish`)
-    const statusData = {
+    const statusData: {
+      train2Finished: boolean,
+      train2ing: boolean,
+      train2Error: boolean,
+      trainModel: unknown,
+      selectId: string,
+      stopIds: string[],
+      mainStep?: number,
+      curStep?: number,
+      lastSubStep?: number,
+      subStepActive?: number,
+    } = {
       train2Finished: true,
       train2ing: false,
       train2Error: false,
@@ -1383,10 +1383,18 @@ wss.register('train', async (message, socket, progress) => {
       selectId: '',
       stopIds: [],
     };
+    const abortCount = commandRes.filter((cr: any) => !!cr.isAbort);
     const modelCounts = await getModelCount(projectId);
 
-    if (modelCounts < 1 && count.length < 1) {
-      statusData.train2Error = true;
+    if (modelCounts < 1 && curModel < 1) {
+      if (abortCount.length === commandRes.length) {
+        statusData.mainStep = 3;
+        statusData.curStep = 3;
+        statusData.lastSubStep = 1;
+        statusData.subStepActive = 1;
+      } else {
+        statusData.train2Error = true;
+      }
     }
 
     return await createOrUpdate(projectId, userId, statusData);
