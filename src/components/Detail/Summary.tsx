@@ -22,7 +22,8 @@ export interface SummaryProps {
     dataView?: any
     totalCount?: number,
     target?: string,
-    mapHeader?: string[]
+    mapHeader?: string[],
+    problemType?: string
   },
   loading: boolean
   onClose: () => void,
@@ -47,6 +48,7 @@ class Summary extends Component<SummaryProps> {
       totalCount,
       target,
       mapHeader,
+      problemType
     } = summary
     const deletePercent = formatNumber((deletedCount / totalCount * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedCount - deletedCount) / totalCount * 100).toString(), 2)
@@ -61,7 +63,7 @@ class Summary extends Component<SummaryProps> {
       } = {
         missing: nullLineCounts[v] / totalCount * 100,
         mismatch: (colType[v] === 'Numerical' ? mismatchLineCounts[v] : 0) / totalCount * 100,
-        outlier: ((hasTarget && colType[v] === 'Numerical') ? outlierLineCounts[v] : 0) / totalCount * 100,
+        outlier: ((problemType === 'Clustering' && colType[v] === 'Numerical') ? outlierLineCounts[v] : 0) / totalCount * 100,
       }
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent

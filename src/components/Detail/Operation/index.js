@@ -113,7 +113,7 @@ class ScheduleOperation extends Component {
     this.visible = true
     const { socketStore, schedule } = this.props
     socketStore.ready()
-      .then(api => api.getScheduleSummary({ sid: schedule.schedule.id, pid: schedule.deployment.projectId }))
+      .then(api => api.getScheduleSummary({ sid: schedule.schedule.id, pid: schedule.deployment.projectId, problemType: schedule.deployment.modelType }))
       .then(result => {
         this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader }
         this.loading = false
