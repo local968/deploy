@@ -824,6 +824,8 @@ class Project {
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl(false)
+      if (this.originalIndex) await this.deleteIndex(this.originalIndex)
+      if (this.etlIndex) await this.deleteIndex(this.etlIndex)
       this.models = []
       //全部恢复到problem步骤
       const backData = Object.assign({}, this.defaultUploadFile, this.defaultDataQuality, this.defaultTrain, updObj, {
@@ -845,6 +847,8 @@ class Project {
   fastTrackInit = async (data: UploadProps) => {
 
     await this.abortTrainByEtl(false)
+    if (this.originalIndex) await this.deleteIndex(this.originalIndex)
+    if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const api = await socketStore.ready()
     const { header } = await api.getHeader({ index: data.originalIndex })
@@ -939,6 +943,7 @@ class Project {
   endSchema = async () => {
     this.etling = true
     await this.abortTrainByEtl(false)
+    if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
       target: string,
@@ -1010,6 +1015,7 @@ class Project {
     if (!this.qualityHasChanged) return
     this.etling = true
     await this.abortTrainByEtl(false)
+    if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
       targetMap: NumberObject,
@@ -1054,8 +1060,15 @@ class Project {
     return true
   }
 
+  deleteIndex = async (index: string) => {
+    if (!index) return
+    const api = await socketStore.ready()
+    return await api.deleteIndex({ index, projectId: this.id })
+  }
+
   newEtl = async () => {
     const api = await socketStore.ready()
+    if (this.etlIndex) await api.deleteIndex(this.etlIndex)
     const { status, message, result } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })

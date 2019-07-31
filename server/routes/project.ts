@@ -61,19 +61,6 @@ async function parseNewChartData(url) {
   }
 }
 
-function parseChartData(result) {
-  if (!result) return { chart: null, fitIndex: null, initialFitIndex: null };
-  const charts = ['density', 'lift', 'roc'];
-  charts.forEach(chart => {
-    try {
-      result[chart] = JSON.parse(result[chart]);
-    } catch (e) {
-      result[chart] = null;
-    }
-  });
-  return getChartData(result);
-}
-
 async function query(key, offset, limit, userId) {
   const projectIdList = await projectService.list(userId) || [];
   const count = projectIdList.length;
@@ -298,42 +285,55 @@ function deleteProject(userId, id) {
       me4ssage: 'ok'
     }
     if (err.status !== 200) return err;
-    const pipeline = redis.pipeline();
-    pipeline.del(`project:${id}`);
-    pipeline.zrem(`user:${userId}:projects:updateTime`, id);
-    pipeline.zrem(`user:${userId}:projects:createTime`, id);
-    return pipeline.exec().then(async list => {
-      const error = list.find(i => !!i[0]);
-      if (error) {
-        errorLogger.error({
+
+    const oIndexPromise = getProjectField(id, 'originalIndex')
+    const eIndexPromise = getProjectField(id, 'etlIndex')
+
+    const promise = Promise.all([oIndexPromise, eIndexPromise]).then(([oIndex, eIndex]) => {
+      const arr = []
+      if (oIndex) arr.push(deleteEsIndex(oIndex))
+      if (eIndex) arr.push(deleteEsIndex(eIndex))
+      return Promise.all(arr)
+    })
+
+    return promise.then(() => {
+      const pipeline = redis.pipeline();
+      pipeline.del(`project:${id}`);
+      pipeline.zrem(`user:${userId}:projects:updateTime`, id);
+      pipeline.zrem(`user:${userId}:projects:createTime`, id);
+      return pipeline.exec().then(async list => {
+        const error = list.find(i => !!i[0]);
+        if (error) {
+          errorLogger.error({
+            userId,
+            message: 'delete project error',
+            pid: id,
+            time: moment().unix(),
+          });
+          userLogger.error({
+            userId,
+            message: 'delete project error',
+            pid: id,
+            time: moment().unix(),
+          });
+          return { status: 415, message: 'delete project error', error };
+        }
+        userLogger.warn({
           userId,
-          message: 'delete project error',
+          message: 'delete project success',
           pid: id,
           time: moment().unix(),
         });
-        userLogger.error({
-          userId,
-          message: 'delete project error',
-          pid: id,
-          time: moment().unix(),
+        wss.publish(`user:${userId}:projects`, {
+          status: 200,
+          message: `delete project success`,
+          result: { exist: false },
+          id,
         });
-        return { status: 415, message: 'delete project error', error };
-      }
-      userLogger.warn({
-        userId,
-        message: 'delete project success',
-        pid: id,
-        time: moment().unix(),
+        await projectService.remove(id);
+        return deleteModels(userId, id);
       });
-      wss.publish(`user:${userId}:projects`, {
-        status: 200,
-        message: `delete project success`,
-        result: { exist: false },
-        id,
-      });
-      await projectService.remove(id);
-      return deleteModels(userId, id);
-    });
+    })
   });
 }
 
@@ -635,6 +635,17 @@ function getProject(projectId) {
   });
 }
 
+function deleteEsIndex(index) {
+  axios.delete(`${esServicePath}/etls/${index}`)
+  // return axios.delete(`${esServicePath}/etls/${index}`).then(result => {
+  console.log(`delete index: ${index}`)
+  return {
+    status: 200,
+    message: 'ok'
+  }
+  // })
+}
+
 wss.register('initProject', async (message, socket) => {
   const { id } = message
   return getProject(id)
@@ -757,134 +768,6 @@ wss.register('queryModelList', (message, socket, process) => {
   const { id } = message;
   return queryModelList(id, process);
 });
-
-// wss.register('etl', (message, socket, progress) => {
-//   const { userId } = socket.session;
-//   const {
-//     firstEtl,
-//     noCompute,
-//     saveIssue,
-//     projectId: id,
-//     csvLocation: files,
-//     _id: requestId,
-//   } = message;
-
-//   return setDefaultData(id, userId).then(setResult => {
-//     if (setResult.status !== 200) return setResult;
-//     return getFileInfo(files).then(fileInfo => {
-//       if (fileInfo.status !== 200) return fileInfo;
-//       const { csvLocation, ext } = fileInfo;
-//       const data = {
-//         ...message,
-//         userId: userId,
-//         requestId,
-//         csvLocation,
-//         ext,
-//         noCompute: firstEtl || noCompute,
-//         stopId: requestId,
-//       };
-//       // delete data.firstEtl
-//       Reflect.deleteProperty(data, 'firstEtl');
-//       Reflect.deleteProperty(data, 'saveIssue');
-//       if (!csvLocation) Reflect.deleteProperty(data, 'csvLocation');
-//       if (!ext) Reflect.deleteProperty(data, 'ext');
-//       return createOrUpdate(id, userId, {
-//         etling: true,
-//         stopId: requestId,
-//       }).then(() =>
-//         command(data, processData => {
-//           let { result, status } = processData;
-//           if (status < 0 || status === 100) return processData;
-//           const { name, path, key, originHeader, value, fields } = result;
-//           if (name === 'progress' && key === 'etl')
-//             return createOrUpdate(id, userId, { etlProgress: value });
-//           if (name === 'csvHeader')
-//             return createOrUpdate(id, userId, {
-//               originPath: path,
-//               rawHeader: originHeader,
-//               dataHeader: fields,
-//             });
-//           if (name === 'cleanCsvHeader')
-//             return createOrUpdate(id, userId, { cleanPath: path });
-//           return null;
-//         }).then((returnValue: any) => {
-//           let { result, status } = returnValue;
-//           if (status < 0) {
-//             return createOrUpdate(id, userId, {
-//               etlProgress: 0,
-//               etling: false,
-//             }).then(() => {
-//               return {
-//                 status: 418,
-//                 result,
-//                 message: returnValue.message,
-//               };
-//             });
-//           }
-
-//           //赋值给temp
-//           result.outlierDictTemp = result.outlierDict;
-//           result.nullFillMethodTemp = result.nullFillMethod;
-//           result.mismatchFillMethodTemp = result.mismatchFillMethod;
-//           result.outlierFillMethodTemp = result.outlierFillMethod;
-
-//           //保存原始错误
-//           if (saveIssue) {
-//             result.nullLineCounts = result.nullLineCounts;
-//             result.mismatchLineCounts = result.mismatchLineCounts;
-//             result.outlierLineCounts = result.outlierLineCounts;
-//           }
-
-//           result.etling = false;
-//           result.etlProgress = 0;
-//           result.firstEtl = false;
-//           result.stopId = '';
-//           // delete result.name
-//           // delete result.id
-//           // delete result.userId
-//           Reflect.deleteProperty(result, 'name');
-//           Reflect.deleteProperty(result, 'id');
-//           Reflect.deleteProperty(result, 'userId');
-//           if (!files) Reflect.deleteProperty(result, 'totalRawLines'); //delete result.totalRawLines
-//           // 最终ETL 小于1W行  使用cross
-//           if (result.totalLines < 10000) result.runWith = 'cross';
-//           const steps: Steps = {};
-//           if (firstEtl) {
-//             steps.curStep = 2;
-//             steps.mainStep = 2;
-//             steps.subStepActive = 2;
-//             steps.lastSubStep = 2;
-//           } else {
-//             if (noCompute) {
-//               steps.curStep = 3;
-//               steps.mainStep = 3;
-//               steps.subStepActive = 1;
-//               steps.lastSubStep = 1;
-//             } else {
-//               steps.curStep = 2;
-//               steps.mainStep = 2;
-//               steps.subStepActive = 3;
-//               steps.lastSubStep = 3;
-//             }
-//           }
-//           //重新做ETL后删除所有模型
-//           deleteModels(userId, id);
-
-//           return createOrUpdate(id, userId, { ...result, ...steps }).then(
-//             updateResult => {
-//               if (updateResult.status !== 200) return updateResult;
-//               return {
-//                 status: 200,
-//                 message: 'ok',
-//                 result: result,
-//               };
-//             },
-//           );
-//         }),
-//       );
-//     });
-//   });
-// });
 
 wss.register('dataView', (message, socket, progress) => {
   return createOrUpdate(message.projectId, socket.session.userId, {
@@ -1754,6 +1637,22 @@ wss.register('getOutlierData', (message, socket, progress) => {
   })
 })
 
+wss.register('deleteIndex', (message, socket) => {
+  const { index, projectId } = message
+  const { userId } = socket.session;
+
+  return checkProject(userId, projectId).then(checked => {
+    const { status } = checked
+    if (status !== 200) {
+      if (status === 444) return {
+        status: 200,
+        message: 'ok'
+      }
+      return checked
+    }
+    return deleteEsIndex(index)
+  })
+})
 
 router.get('/export', (req, res) => {
   const { id, sign } = req.query
