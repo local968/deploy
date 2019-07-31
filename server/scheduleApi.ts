@@ -277,20 +277,9 @@ const api = {
     }
   },
   getCleanIndex: async (schedule, index, projectId, modelName) => {
-    const result = await redis.hmget(
-      `project:${projectId}:model:${modelName}`,
-      'stats',
-      'problemType'
-    );
-    const mapHeaderResult = await redis.hmget(`project:${projectId}`,
-      'mapHeader')
-    let [stats, problemType] = result;
-    let [mapHeader] = mapHeaderResult
-    mapHeader = JSON.parse(mapHeader)
-    stats = JSON.parse(stats);
-    problemType = JSON.parse(problemType)
 
-    return await etl(schedule, index, stats, mapHeader, problemType);
+
+    return await etl(schedule, index, projectId, modelName);
   },
 
   getDatabaseData: async (message, schedule, onProgress) => {
@@ -354,16 +343,33 @@ const api = {
   },
 };
 
-const etl = async (schedule, index, stats, mapHeader, problemType) => {
+const etl = async (schedule, index, projectId, modelName) => {
+  const result = await redis.hmget(
+    `project:${projectId}:model:${modelName}`,
+    'stats',
+    'problemType',
+    'featureLabel',
+    'target'
+  );
+  const mapHeaderResult = await redis.hmget(`project:${projectId}`,
+    'mapHeader')
+  let [stats, problemType, featureLabel] = result;
+  let [mapHeader] = mapHeaderResult
+  mapHeader = JSON.parse(mapHeader)
+  stats = JSON.parse(stats);
+  featureLabel = JSON.parse(featureLabel)
+  problemType = JSON.parse(problemType)
+
   const mappingResponse = await
   axios.get(`${esServicePath}/etls/${index}/header`)
   const dataHeader = mappingResponse.data.split(',')
   const headerArray = dataHeader.filter(h => h !== '__no')
-  if (schedule.type === 'deployment' || problemType === 'Outlier' || problemType === 'Clustering') {
-    Object.keys(stats).forEach(key => {
+  Object.keys(stats).forEach(key => {
+    if (schedule.type === 'deployment' || problemType === 'Outlier' || problemType === 'Clustering') {
       if (stats[key].isTarget && headerArray.indexOf(key) === -1) delete stats[key];
-    });
-  }
+    }
+    if (!stats[key].isTarget && featureLabel.indexOf(key) === -1) delete stats[key]
+  });
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
     === -1)
   if(lackHeaders.length > 0) {
