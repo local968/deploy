@@ -261,7 +261,7 @@ wss.register('getScheduleSummary', async (message) => {
   const result: any = {}
   try {
     const schedule = JSON.parse(await redis.get(`schedule:${sid}`))
-    const { index, modelName } = schedule
+    const { index, modelName, type, } = schedule
     const { data } = await axios.get(
       `${esServicePath}/etls/${index}/headerArray`,
     );
@@ -273,12 +273,24 @@ wss.register('getScheduleSummary', async (message) => {
     const modelStats = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'stats'))
     const featureLabel = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'featureLabel'))
     const target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
+    const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
+
+    const stats = featureLabel.reduce((prev, l) => {
+      prev[l] = modelStats[l]
+      return prev
+    }, {})
+
+    if (type === 'performance' && (problemType === 'Classification' || problemType === 'Regression')) {
+      target.forEach(t => {
+        stats[t] = modelStats[t]
+      })
+    }
 
     const {
       data: { totalFixedCount, deletedCount },
     } = await axios.post(
       `${esServicePath}/etls/${index}/fixedLines`,
-      modelStats,
+      stats,
     );
 
     const { data: { count } } = await axios.get(
