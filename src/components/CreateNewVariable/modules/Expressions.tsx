@@ -65,7 +65,7 @@ const useStyles = withStyles({
 });
 
 const MyTableCell = styled(TableCell)({
-  padding: '10px 14px 10px',
+  padding: '8px 10px 8px',
 });
 
 interface ExpressionsProps {
@@ -249,7 +249,7 @@ class Expressions extends React.Component<ExpressionsProps, ExpressionsState> {
     } = this.props;
 
     return (
-      <MuiCard style={{ paddingBottom: 0, maxHeight: 276, overflowY: 'auto' }}>
+      <MuiCard style={{ paddingBottom: 0, maxHeight: 248, overflowY: 'auto' }}>
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
