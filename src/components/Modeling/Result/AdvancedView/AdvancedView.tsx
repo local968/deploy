@@ -27,7 +27,7 @@ interface AdvancedViewProps {
 
 const AdvancedView = (props: AdvancedViewProps) => {
   const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange } = props
-  const { selectModel, problemType, train2Finished, metricCorrection, fbeta } = project
+  const { selectModel, problemType, train2Finished, metricCorrection, fbeta } = project;
 
   const performance = useMemo(() => {
     try {
@@ -161,7 +161,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
     updateProject({
       metricCorrection: { metric: 'default', type: '', value: 0 }
     })
-  }
+  };
 
   return <div className={styles.main}>
     {(problemType === 'Classification' || problemType === 'Regression') && <div className={styles.title}>

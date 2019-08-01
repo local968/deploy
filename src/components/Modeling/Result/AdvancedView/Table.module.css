@@ -166,3 +166,9 @@ span.text {
 .recommendLabel :global(.ant-tooltip-inner) {
   min-height: 0;
 }
+
+.iconParallel{
+  position: relative;
+  top: -2px;
+  padding-right: 5px;
+}

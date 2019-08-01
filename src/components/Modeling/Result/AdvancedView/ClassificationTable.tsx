@@ -5,7 +5,7 @@ import { Icon, Switch, Select, Tooltip } from 'antd'
 import Project from 'stores/Project';
 import Model from 'stores/Model';
 import { Hint } from 'components/Common';
-import { observer } from 'mobx-react';
+import {observer } from 'mobx-react';
 import { TableHeader } from './AdvancedViewTable';
 import moment from 'moment';
 import { formatNumber } from '../../../../util'
@@ -96,9 +96,9 @@ interface ClassificationTableProps {
 }
 
 const ClassificationTable = (props: ClassificationTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props
-  const { isHoldout, fbeta } = project
-  const [detailArr, setDetail] = useState([] as string[])
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props;
+  const { isHoldout, fbeta } = project;
+  const [detailArr, setDetail] = useState([] as string[]);
 
   const sortMethods = (aModel, bModel) => {
     switch (sort.key) {
@@ -193,10 +193,16 @@ const ClassificationTable = (props: ClassificationTableProps) => {
   const handleDetail = (s: string) => {
     if (detailArr.includes(s)) return setDetail(detailArr.filter(d => d !== s))
     return setDetail([...detailArr, s])
-  }
+  };
   const modelElements = useMemo(() => {
-    return models.reduce((els, m) => ({ ...els, [m.id]: <Row model={m} metric={metric} project={project} key={m.id} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
-  }, [detailArr, metric])
+    return models.reduce((els, m) => ({ ...els, [m.id]: <Row
+        model={m}
+        metric={metric}
+        project={project}
+        key={m.id}
+        detail={detailArr.includes(m.id)}
+        handleDetail={handleDetail} /> }), {})
+  }, [detailArr, metric,isHoldout]);
 
   return <div className={styles.main}>
     <div className={styles.header}>
@@ -220,7 +226,7 @@ const ClassificationTable = (props: ClassificationTableProps) => {
             <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
             <span>{EN.Holdout}</span>
           </div>
-          <div className={styles.metricBg}></div>
+          <div className={styles.metricBg}/>
           <div className={styles.metric}>
             <span className={styles.metricText} >{EN.MeasurementMetric}</span>
             <Select size="large" value={metric} onChange={handleChange} style={{ width: '120px', fontSize: '1.125rem' }} getPopupContainer={el => el.parentElement}>
@@ -240,7 +246,6 @@ const ClassificationTable = (props: ClassificationTableProps) => {
     </div>
     <div className={styles.body}>
       {filtedModels.map(m => modelElements[m.id])}
-      {/* {filtedModels.get().map((m, i) => <Row model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)} */}
     </div>
   </div>
 }
@@ -302,11 +307,11 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
       </div>
     </div>
   </Tooltip>
-})
+});
 
 const Row = (props: ClassificationRowProps) => {
-  const { model, project, detail } = props
-  const { targetArray, targetColMap, renameVariable } = project
+  const { model, project, detail } = props;
+  const { targetArray, targetColMap, renameVariable } = project;
   const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
   const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
   return <div className={styles.rowBody}>

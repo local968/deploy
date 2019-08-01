@@ -58,7 +58,9 @@ export default class Iso extends PureComponent<DataSampleProps> {
   async message() {
     const chart = this.chart.getEchartsInstance();
     chart.showLoading();
-    const { selectModel: models } = this.props.projectStore.project;
+    const {project} = this.props.projectStore;
+    if(!project)return;
+    const { selectModel: models } = project;
     const { outlierPlotData: url, rate, initRate } = models;
 
     const point = rate.toFixed(3);
