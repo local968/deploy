@@ -638,7 +638,6 @@ function getProject(projectId) {
 
 function deleteEsIndex(index) {
   const sampleIndex = getSampleIndex()
-  console.log(sampleIndex, index, sampleIndex.includes(index), 'delete?')
   if (!sampleIndex.includes(index)) axios.delete(`${esServicePath}/etls/${index}`)
   // return axios.delete(`${esServicePath}/etls/${index}`).then(result => {
   console.log(`delete index: ${index}`)
@@ -1246,6 +1245,7 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue);
     };
+    console.log(`project: ${projectId} train start, command: ${_stopIds.length}`)
 
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
