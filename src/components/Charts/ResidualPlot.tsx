@@ -3,7 +3,14 @@ import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
 import _ from 'lodash';
 
-export default function ResidualPlot(props){
+interface Interface {
+	chartDate:any
+	title:string
+	width?
+	height?
+}
+
+export default function ResidualPlot(props:Interface){
 	const {chartDate={},title='',width=500,height=300} = props;
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{
@@ -29,7 +36,13 @@ export default function ResidualPlot(props){
 			y: 0,
 		},
 		tooltip: {
-			formatter: '{c}',
+			formatter: params=>{
+				const [x,y] = params.value;
+				return `
+						${EN.Predictvalue}:${x}<br/>
+						${EN.residual}:${y}
+					`;
+			}
 		},
 		grid:{
 			x:`${Math.floor(max+1)}`.length * 10 +20,

@@ -51,14 +51,11 @@ class ResidualDiagnose extends Component<ResidualDiagnoseProps> {
       type: 'largey',
       text: EN.LargeYaxisDataPoints
     }];
-    const { diagnoseType, residualplot } = this.props;
+    const { diagnoseType } = this.props;
     const RadioGroup = Radio.Group;
-    // const disabled = diagnoseType === '';
-    // const disabled = false;
     return (
       <div className={styles.residualDiagnose} >
-        <div className={styles.plot} style={{ zoom: 0.7 }}>
-          {/*<img width={300} src={residualplot} alt="" />*/}
+        <div className={styles.plot}>
           {this.props.Plot}
         </div>
         <div className={styles.choosePlot} >
