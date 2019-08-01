@@ -28,7 +28,6 @@ export default function ModelInterpretation(props){
           if(ind>1000)return;
           list+=`${itm[0]}*${dt}\\\\`
         });
-        console.log(11,list)
         katex.render(`Z=\\Sigma \\allowbreak\t
       \\begin{Bmatrix} 
          ${list}
