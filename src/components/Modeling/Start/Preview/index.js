@@ -35,12 +35,15 @@ export default class Preview extends Component {
   formatTable = () => {
     const { cleanData, newVariableData } = this
     const { visiable, project } = this.props
-    const { colType, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target, mapHeader } = project;
+    const { colType, renameVariable, trainHeader, newVariable, newType, rawHeader, dataHeader, target, mapHeader, problemType } = project;
     if (!visiable) return []
     if (this.loading) return []
     if (!cleanData.length) return []
     if (!!newVariable.length && !newVariableData.length) return []
-    const headerList = target ? [target, ...rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target), ...newVariable].filter(h => !trainHeader.includes(h)) : [...rawHeader.filter(_h => dataHeader.includes(_h)), ...newVariable].filter(h => !trainHeader.includes(h))
+    const isUn = ['Clustering', 'Outlier'].includes(problemType)
+    const variables = rawHeader.filter(_h => dataHeader.includes(_h) && _h !== target)
+    if (!isUn && !!target) variables.unshift(target)
+    const headerList = [...variables, ...newVariable].filter(h => !trainHeader.includes(h))
     const showIndex = headerList.map(v => [...rawHeader, ...newVariable].indexOf(v))
 
     const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
@@ -51,7 +54,6 @@ export default class Preview extends Component {
     const types = { ...colType, ...newType }
 
     const realColumn = headerList.length
-
     /**
      * 根据showSelect, indexPosition变化
      * showSelect: true  显示勾选框
@@ -102,8 +104,11 @@ export default class Preview extends Component {
 
   render() {
     const { project, visiable, hideTable, showTable } = this.props
-    const { dataHeader, target, trainHeader, newVariable, mapHeader } = project
-    const header = [...dataHeader, ...newVariable].filter(v => !trainHeader.includes(v))
+    const { dataHeader, target, trainHeader, newVariable, mapHeader, problemType } = project
+    const isUn = ['Clustering', 'Outlier'].includes(problemType)
+    const variables = [...dataHeader.filter(h => h !== target), ...newVariable]
+    if (!isUn && target) variables.unshift(target)
+    const header = variables.filter(v => !trainHeader.includes(v))
     const tableData = this.formatTable()
     return <div className={classnames(styles.content, {
       [styles.active]: visiable
@@ -116,7 +121,7 @@ export default class Preview extends Component {
       </div>
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
-        <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={mapHeader[target]}>{mapHeader[target]}</span></div>
+        {(!isUn && !!target) && <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={mapHeader[target]}>{mapHeader[target]}</span></div>}
         <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
