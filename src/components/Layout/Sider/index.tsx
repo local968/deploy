@@ -17,14 +17,16 @@ import { Show } from 'components/Common';
 import { UserStore } from 'stores/UserStore';
 import { DeploymentStore } from 'stores/DeploymentStore';
 import { RouterStore } from 'mobx-react-router';
+import { ProjectStore } from 'stores/ProjectStore';
 
 interface SiderProps {
   userStore: UserStore,
   deploymentStore: DeploymentStore,
-  routing: RouterStore
+  routing: RouterStore,
+  projectStore: ProjectStore
 }
 
-@inject('userStore', 'deploymentStore', 'routing')
+@inject('userStore', 'deploymentStore', 'routing', 'projectStore')
 @observer
 class Sider extends Component<SiderProps> {
   constructor(props) {
@@ -50,7 +52,7 @@ class Sider extends Component<SiderProps> {
     return (
       <aside className={styles.sider}>
         <div className={styles.logo}>
-          <img className={styles.logoImg} src={logo}   alt="logo" />
+          <img className={styles.logoImg} src={logo} alt="logo" />
           {/*<img className={styles.logoImg} src={logo} alt="logo"/>*/}
           {/* <h2 className={styles.mrone}>R2 Learn</h2> */}
         </div>
@@ -126,16 +128,16 @@ class Sider extends Component<SiderProps> {
     if (!project) {
       return;
     }
-    const { deploymentStore, userStore, routing } = this.props;
+    const { deploymentStore, userStore, routing, projectStore } = this.props;
     const isDeploy = routing.location.pathname.includes('deploy');
     const userId = userStore.info.id;
     if (routing.location.pathname.indexOf('/deploy/project/') !== -1) {
+      projectStore.clean()
       const deploymentId = location.pathname.split('/')[3];
       const projectId = deploymentStore.deployments.find(d => d.id === parseInt(deploymentId, 10)).projectId;
       routing.push('/project/' + projectId);
       return;
     }
-
     isDeploy || !userId ? routing.push('/') : routing.push('/deploy');
   };
 }
