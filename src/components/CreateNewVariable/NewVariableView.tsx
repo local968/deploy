@@ -106,8 +106,8 @@ const OPARRAY = ['+', '-', '*', '/'];
 @observer
 // New Variable Module
 export class NewVariableView extends React.Component<
-  InterfaceNewVariableProps,
-  InterfaceNewVariableState
+InterfaceNewVariableProps,
+InterfaceNewVariableState
 > {
   constructor(props) {
     super(props);
@@ -298,18 +298,18 @@ export class NewVariableView extends React.Component<
     const type: Type = isNumber
       ? Type.Number
       : isOp
-      ? Type.Op
-      : isLParen
-      ? Type.Lparen
-      : isRParen
-      ? Type.Rparen
-      : isSplit
-      ? Type.Split
-      : isLc
-      ? Type.Lc
-      : isRc
-      ? Type.RC
-      : Type.Char;
+        ? Type.Op
+        : isLParen
+          ? Type.Lparen
+          : isRParen
+            ? Type.Rparen
+            : isSplit
+              ? Type.Split
+              : isLc
+                ? Type.Lc
+                : isRc
+                  ? Type.RC
+                  : Type.Char;
     let value: Coordinate = {
       name: v,
       value: v,
@@ -750,20 +750,20 @@ export class NewVariableView extends React.Component<
     const BaseFn = !functionName.length
       ? false
       : this.props.functions.base.find(
-          fn => fn.value === (functionName[0] as Coordinate).value,
-        );
+        fn => fn.value === (functionName[0] as Coordinate).value,
+      );
     const SeniorFn = !functionName.length
       ? false
       : this.props.functions.senior.find(
-          fn => fn.value === (functionName[0] as Coordinate).value,
-        );
+        fn => fn.value === (functionName[0] as Coordinate).value,
+      );
     // 判断函数参数个数限制
     if (BaseFn && BaseFn.params && BaseFn.params !== expArray.length)
       return {
         isPass: false,
         message: `${EN.Function} ${
           (functionName[0] as Coordinate).value
-        } must have ${BaseFn.params} params`,
+          } must have ${BaseFn.params} params`,
       };
 
     if (SeniorFn) {
@@ -977,7 +977,6 @@ export class NewVariableView extends React.Component<
         }
         break;
       case 'Groupby':
-        type = 'Categorical';
         let nList;
         if (numOfParam === 1) {
           if (numList.length !== 2)
@@ -1031,6 +1030,7 @@ export class NewVariableView extends React.Component<
               .join(',')} `,
           };
         }
+        type = paramList[0].type
 
         const nExp = this.expToString(nList.exp);
         const nListValues =
@@ -1217,7 +1217,7 @@ export class NewVariableView extends React.Component<
                 isPass: false,
                 message: `${this.expToString(subItem.exp)} contain ${
                   EN.Emptyexpression
-                } `,
+                  } `,
               };
             if (isVariable)
               return { isPass: false, message: `cannot use variable` };
@@ -1272,7 +1272,7 @@ export class NewVariableView extends React.Component<
   public checkArrayParams = (
     exps: any[],
     bracketExps: any,
-    callback: ({  }: any) => { isPass: boolean; message: string },
+    callback: ({ }: any) => { isPass: boolean; message: string },
     unCheck?: boolean,
   ): { isPass: boolean; message: string; params?: number } => {
     if (!exps.length) return { isPass: false, message: EN.Emptyparameter };
@@ -1330,8 +1330,8 @@ export class NewVariableView extends React.Component<
         !_e.value
           ? ''
           : _e.type === Type.ID
-          ? this.props.mapHeader[_e.value]
-          : (_e as any).value,
+            ? this.props.mapHeader[_e.value]
+            : (_e as any).value,
       )
       .join('');
 
@@ -1508,8 +1508,8 @@ export class NewVariableView extends React.Component<
             {!loading ? (
               EN.Yes
             ) : (
-              <Icon type="loading" style={{ fontSize: '24px' }} />
-            )}
+                <Icon type="loading" style={{ fontSize: '24px' }} />
+              )}
           </MySave>
           <MyCancel variant="contained" onClick={this.props.onClose} href={''}>
             {EN.CANCEL}
