@@ -96,6 +96,7 @@ router.post('/login/token', async(req, res) => {
   });
 
   return res.send({
+    status:200,
     token,
     token_overdue_time,
   })
@@ -129,7 +130,7 @@ router.get('/login/:token',async(req, res) => {
       };
       return res.redirect('/');
     }
-    return res.send({ status:500, message: 'token is Unavailable!'})
+  return res.send({ status:500, message: 'token is Unavailable!'})
 });
 
 router.post('/login', async(req, res) => {
@@ -153,7 +154,7 @@ router.post('/login', async(req, res) => {
     }
   }else{
     const _result = await userService.login(email,sha256(password));
-    user = _result[0];
+    user = _result&&_result[0];
   }
 
   if(!user){
@@ -245,7 +246,7 @@ router.post('/signin', async (req, res) => {
   let { email,password:_password} = req.body;
 
   if(!email||!_password){
-    return res.send({ status: 500, message: 'please send email and password.' })
+    return res.json({ status: 500, message: 'please send email and password.' })
   }
 
   const password = sha256(_password);
@@ -267,6 +268,7 @@ router.post('/signin', async (req, res) => {
   });
 
   return res.send({
+    status:200,
     message:'success'
   });
 });
@@ -283,10 +285,10 @@ router.delete('/signout/:token', async (req, res) => {
       token:'',
     });
     return res.send({
+      status:200,
       message:'signout success'
     });
   }
-
   return res.send({ status:500, message: 'token error'});
 });
 
