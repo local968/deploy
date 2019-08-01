@@ -188,7 +188,7 @@ const getProject = async (message): Promise<Project> => {
 wss.register('newEtl', async (message, socket, process) => {
   const project = await getProject(message);
   const { userId } = socket.session;
-  if (project.userId !== userId) return { status: 420, message: 'error' };
+  // if (project.userId !== userId) return { status: 420, message: 'error' };
   const stats = project.stats || {};
   const { projectId } = message;
   _.chain(project.colType)

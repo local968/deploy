@@ -9,6 +9,7 @@ import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData } from '../types';
+import { getSampleIndex } from './upload'
 
 const router = Router()
 
@@ -636,7 +637,9 @@ function getProject(projectId) {
 }
 
 function deleteEsIndex(index) {
-  axios.delete(`${esServicePath}/etls/${index}`)
+  const sampleIndex = getSampleIndex()
+  console.log(sampleIndex, index, sampleIndex.includes(index), 'delete?')
+  if (!sampleIndex.includes(index)) axios.delete(`${esServicePath}/etls/${index}`)
   // return axios.delete(`${esServicePath}/etls/${index}`).then(result => {
   console.log(`delete index: ${index}`)
   return {
@@ -1243,7 +1246,7 @@ wss.register('train', async (message, socket, progress) => {
       }
       return progress(processValue);
     };
-    console.log(`project: ${projectId} start train, command: ${_stopIds.length} `)
+
     const commandRes = await Promise.all(
       commandArr.map(_ca => command(_ca, processFn, true)),
     );
@@ -1266,17 +1269,24 @@ wss.register('train', async (message, socket, progress) => {
       selectId: '',
       stopIds: [],
     };
-    const abortCount = commandRes.filter((cr: any) => !!cr.isAbort);
+
+    let abortCount = 0, errorCount = 0, finishCount = 0
+    commandRes.forEach((cm: any) => {
+      if (cm.isAbort) abortCount++
+      else cm.status < 0 ? errorCount++ : finishCount++
+    })
     const modelCounts = await getModelCount(projectId);
 
+    console.log(`project: ${projectId} train finished, all command: ${_stopIds.length} ,finish: ${finishCount}, abort: ${abortCount}, error: ${errorCount}`)
+
     if (modelCounts < 1 && curModel < 1) {
-      if (abortCount.length === commandRes.length) {
+      if (errorCount > 0) {
+        statusData.train2Error = true;
+      } else {
         statusData.mainStep = 3;
         statusData.curStep = 3;
         statusData.lastSubStep = 1;
         statusData.subStepActive = 1;
-      } else {
-        statusData.train2Error = true;
       }
     }
 
