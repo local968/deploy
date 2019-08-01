@@ -293,7 +293,6 @@ export default class Home extends Component<Interface> {
             toggleSelect={this.removeSelected}
             ids={this.ids}
             actions={this.actions}
-            // selected={this.selected}
           />
         )}
         {

@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, Fragment} from 'react'
 import TSEN from './T-SEN'
 import request from '../Request'
 import styles from './charts.module.css';
@@ -7,14 +7,14 @@ import EN from "../../constant/en";
 import { inject, observer } from 'mobx-react';
 import D3D2List from './D3D2List'
 
-interface DataSampleProps {
+interface Interface {
 	url:string
 	projectStore?:any
 }
 
 @inject('projectStore')
 @observer
-export default class D3D2 extends PureComponent<DataSampleProps>{
+export default class D3D2 extends PureComponent<Interface>{
 	state:any;
 	constructor(props) {
 		super(props);
@@ -98,8 +98,6 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 	}
 
 	async save(show_name){
-		// const {show_name} = this.state;
-		// const {show_name} = this;
 		const {x_name,y_name,z_name} = show_name;
 		await this.setState({
 			show:false,
@@ -122,14 +120,14 @@ export default class D3D2 extends PureComponent<DataSampleProps>{
 		return <section className={styles.d3d2}>
 			<dl>
 				{
-					!changing&&<React.Fragment>
+					!changing&&<Fragment>
 						<dt>{EN.Choose2or3Variables}</dt>
 						<D3D2List
 							featuresLabel = {result.featuresLabel}
 							mapHeader = {mapHeader}
 							update = {this.save.bind(this)}
 						/>
-					</React.Fragment>
+					</Fragment>
 				}
 			</dl>
 			{show&&this.chart()}

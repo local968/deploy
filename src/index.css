@@ -137,8 +137,5 @@ body {
 .katex-html >:nth-child(3){
   overflow: auto;
   max-height: 300px;
-}
-.katex .mathdefault{
-  /*font-family: unset;*/
-  /*font-style: normal;*/
+  padding:10px 0;
 }
