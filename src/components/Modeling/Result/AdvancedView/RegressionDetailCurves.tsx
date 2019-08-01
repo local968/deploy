@@ -150,15 +150,19 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
         const Plot = show && (
           <ResidualPlot
             title={EN.ResidualPlot}
-            // x_name={EN.Truevalue}
-            y_name={EN.Predictvalue}
             chartDate={isHoldout ? holdOutChartDate : chartDate}
+          />
+        );
+        const sPlot = show && (
+          <ResidualPlot
+            title={EN.ResidualPlot}
+            chartDate={isHoldout ? holdOutChartDate : chartDate}
+            width = {350}
+            height = {280}
           />
         );
         curComponent = (
           <div className={styles.plot}>
-            {/*<img className={styles.img} src={model.residualPlotPath} alt="residual plot" />*/}
-            {/*<ResidualPlot/>*/}
             {chartDate && Plot}
             <Modal
               visible={this.state.visible}
@@ -166,11 +170,12 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
               width={1200}
               onOk={() => this.setState({ visible: false })}
               onCancel={() => this.setState({ visible: false })}
+              zIndex={100000}
             >
               <ResidualDiagnose
                 handleDiagnoseType={this.handleDiagnoseType}
                 diagnoseType={diagnoseType}
-                Plot={Plot}
+                Plot={sPlot}
                 residualplot={model.residualPlotPath}
               />
             </Modal>
