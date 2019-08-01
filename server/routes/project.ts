@@ -1277,7 +1277,7 @@ wss.register('train', async (message, socket, progress) => {
     })
     const modelCounts = await getModelCount(projectId);
 
-    console.log(`project: ${projectId} train finished, all command: ${_stopIds.length} ,finish: ${finishCount}, abort: ${abortCount}, error: ${errorCount}`)
+    console.log(`project: ${projectId} train finished, models: ${curModel}\nall command: ${_stopIds.length} ,finish: ${finishCount}, abort: ${abortCount}, error: ${errorCount}`)
 
     if (modelCounts < 1 && curModel < 1) {
       if (errorCount > 0) {
