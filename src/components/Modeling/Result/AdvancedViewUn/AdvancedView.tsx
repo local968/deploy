@@ -274,17 +274,17 @@ interface RegressionModleRowProps {
           })}
           <RowCell
             onClick={this.handleResult.bind(this, 'Parallel Plot')}
-            key='Parallel Plot' data={<a href='javascript:;' className={detail && type === 'Parallel Plot' ? styles.on : ''}>
+            key='Parallel Plot' data={<a href='javascript:' className={detail && type === 'Parallel Plot' ? styles.on : ''}>
               {
-                detail && type === 'Parallel Plot' ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
+                detail && type === 'Parallel Plot' ? <img className={styles.iconParallel} src={IconParallel2} alt='' /> : <img className={styles.iconParallel} src={IconParallel} alt='' />
               }
               {EN.Compute}
             </a>} />
           <RowCell
             onClick={this.handleResult.bind(this, 'PCA')}
-            key='PCA' data={<a href='javascript:;' className={detail && type === 'PCA' ? styles.on : ''}>
+            key='PCA' data={<a href='javascript:' className={detail && type === 'PCA' ? styles.on : ''}>
               {
-                detail && type === 'PCA' ? <img src={IconParallel2} alt='' /> : <img src={IconParallel} alt='' />
+                detail && type === 'PCA' ? <img className={styles.iconParallel} src={IconParallel2} alt='' /> : <img className={styles.iconParallel} src={IconParallel} alt='' />
               }
               {EN.Compute}
             </a>} />
