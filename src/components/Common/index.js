@@ -22,8 +22,10 @@ import DatabaseConfig from './DatabaseConfig'
 import AutoRepeat from './AutoRepeat'
 import OneTime from './OneTime'
 import TrainModel from './TrainModel'
+import ErrorBoundary from './ErrorBoundary'
 
 export {
+  ErrorBoundary,
   OneTime,
   AutoRepeat,
   DatabaseConfig,

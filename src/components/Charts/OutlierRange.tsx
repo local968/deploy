@@ -91,13 +91,19 @@ export default class OutlierRange extends PureComponent<Interface>{
 			high =(+data[1]).toFixed(6);
 		}
 
-		const [rs,re] = sliderValue;
+		let [rs,re] = sliderValue;
 
 		const _re = re + (re - rs)/1000;
 
 
 		const interval = (re-rs) / bin;
-		const _interval = (_re-rs) / bin;
+		const _interval = Math.max((_re-rs) / bin,0.01);
+
+		let range = sliderValue;
+		if(rs === re){
+			sliderValue[1] += 0.0001;
+		}
+
 
 		request.post({
 			url: '/graphics/outlier-range',
@@ -105,7 +111,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 				field:field + '.double',
 				id,
 				interval:+(_interval.toFixed(3)),
-				range:sliderValue,
+				range,
 			},
 		}).then((result:any) => {
 			this.setState({
@@ -340,7 +346,7 @@ export default class OutlierRange extends PureComponent<Interface>{
     return [
 			<div key="div" className={styles.outlierTop}>
 				<div>{EN.Minimum}:<InputNum
-					max={+end-0.01}
+					max={+end}
 					step={0.01}
 					precision={2}
 					value={+start}
@@ -349,7 +355,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 						if(start === '-'){
 							start = '-0'
 						}
-						if(+start>=+end){
+						if(+start>+end){
 							start = ((end).toFixed(2)*100 - 1)/100;
 						}
 						this.setState({
@@ -358,7 +364,7 @@ export default class OutlierRange extends PureComponent<Interface>{
 					}}
 				/></div>
 				<div>{EN.Maximum}:<InputNum
-					min={+start+0.01}
+					min={+start}
 					step={0.01}
 					precision={2}
 					value={+end}
@@ -367,8 +373,8 @@ export default class OutlierRange extends PureComponent<Interface>{
 						if(end === '-'){
 							end = '-0'
 						}
-						if(+start>=+end){
-							end = ((end).toFixed(2)*100 + 1)/100
+						if(+start>+end){
+							end = start;
 						}
 						this.setState({
 							selectArea:[+start,+end],

@@ -23,14 +23,12 @@ class Layout extends Component<LayoutProps> {
   }
 
   render() {
-    const { userStore, projectStore } = this.props;
+    const { userStore, projectStore:{init,isOnline} } = this.props;
     const { status } = userStore;
-    const { init, isOnline } = projectStore
-    const useLoginRouter = status === 'unlogin'
-    const showMask = status === 'unlogin' ? false : status !== 'unlogin' && !init
+    const useLoginRouter = status === 'unlogin';
+    const showMask = status === 'unlogin' ? false : status !== 'unlogin' && !init;
     const text = isOnline ? EN.Loading : EN.Reconnecting;
-    const style = isOnline ? null : { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
-    // const community = ;
+    const style = isOnline ? null : { backgroundColor: 'rgba(255, 255, 255, 0.8)' };
     return <div className={styles.route}>
       {status !== 'init' && (useLoginRouter ? <LoginRouter /> : <Route />)}
       {showMask && <Mask text={text} style={style} />}
@@ -47,7 +45,7 @@ interface MaskProps {
 
 class Mask extends Component<MaskProps> {
   render() {
-    const { style, text } = this.props
-    return <div className={styles.load} style={style}><Spin tip={text} size="large"></Spin></div>
+    const { style, text } = this.props;
+    return <div className={styles.load} style={style}><Spin tip={text} size="large"/></div>
   }
 }

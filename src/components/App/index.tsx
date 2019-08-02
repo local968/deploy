@@ -14,8 +14,8 @@ import { LocaleProvider } from 'antd';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 import config from 'config'
 
-const isEN = config.isEN;
-const r2Report = (window as any).r2Report
+const {isEN} = config;
+const r2Report = (window as any).r2Report;
 const browserHistory = r2Report ? createHashHistory() : createBrowserHistory();
 const routingStore = new RouterStore();
 const history = syncHistoryWithStore(browserHistory, routingStore);
