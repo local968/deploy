@@ -1068,7 +1068,6 @@ class Project {
 
   newEtl = async () => {
     const api = await socketStore.ready()
-    if (this.etlIndex) await api.deleteIndex(this.etlIndex)
     const { status, message, result } = await api.newEtl({ projectId: this.id }, ({ progress }: { progress: number }) => {
       this.etlProgress = progress
     })
