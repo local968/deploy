@@ -147,6 +147,11 @@ class TargetIssue extends Component<TargetIssueProps> {
     if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines)
       warnings.push(EN.Yourtargetvariableisempty);
     const updateCondition = (column, type) => () => {
+      ['missing', 'mismatch', 'outlier'].forEach(t => {
+        if(t === type) return
+        const index = this[t].indexOf(column)
+        if(index !== -1) this[t].splice(index, 1)
+      })
       const index = this[type].indexOf(column)
       if ( index !== -1 ) this[type].splice(index,1)
       if( index === -1 ) this[type].push(column)
