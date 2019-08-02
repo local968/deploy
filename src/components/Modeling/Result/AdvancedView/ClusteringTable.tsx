@@ -149,7 +149,7 @@ const ClusteringTable = (props: ClusteringTableProps) => {
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const modelElements = useMemo(() => {
-    return models.reduce((els, m, i) => ({ ...els, [m.id]: <ClusteringTableRow model={m} project={project} key={i} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} /> }), {})
+    return models.reduce((els, m) => ({ ...els, [m.id]: <ClusteringTableRow model={m} project={project} key={m.id} detail={detailArr.find(d => d.id === m.id)} handleDetail={handleDetail} /> }), {})
   }, [detailArr])
 
   return <div className={styles.main}>
@@ -239,12 +239,12 @@ const ClusteringTableRow = observer((props: ClusteringTableRowProps) => {
         <div className={styles.scoreCell}>
           <div className={styles.cell} style={isNull ? { cursor: 'not-allowed', color: '#ccc' } : {}} onClick={isNull ? () => { } : handleResult(model.id, 'parallel')}>
             <span className={styles.text} style={(!!detail && detail.type === 'parallel') ? { backgroundColor: '#539df0', color: '#fff' } : { color: '#539df0' }}>
-              <img src={(!!detail && detail.type === 'parallel') ? IconParallel2 : IconParallel} alt='' />{EN.Compute}
+              <img className={styles.iconParallel} src={(!!detail && detail.type === 'parallel') ? IconParallel2 : IconParallel} alt='' />{EN.Compute}
             </span>
           </div>
           <div className={styles.cell} style={isNull ? { cursor: 'not-allowed', color: '#ccc' } : {}} onClick={isNull ? () => { } : handleResult(model.id, 'pca')}>
             <span className={styles.text} style={(!!detail && detail.type === 'pca') ? { backgroundColor: '#539df0', color: '#fff' } : { color: '#539df0' }}>
-              <img src={(!!detail && detail.type === 'pca') ? IconParallel2 : IconParallel} alt='' />{EN.Compute}
+              <img className={styles.iconParallel} src={(!!detail && detail.type === 'pca') ? IconParallel2 : IconParallel} alt='' />{EN.Compute}
             </span>
           </div>
         </div>

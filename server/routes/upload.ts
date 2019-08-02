@@ -22,6 +22,8 @@ import { getProjectField } from './project';
 
 const esServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
+
+const sampleIndex = {}
 // const { userModelingRestriction, userStorageRestriction } = Restriction;
 
 router.post('/check', async (req, res) => {
@@ -238,8 +240,11 @@ async function saveSample(force: boolean = false) {
       try {
         if (!force) {
           try {
-            const exist = await checkSampleExist(name)
-            if (exist) return console.info(`sample:${f} already exist`)
+            const { status, data } = await checkSampleExist(name)
+            if (status === 200) {
+              sampleIndex[name] = data.index
+              return console.info(`sample:${f} already exist`)
+            }
           } catch (e) {
             return console.error(`sample:${f} check failed`, e)
           }
@@ -267,6 +272,7 @@ async function saveSample(force: boolean = false) {
         pipeline.sadd(`file:${type}:samples`, JSON.stringify(fileData));
         pipeline.set(`file:sample:${name}`, JSON.stringify({ ...fileData, ...data }));
         await pipeline.exec();
+        sampleIndex[name] = data.index
         console.info('file:' + f + ' end');
       } catch (e) {
         console.error(e, `sample: ${f} error`);
@@ -281,10 +287,25 @@ async function saveSample(force: boolean = false) {
   // pipeline.exec()
 }
 
-async function checkSampleExist(name: string) {
+async function checkSampleExist(name: string): Promise<{
+  status: number,
+  data?: {
+    index: string
+  }
+}> {
   if (!name) throw new Error("filename required")
-  const id = await redis.get(`file:sample:${name}`)
-  return !!id
+  const data = await redis.get(`file:sample:${name}`)
+  if (!data) return {
+    status: 500
+  }
+  return {
+    status: 200,
+    data: JSON.parse(data)
+  }
+}
+
+function getSampleIndex() {
+  return Object.values(sampleIndex)
 }
 
 router.get('/download/pmml', async (req, res) => {
@@ -737,5 +758,9 @@ function scheduleDownloadCsv(
 }
 
 saveSample()
+
+export {
+  getSampleIndex
+}
 
 export default router;

@@ -33,7 +33,7 @@ export interface TableHeader {
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {
   const { project, sort, handleSort, metric, handleChange, models, currentSettingId } = props
   const { problemType } = project
-  const [fbeta, setFbeta] = useState(project.fbeta)
+  const [fbeta, setFbeta] = useState(project.fbeta);
 
   const handleBeta = value => {
     setFbeta(value)
@@ -41,12 +41,20 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
 
   const submitBeta = () => {
     project.updateProject({ fbeta })
-  }
+  };
 
   const renderTable = () => {
     switch (problemType) {
       case "Classification":
-        return <ClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+        return <ClassificationTable
+          sort={sort}
+          handleSort={handleSort}
+          project={project}
+          metric={metric}
+          handleChange={handleChange}
+          models={models}
+          currentSettingId={currentSettingId}
+        />;
       case "Regression":
         return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
       case "Clustering":
@@ -70,6 +78,6 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
       {renderTable()}
     </div>
   </div>
-}
+};
 
 export default observer(AdvancedViewTable)

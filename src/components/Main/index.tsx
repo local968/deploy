@@ -70,7 +70,6 @@ function Main(props: MainProps) {
   React.useEffect(() => {
     return () => {
       _autorun && _autorun()
-      projectStore.clean()
     }
   }, [])
 

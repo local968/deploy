@@ -106,8 +106,8 @@ const OPARRAY = ['+', '-', '*', '/'];
 @observer
 // New Variable Module
 export class NewVariableView extends React.Component<
-  InterfaceNewVariableProps,
-  InterfaceNewVariableState
+InterfaceNewVariableProps,
+InterfaceNewVariableState
 > {
   constructor(props) {
     super(props);
@@ -298,18 +298,18 @@ export class NewVariableView extends React.Component<
     const type: Type = isNumber
       ? Type.Number
       : isOp
-      ? Type.Op
-      : isLParen
-      ? Type.Lparen
-      : isRParen
-      ? Type.Rparen
-      : isSplit
-      ? Type.Split
-      : isLc
-      ? Type.Lc
-      : isRc
-      ? Type.RC
-      : Type.Char;
+        ? Type.Op
+        : isLParen
+          ? Type.Lparen
+          : isRParen
+            ? Type.Rparen
+            : isSplit
+              ? Type.Split
+              : isLc
+                ? Type.Lc
+                : isRc
+                  ? Type.RC
+                  : Type.Char;
     let value: Coordinate = {
       name: v,
       value: v,
@@ -422,18 +422,23 @@ export class NewVariableView extends React.Component<
   };
 
   public processAndSave = () => {
-    if (this.state.loading) return;
+
+    if (this.state.loading) return false;
+
     const { exps } = this.state;
-    const checkd = exps.map(exp => this.checkExp(exp.value));
-    const error = checkd.find(c => !c.isPass);
+
+    const exps_checked = exps.map((exp, index) => this.checkExp(exp, index));
+
+    const error = exps_checked.find(c => !c.isPass);
     if (error) {
       return alert(error.message);
     }
+
     const newType: StringObject = {};
     // const variables: string[] = [...newVariable]
     const newExps: NewVariable[] = [];
-    for (let i = 0; i < checkd.length; i++) {
-      const { num, type } = checkd[i] as any;
+    for (let i = 0; i < exps_checked.length; i++) {
+      const { num, type } = exps_checked[i] as any;
       const name = exps[i].label;
       if (!name) return message.error(EN.Nameisempty);
       if (this.props.expression.hasOwnProperty(name))
@@ -745,20 +750,20 @@ export class NewVariableView extends React.Component<
     const BaseFn = !functionName.length
       ? false
       : this.props.functions.base.find(
-          fn => fn.value === (functionName[0] as Coordinate).value,
-        );
+        fn => fn.value === (functionName[0] as Coordinate).value,
+      );
     const SeniorFn = !functionName.length
       ? false
       : this.props.functions.senior.find(
-          fn => fn.value === (functionName[0] as Coordinate).value,
-        );
+        fn => fn.value === (functionName[0] as Coordinate).value,
+      );
     // 判断函数参数个数限制
     if (BaseFn && BaseFn.params && BaseFn.params !== expArray.length)
       return {
         isPass: false,
         message: `${EN.Function} ${
           (functionName[0] as Coordinate).value
-        } must have ${BaseFn.params} params`,
+          } must have ${BaseFn.params} params`,
       };
 
     if (SeniorFn) {
@@ -972,7 +977,6 @@ export class NewVariableView extends React.Component<
         }
         break;
       case 'Groupby':
-        type = 'Categorical';
         let nList;
         if (numOfParam === 1) {
           if (numList.length !== 2)
@@ -1026,6 +1030,7 @@ export class NewVariableView extends React.Component<
               .join(',')} `,
           };
         }
+        type = paramList[0].type
 
         const nExp = this.expToString(nList.exp);
         const nListValues =
@@ -1212,7 +1217,7 @@ export class NewVariableView extends React.Component<
                 isPass: false,
                 message: `${this.expToString(subItem.exp)} contain ${
                   EN.Emptyexpression
-                } `,
+                  } `,
               };
             if (isVariable)
               return { isPass: false, message: `cannot use variable` };
@@ -1267,7 +1272,7 @@ export class NewVariableView extends React.Component<
   public checkArrayParams = (
     exps: any[],
     bracketExps: any,
-    callback: ({  }: any) => { isPass: boolean; message: string },
+    callback: ({ }: any) => { isPass: boolean; message: string },
     unCheck?: boolean,
   ): { isPass: boolean; message: string; params?: number } => {
     if (!exps.length) return { isPass: false, message: EN.Emptyparameter };
@@ -1325,15 +1330,25 @@ export class NewVariableView extends React.Component<
         !_e.value
           ? ''
           : _e.type === Type.ID
-          ? this.props.mapHeader[_e.value]
-          : (_e as any).value,
+            ? this.props.mapHeader[_e.value]
+            : (_e as any).value,
       )
       .join('');
 
   // 校验总表达式
-  public checkExp = (_expression: Coordinate[]) => {
+  public checkExp = (exp: Exp, index: number) => {
+    const label_checked = this.checkLabel(exp.label, index);
+    if (!label_checked.isPass) return label_checked;
+    return this.checkValue(exp.value, index);
+  };
+
+  public checkLabel = (label: string, index?: number) => {
+    return { isPass: !!label, message: `${EN.NAMEMUSTBESET}, line_number: ${index + 1}` };
+  };
+
+  public checkValue = (_expression: Coordinate[], index?: number) => {
     if (!_expression.length)
-      return { isPass: true, message: EN.Emptyparameter, num: 0 };
+      return { isPass: false, message: `${EN.EXPRESSIONMUSTBESET}, line_number: ${index + 1}`, num: 0 };
     // if (_expression.includes("$")) return { isPass: false, message: EN.Unexpectedtoken$ }
 
     const {
@@ -1389,7 +1404,10 @@ export class NewVariableView extends React.Component<
     const func = vari.type === Type.Func ? undefined : value[lParenIndex - 1];
     if (func) {
       const { name } = func;
-      variables = _.filter(this.variables, ({ varType }: any) => varType !== 'raw');
+      variables = _.filter(
+        this.variables,
+        ({ varType }: any) => varType !== 'raw',
+      );
       if (
         !_.includes(
           [
@@ -1490,8 +1508,8 @@ export class NewVariableView extends React.Component<
             {!loading ? (
               EN.Yes
             ) : (
-              <Icon type="loading" style={{ fontSize: '24px' }} />
-            )}
+                <Icon type="loading" style={{ fontSize: '24px' }} />
+              )}
           </MySave>
           <MyCancel variant="contained" onClick={this.props.onClose} href={''}>
             {EN.CANCEL}

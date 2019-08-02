@@ -1,6 +1,5 @@
 import Bar from './Bar'
 import HistogramCategorical from './HistogramCategorical'
-import HistogramNumerical from './HistogramNumerical'
 import BoxPlots from './BoxPlots'
 import CorrelationMatrixs from './CorrelationMatrixs'
 import D3D2 from './D3D2'
@@ -23,7 +22,6 @@ import PVA from './PVA'
 import PAW from './PAW'
 import ParallelPlots from './ParallelPlots'
 import SSPlot from './SSPlot'
-import TSEN from './T-SEN'
 import PIE from './PIE'
 import HS from './HS'
 import TwinBar from './TwinBar'
@@ -31,7 +29,6 @@ import TwinBar from './TwinBar'
 export {
   Bar,
   HistogramCategorical,
-  HistogramNumerical,
   BoxPlots,
   CorrelationMatrixs,
   D3D2,
@@ -54,7 +51,6 @@ export {
   PAW,
   ParallelPlots,
   SSPlot,
-  TSEN,
   PIE,
   HS,
   TwinBar,

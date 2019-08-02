@@ -104,7 +104,6 @@ const Groupby = {
     'var为离散变量时，默认支持 mode（众数）统计。',
   ],
   output: '连续变量或离散变量',
-  output_desc: ['当变量中含有多个间隔数字时，提取后数字将被合并。'],
   examples: [
     {
       length: 4,
@@ -129,7 +128,7 @@ const Groupby = {
         ['141', '0', '1', '261.25', '4'],
       ],
     }, {
-      length: 4,
+      length: 3,
       input: 'Groupby(job, [education])',
       output: [
         ['job', 'education', 'job_mode'],
@@ -212,7 +211,7 @@ const Max = {
 
 const Median = {
   name: 'Median',
-  describe: '输入单个变量时，返回该变量的最大值；输入多个变量时，返回行的中间值。',
+  describe: '输入单个变量时，返回该变量的中位数；输入多个变量时，返回行的中位数。',
   grammar: 'Median( var1, var2, var3, … )',
   input: ['var1, var2, var3, ….- 连续变量'],
   output: '连续变量',

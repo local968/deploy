@@ -400,6 +400,8 @@ const ZH_LAN = {
   STD: '标准差',
   Median: '中位数',
   Nameisempty: '名称为空',
+  NAMEMUSTBESET: '请填写变量名称',
+  EXPRESSIONMUSTBESET: '请填写表达式',
   Newvariable: '新变量',
   Isexist: '已存在',
   Namecannotcontain: '名称不能包含_',

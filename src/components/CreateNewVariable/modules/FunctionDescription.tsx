@@ -74,11 +74,11 @@ const Example = ({ example }) => {
     <div>
       <div className={styles.tableLabel}>{EN.Input + input}</div>
       {inputData ?
-        <Table dataSource={inputSource} columns={inputColumns} pagination={false}/>
+        <Table size="small" dataSource={inputSource} columns={inputColumns} pagination={false}/>
         : null}
       <div className={styles.tableLabel}>{EN.Output}</div>
       {input ?
-        <Table dataSource={outputSource} columns={outputColumns} pagination={false}/>
+        <Table size="small" dataSource={outputSource} columns={outputColumns} pagination={false}/>
         : null}
     </div>
   );

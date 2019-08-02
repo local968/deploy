@@ -1998,7 +1998,7 @@ class Project {
 
   setModel = (data: Model, force = false) => {
     if (this.mainStep !== 3 || this.lastSubStep !== 2) return
-    if (this.isAbort) return
+    // if (this.isAbort) return
     // if (this.trainModel && data.modelName === this.trainModel.name) this.trainModel = null
     const model = new Model(this.id, { ...data, measurement: this.measurement })
     if (!!this.models.length) {

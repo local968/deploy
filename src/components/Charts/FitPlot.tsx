@@ -31,7 +31,13 @@ export default function FitPlot(props){
 			x:`${Math.floor((max)+1)}`.length * 10 +20,
 		},
 		tooltip: {
-			formatter: '{c}',
+			formatter: params=>{
+				const [x,y] = params.value;
+				return `
+						${x_name}:${x}<br/>
+						${y_name}:${y}
+					`;
+			}
 		},
 		xAxis: {
 			name:x_name,

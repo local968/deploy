@@ -112,7 +112,7 @@ export default class ModelResult extends Component<ModelResultProps> {
 
   render() {
     const { project } = this.props.projectStore;
-    const { models, isHoldout } = project
+    const { models, isHoldout } = project;
     const { id, etlIndex, fileName, selectModel, target, loadModel, settings, problemType } = project
     if (!models.length) return null;
     if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />

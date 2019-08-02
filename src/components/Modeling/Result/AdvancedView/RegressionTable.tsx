@@ -200,8 +200,8 @@ const RegressionTable = (props: RegressionTableProps) => {
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const modelElements = useMemo(() => {
-    return models.reduce((els, m, i) => ({ ...els, [m.id]: <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
-  }, [detailArr])
+    return models.reduce((els, m) => ({ ...els, [m.id]: <RegressionTableRow model={m} project={project} metric={metric} key={m.id} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
+  }, [detailArr, metric])
 
   return <div className={styles.main}>
     <div className={styles.header}>

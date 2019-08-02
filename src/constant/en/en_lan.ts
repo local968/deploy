@@ -528,6 +528,8 @@ const EN_LAN = {
   STD: 'STD',
   Median: 'Median',
   Nameisempty: 'name is empty',
+  NAMEMUSTBESET: 'name must be set',
+  EXPRESSIONMUSTBESET: 'expression must be set',
   Newvariable: 'new variable',
   Isexist: 'is exist',
   Namecannotcontain: 'name cannot contain _',
