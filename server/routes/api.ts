@@ -5,7 +5,6 @@ import uuid from 'uuid';
 import crypto from 'crypto';
 import command from '../command';
 import api from '../scheduleApi';
-// import restriction from '../restriction';
 const {restriction} = require("../apis/service/planService");
 import wss from '../webSocket';
 import Papa from 'papaparse';
@@ -32,8 +31,7 @@ const autoFixHeader = (mapHeader) => {
   });
 
   return header
-}
-// const { userDeployRestriction } = restriction;
+};
 
 wss.register('getDeploymentToken', (message = {}, socket) => {
   if (!message.projectId || !message.deploymentId)

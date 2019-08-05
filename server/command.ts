@@ -1,7 +1,5 @@
-import { redis, pubsub } from './redis';
+import {pubsub } from './redis';
 import moment from 'moment';
-import amqp from 'amqplib';
-import _ from 'lodash';
 import RabbitMQ from './rabbitMQ';
 import config from '../config';
 
