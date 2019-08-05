@@ -260,6 +260,7 @@ export default class OutlierRange extends PureComponent<Interface>{
           trigger: 'item',
           formatter:params=>{
             const {marker,value} = params;
+	          if(!value)return;
             const [x,y,z] = value;
             return `
 						${marker}[${x.toFixed(3)},${y.toFixed(3)}):${z}

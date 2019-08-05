@@ -13,8 +13,18 @@ import './etl';
 
 const router = Router();
 
-router.use("/image", image);
 router.use('/user', user);
+
+router.use('/*',function(req, res, next){
+  if(req.session.userId){
+    next()
+  }else{
+    res.status(403);
+    res.send('please login first');
+  }
+});
+
+router.use("/image", image);
 router.use('/upload', upload);
 router.use('/redirect', redirect);
 router.use('/etls', redirectEs);
