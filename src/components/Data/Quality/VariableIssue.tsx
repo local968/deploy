@@ -223,7 +223,7 @@ class VariableIssue extends Component<VariableIssueProps> {
       issueArr.push(issueData);
     }
 
-    const tableData = data.map((row) =>
+    const tableData = data.length ? data.map((row) =>
       row.map((v, k) => {
         const header = headerList[k] && headerList[k].trim();
         const itemData = {
@@ -249,11 +249,9 @@ class VariableIssue extends Component<VariableIssueProps> {
         }
         return itemData;
       }),
-    );
+    ): [[]];
 
-    return [indexArr, headerArr, selectArr, issueArr, ...tableData].filter(
-      row => row.length === realColumn,
-    );
+    return [indexArr, headerArr, selectArr, issueArr, ...tableData]
   };
 
   toggleMultiMode = () => {
