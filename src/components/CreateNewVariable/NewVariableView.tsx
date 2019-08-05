@@ -707,28 +707,6 @@ InterfaceNewVariableState
     let num = 1;
     let fnType = '';
     const params: Params[] = [];
-    let stillVariable = true;
-    for (const exp of expArray) {
-      // 校验表达式
-      const expChecked = this.checkSimpleExp(
-        exp,
-        bracketExps,
-        !!functionName.length,
-      );
-      if (!expChecked.isPass) return expChecked;
-      const { isVariable, num, type } = expChecked;
-      if (stillVariable) {
-        if (isVariable) numOfParam++;
-        if (!isVariable) stillVariable = false;
-      }
-      // 报存参数类型
-      params.push({
-        isVariable,
-        num,
-        exp,
-        type,
-      });
-    }
 
     let skipParams = false;
     fnType = 'Numerical';
@@ -765,6 +743,42 @@ InterfaceNewVariableState
           (functionName[0] as Coordinate).value
           } must have ${BaseFn.params} params`,
       };
+
+    const isGroupBy = SeniorFn.value === 'Groupby'
+    let stillVariable = true;
+    for (let i = 0; i < expArray.length; i++) {
+      const exp = expArray[i]
+      // 校验表达式
+      const expChecked = this.checkSimpleExp(
+        exp,
+        bracketExps,
+        !!functionName.length
+      );
+      if (!expChecked.isPass) {
+        if (isGroupBy && i === expArray.length - 1) {
+          params.push({
+            isVariable: false,
+            num: 1,
+            exp,
+            type: 'Categorical',
+          })
+          continue
+        }
+        return expChecked;
+      }
+      const { isVariable, num, type } = expChecked;
+      if (stillVariable) {
+        if (isVariable) numOfParam++;
+        if (!isVariable) stillVariable = false;
+      }
+      // 报存参数类型
+      params.push({
+        isVariable,
+        num,
+        exp,
+        type,
+      });
+    }
 
     if (SeniorFn) {
       // 校验高级函数参数
@@ -1032,7 +1046,7 @@ InterfaceNewVariableState
         }
         type = paramList[0].type
 
-        const nExp = this.expToString(nList.exp);
+        // const nExp = this.expToString(nList.exp);
         const nListValues =
           paramList[0].type === 'Numerical'
             ? ['sum', 'mean', 'min', 'max', 'std', 'median']
@@ -1063,12 +1077,7 @@ InterfaceNewVariableState
           if (!nListchecked.isPass) return nListchecked;
           num = nListchecked.params || 0;
         } else {
-          if (nList.exp.length > 1)
-            return {
-              isPass: false,
-              message: `${EN.Unexpectedidentifier} ${nExp} `,
-            };
-          const nParamExp = this.expToString([nList.exp[0]]);
+          const nParamExp = this.expToString(nList.exp);
           if (!nListValues.includes(nParamExp.toLowerCase()))
             return {
               isPass: false,
