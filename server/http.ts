@@ -50,10 +50,10 @@ app.use(bodyParser.json({ limit: '200mb' }));
 app.use(sessionParser);
 app.use(messageRouter);
 
-app.use(routes);
-
 // Serve static files from the 'static' folder.
 app.use(express.static('static'));
+
+app.use(routes);
 
 // CRA routing
 app.get('*', function(req, res) {
