@@ -1397,6 +1397,8 @@ const EN_LAN = {
   AssociateExport: 'Export',
   AssociatePlots: 'Plots',
   AssociateReModel: 'Remodel',
+  AssociateScatterPlot: 'Scatter plot',
+  AssociateNetworkDiagram: 'Network Diagram'
 };
 
 

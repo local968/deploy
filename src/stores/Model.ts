@@ -96,6 +96,10 @@ class Model {
   settingId: string;
   dbscanClusters: number = 2
   realLabelScore = {}
+  correlationData: string
+  graphData: string
+  plotData: string
+  rulesData: string
   @observable score: Score;
   @observable backend: string;
   @observable featureImportance: NumberObject;

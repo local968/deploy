@@ -1255,6 +1255,8 @@ const ZH_LAN = {
   AssociateExport: 'Export',
   AssociatePlots: 'Plots',
   AssociateReModel: 'Remodel',
+  AssociateScatterPlot: 'Scatter plot',
+  AssociateNetworkDiagram: 'Network Diagram'
 };
 
 export default ZH_LAN;
