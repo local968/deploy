@@ -2446,7 +2446,7 @@ class Project {
 
   getPlots(Plots,field:string){
     const result = this[Plots][field];
-    // console.log(111,result)
+    console.log(111,result)
 
     if(!result){
       // return setTimeout(async()=>{
@@ -2472,7 +2472,7 @@ class Project {
         url
       }
     }
-    if (type) {
+    if (type === 'Numerical') {
       if(!data){
         const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
         const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
