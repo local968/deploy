@@ -864,21 +864,23 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
           }
           promise.push(
             status === 100
-              ? updateProjectField(
+              ? createOrUpdate(
                 message.projectId,
                 socket.session.userId,
-                'preImportance',
-                result.data,
+                {
+                  preImportance: result.data
+                }
               )
               : Promise.resolve({}),
           );
           promise.push(
             status === 100
-              ? updateProjectField(
+              ? createOrUpdate(
                 message.projectId,
                 socket.session.userId,
-                'informativesLabel',
-                result.informativesLabel,
+                {
+                  informativesLabel: result.informativesLabel
+                }
               )
               : Promise.resolve({}),
           );
@@ -888,14 +890,8 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
               importanceProgress: 0,
             }),
           );
-          return Promise.all(promise).then(([result1, result2]) => {
-            const realResult = Object.assign(
-              {},
-              result,
-              (result1 || {}).result,
-              (result2 || {}).result,
-            );
-            return Object.assign({}, returnValue, { result: realResult });
+          return Promise.all(promise).then(() => {
+            return returnValue;
           });
         }),
     );
