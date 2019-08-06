@@ -14,6 +14,7 @@ import './etl';
 const router = Router();
 
 router.use('/user', user);
+router.use('/api', api);
 
 router.use('/*',function(req, res, next){
   if(req.session.userId){
@@ -29,7 +30,6 @@ router.use('/upload', upload);
 router.use('/redirect', redirect);
 router.use('/etls', redirectEs);
 router.use("/uploads", redirectUpload);
-router.use('/api', api);
 router.use("/project", project);
 router.get('/jupyterLabUrl', (req, res) =>
   res.send(process.env.JUPYTER_LAB || '/notebook/lab'),
