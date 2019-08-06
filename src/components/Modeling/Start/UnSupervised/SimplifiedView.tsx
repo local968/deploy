@@ -97,7 +97,7 @@ export default class SimplifiedViews extends Component<Interface> {
 
   reloadTable = async (force = false) => {
     try {
-      await this.props.project.dataView();
+      // await this.props.project.dataView();
       await this.props.project.clusterPreTrainImportance(force);
       this.weights = { ...this.props.project.weightsTemp };
       this.standardType = this.props.project.standardTypeTemp;

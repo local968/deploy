@@ -1323,6 +1323,7 @@ class Project {
       };
       return api.createNewVariable(command).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
+        console.log(result, 'createNewVariable')
         if (status < 0) {
           antdMessage.error(result.processError)
           return false
@@ -1336,11 +1337,25 @@ class Project {
           return prev
         }, {} as { [key: string]: NewVariable })
         const expression = Object.assign({}, this.expression, variableExp)
+        const uptData: {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+          newVariableViews?
+        } = {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+        }
+        if (result.dataView) uptData.newVariableViews = result.dataView
         return this.updateProject({
           newVariable,
           trainHeader,
           expression,
           newType,
+          newVariableViews: result.dataView
         }).then(() => true)
       })
     })
