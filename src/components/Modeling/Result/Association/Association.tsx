@@ -12,8 +12,8 @@ interface AssociationProps {
 
 const Association = (props: AssociationProps) => {
   const { project } = props
-  const { selectModel, fetchData } = project
-  const { correlationData, graphData, plotData } = selectModel
+  const { selectModel, fetchData, id, fileName } = project
+  const { correlationData, graphData, plotData, id: mid } = selectModel
   const [state, setState] = useState({
     'correlation': null, 'graph': null, 'plot': null
   })
@@ -47,14 +47,17 @@ const Association = (props: AssociationProps) => {
   />
 
   const texts = state.correlation[config.isEN ? 0 : 1]
-
-  console.log(state, 'state')
+  const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
 
   return <div className={styles.association}>
     <div className={styles.main}>
       <div className={styles.title}><span>{EN.AssociateRules}</span></div>
       <div className={styles.buttons}>
-        <div className={styles.button}><span>{EN.AssociateExport}</span></div>
+        <div className={styles.button}>
+          <a style={{ display: 'flex' }} target='_blank' href={`/upload/download/association?projectId=${id}&modelId=${mid}&filename=${encodeURIComponent(`${realName}-${mid}.csv`)}`}>
+            <span>{EN.AssociateExport}</span>
+          </a>
+        </div>
         <div className={styles.button}><span>{EN.AssociatePlots}</span></div>
         <div className={styles.button}><span>{EN.AssociateReModel}</span></div>
       </div>

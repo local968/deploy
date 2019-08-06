@@ -315,13 +315,14 @@ router.get('/download/pmml', async (req, res) => {
   if (!url) return res.status(404).send("error")
   res.attachment(`${mid}.pmml`);
   return http.get(JSON.parse(url), response => {
-    if (response.statusCode !== 200) res.status(404).send('error')
+    if (response.statusCode !== 200) return res.status(404).send('error')
     response.on('data', (str) => {
       res.write(str)
     })
     response.on('end', () => {
       res.end()
     })
+    return null
   })
 })
 
@@ -643,6 +644,26 @@ router.get('/download/outlier', async (req, res) => {
     });
   });
 });
+
+router.get('/download/association', async (req, res) => {
+  const { projectId, modelId, filename } = req.query
+  let rulesData = await redis.hget(`project:${projectId}:model:${modelId}`, 'rulesData');
+  try {
+    rulesData = JSON.parse(rulesData)
+  } catch (e) { }
+  return http.get(rulesData, response => {
+    if (response.statusCode !== 200) return res.status(404).send('export error')
+    res.attachment(filename);
+    res.type('csv');
+    response.on('data', (str) => {
+      res.write(str)
+    })
+    response.on('end', () => {
+      res.end()
+    })
+    return null
+  })
+})
 
 // todo
 // 500行分片下载还是有潜在bug
