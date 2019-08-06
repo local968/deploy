@@ -1411,6 +1411,7 @@ class Project {
       };
       return api.createNewVariable(command).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
+        console.log(result, 'createNewVariable')
         if (status < 0) {
           antdMessage.error(result.processError)
           return false
@@ -1424,11 +1425,25 @@ class Project {
           return prev
         }, {} as { [key: string]: NewVariable })
         const expression = Object.assign({}, this.expression, variableExp)
+        const uptData: {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+          newVariableViews?
+        } = {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+        }
+        if (result.dataView) uptData.newVariableViews = result.dataView
         return this.updateProject({
           newVariable,
           trainHeader,
           expression,
           newType,
+          newVariableViews: result.dataView
         }).then(() => true)
       })
     })
@@ -2216,10 +2231,10 @@ class Project {
     if (this.preImportanceLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const all_Label = [...this.dataHeader, ...this.newVariable]
+      const all_label = [...this.dataHeader, ...this.newVariable]
       // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
       // const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const feature_label = all_Label.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = all_label.filter(v => !readyLabels.includes(v) && v !== this.target)
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
       let cmd = 'clfreg.preTrainImportance'
@@ -2237,7 +2252,7 @@ class Project {
       const command = {
         projectId: this.id,
         command: cmd,
-        feature_label: all_Label
+        feature_label: all_label
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]

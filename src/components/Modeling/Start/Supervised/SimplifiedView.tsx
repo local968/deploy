@@ -28,9 +28,11 @@ export default class SimplifiedView extends Component<Interface> {
   @observable CorrelationMatrixData = {};
 
   componentDidMount() {
-    this.props.project
-      .dataView()
-      .then(() => this.props.project.preTrainImportance());
+    // this.props.project
+    //   .dataView()
+    // .then(() => 
+    this.props.project.preTrainImportance()
+    // );
   }
 
   show = () => {
@@ -154,9 +156,11 @@ export default class SimplifiedView extends Component<Interface> {
   };
 
   reloadTable = () => {
-    this.props.project
-      .dataView()
-      .then(() => this.props.project.preTrainImportance());
+    // this.props.project
+    //   .dataView()
+    //   .then(() => 
+    this.props.project.preTrainImportance()
+    // );
   };
 
   handleChange = e => {
