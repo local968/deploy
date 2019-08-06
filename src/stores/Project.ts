@@ -317,7 +317,7 @@ class Project {
     this.id = id;
     this.visiable = true;
     this.setProperty(args);
-    this.getPlots = debounce(this.getPlots,1000)
+    // this.getPlots = debounce(this.getPlots,1000)
   }
 
   readData = (path: string) => {
@@ -2444,17 +2444,15 @@ class Project {
     return html
   };
 
-  getPlots(Plots,field:string){
-    const result = this[Plots][field];
-    console.log(111,result)
-
-    if(!result){
-      // return setTimeout(async()=>{
-        return this.getPlots(Plots,field);
-      // },1000);
-    }
-    return result;
-  }
+  // async getPlots(Plots,field:string){
+  //   const result = this[Plots][field];
+  //   console.log(111,result)
+  //
+  //   if(!result){
+  //       return await this.getPlots(Plots,field);
+  //   }
+  //   return result;
+  // }
 
   async histogram(field: string) {
     const { colType, dataViews, etlIndex,histgramPlot,newType ,histgramPlots} = this;
@@ -2464,9 +2462,9 @@ class Project {
 
     if (!value) {
       histgramPlot(field);
-      const url = await this.getPlots('histgramPlots',field);
-      // const url = histgramPlots[field];
-      console.log(22,url)
+      // const url = await this.getPlots('histgramPlots',field);
+      const url = histgramPlots[field];
+      // console.log(22,url)
 
       data = {
         url
@@ -2514,9 +2512,9 @@ class Project {
 
     if (!dataUn) {
       univariatePlot(value);
-      const url = await this.getPlots('univariatePlots',value);
-      // const url = univariatePlots[value];
-      console.log(11,url)
+      // const url = await this.getPlots('univariatePlots',value);
+      const url = univariatePlots[value];
+      // console.log(11,url)
 
       data = {
         url
