@@ -1,0 +1,86 @@
+.association {
+  display: flex;
+  flex: auto;
+  padding-right: 8%;
+  min-width: 1000px;
+}
+
+.main {
+  display: flex;
+  flex: auto;
+  margin: 60px 8%;
+  flex-direction: column;
+}
+
+.title {
+  display: flex;
+  flex: none;
+  padding: 5px;
+  border-bottom: 3px solid #1D2B3C;
+}
+
+.title span {
+  font-size: 1.5rem;
+  color: #000;
+  line-height: 1.4;
+}
+
+.buttons {
+  display: flex;
+  flex: none;
+  margin: 20px 10px;
+  justify-content: space-between;
+}
+
+.button {
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(to bottom, #5b657b, #243448);
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  padding: 10px 0px;
+  width: 160px;
+}
+
+.button span {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: normal;
+}
+
+.content {
+  display: flex;
+  flex: auto;
+  min-height: 520px;
+  margin: 5px 10px;
+  justify-content: space-between;
+}
+
+.result {
+  display: flex;
+  flex: auto;
+}
+
+.views {
+  display: flex;
+  flex: auto;
+  position: relative;
+  overflow-x: visible;
+}
+
+.view {
+  display: flex;
+  flex: none;
+  position: relative;
+    left: calc(50% - 80px);
+    background: blue;
+    width: 100%;
+}
+
+.empty {
+  display: flex;
+  flex: auto;
+}

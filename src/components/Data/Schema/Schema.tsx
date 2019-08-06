@@ -29,6 +29,7 @@ class DataSchema extends Component<DataSchemaProps> {
   @observable dataType = { ...this.props.projectStore.project.colType };
   @observable visiable = false;
   @observable target = this.props.projectStore.project.target;
+  @observable item = this.props.projectStore.project.dataHeader.length === 1 ? this.props.projectStore.project.dataHeader[0] : ''
   tableRef: React.RefObject<Table>;
 
   constructor(props) {
@@ -51,29 +52,31 @@ class DataSchema extends Component<DataSchemaProps> {
     const { project } = this.props.projectStore;
     const { rawHeader, problemType, outlierLineCounts, nullLineCounts } = project;
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
+    const isAssociation = problemType === 'Association'
     //无监督删除target
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
+    const newDataHeader = isAssociation ? [this.item] : rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
 
     let nullFillMethod = {}
     let outlierFillMethod = {}
-
-    // 回归默认设置为drop
-    if (this.target && this.dataType[this.target] === 'Numerical') {
-      if (!!nullLineCounts[this.target]) {
-        nullFillMethod[this.target] = 'drop'
+    if (!isAssociation) {
+      // 回归默认设置为drop
+      if (this.target && this.dataType[this.target] === 'Numerical') {
+        if (!!nullLineCounts[this.target]) {
+          nullFillMethod[this.target] = 'drop'
+        }
+        if (!!outlierLineCounts[this.target]) {
+          outlierFillMethod[this.target] = 'drop'
+        }
       }
-      if (!!outlierLineCounts[this.target]) {
-        outlierFillMethod[this.target] = 'drop'
-      }
-    }
 
-    //聚类设置为drop
-    if (problemType === 'Clustering') {
-      outlierFillMethod = newDataHeader.reduce((prev, h) => {
-        if (this.dataType[h] === 'Numerical' && !!outlierLineCounts[h])
-          prev[h] = 'drop';
-        return prev;
-      }, outlierFillMethod);
+      //聚类设置为drop
+      if (problemType === 'Clustering') {
+        outlierFillMethod = newDataHeader.reduce((prev, h) => {
+          if (this.dataType[h] === 'Numerical' && !!outlierLineCounts[h])
+            prev[h] = 'drop';
+          return prev;
+        }, outlierFillMethod);
+      }
     }
 
     const data = {
@@ -100,11 +103,24 @@ class DataSchema extends Component<DataSchemaProps> {
     const { role } = this.props.userStore.info;
     const { schema_TargetVariable = true } = role as any;
     if (schema_TargetVariable) {
-      this.target = value;
-      this.tableRef.current.updateGrids();
-      this.checkList = [...this.checkList.filter(v => v !== value)];
+      if (!isNaN(+value)) {
+        this.target = value;
+        this.tableRef.current.updateGrids();
+        this.checkList = [...this.checkList.filter(v => v !== value)];
+      } else {
+        this.checkList = [...this.checkList, this.target]
+      }
     }
   };
+
+  variableSelect = value => {
+    if (!isNaN(+value)) {
+      this.item = value
+    } else {
+      this.item = ''
+    }
+    console.log(value, 'variableSelect')
+  }
 
   checked = (key, e) => {
     const checked = e.target.checked;
@@ -143,11 +159,13 @@ class DataSchema extends Component<DataSchemaProps> {
       renameVariable,
       etling,
       mapHeader,
+      problemType,
       headerTemp: { temp },
     } = this.props.projectStore.project;
     if (etling) return [];
     const { showSelect, checkList } = this;
     if (!uploadData.length) return [];
+    const isAssociation = problemType === 'Association'
     const headerList = target
       ? [target, ...rawHeader.filter(v => v !== target)]
       : rawHeader;
@@ -208,7 +226,7 @@ class DataSchema extends Component<DataSchemaProps> {
             checkData.cn = classnames(styles.check, styles.target);
             checkData.content = '';
           }
-          if (checkList.includes(header)) {
+          if (!isAssociation && checkList.includes(header)) {
             checkData.cn = classnames(styles.check, styles.checked);
             checkData.content = (
               <Checkbox
@@ -245,7 +263,7 @@ class DataSchema extends Component<DataSchemaProps> {
         if (target && target === header) {
           headerData.cn = classnames(headerData.cn, styles.target);
         }
-        if (checkList.includes(header)) {
+        if (!isAssociation && checkList.includes(header)) {
           headerData.cn = classnames(headerData.cn, styles.checked);
         }
         if (!headerText) {
@@ -337,7 +355,7 @@ class DataSchema extends Component<DataSchemaProps> {
           itemData.content = <span>{renameVariable[v] || v}</span>;
           itemData.title = renameVariable[v] || v;
         }
-        if (checkList.includes(header)) {
+        if (!isAssociation && checkList.includes(header)) {
           itemData.cn = classnames(itemData.cn, styles.checked);
         }
         return itemData;
@@ -363,19 +381,27 @@ class DataSchema extends Component<DataSchemaProps> {
     // const targetOption = {};
     const tableData = this.formatTable();
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
-    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
-
+    const isAssociation = problemType === 'Association'
+    const newDataHeader = isAssociation ? [this.item] : rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
     //target选择列表
     const targetOption = rawHeader.reduce((prev, h) => {
       h = h.trim();
-      if (problemType === 'Regression') {
-        if (this.dataType[h] === 'Numerical') prev[h] = mapHeader[h];
+      if (isAssociation) {
+        prev[h] = mapHeader[h];
       } else {
-        if (this.dataType[h] === 'Categorical') prev[h] = mapHeader[h];
+        if (problemType === 'Regression') {
+          if (this.dataType[h] === 'Numerical') prev[h] = mapHeader[h];
+        } else {
+          if (this.dataType[h] === 'Categorical') prev[h] = mapHeader[h];
+        }
       }
       return prev;
     }, {});
 
+    const variableOption = { ...targetOption }
+    if (this.target) delete variableOption[this.target]
+    const variable = newDataHeader.length === 1 ? newDataHeader[0] : ''
+    if (variable) delete targetOption[variable]
     return (
       <div className={styles.schema}>
         <div className={styles.schemaInfo}>
@@ -383,15 +409,16 @@ class DataSchema extends Component<DataSchemaProps> {
             <span>i</span>
           </div>
           <div className={styles.schemaText}>
-            <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
+
+            <span>{isAssociation ? EN.AssociationSchemaTitle : EN.Pleaseselectavariableasthetargetvariable}</span>
           </div>
         </div>
         <div className={styles.schemaContent} id="schemaContent">
           <div className={styles.schemaTools}>
             <Select
-              title={EN.TargetVariable}
+              title={isAssociation ? EN.AssociationTarget : EN.TargetVariable}
               dropdownClassName={'targetSelect'}
-              width={'1.6em'}
+              width={'190px'}
               options={targetOption}
               onChange={this.targetSelect}
               value={this.target}
@@ -400,6 +427,7 @@ class DataSchema extends Component<DataSchemaProps> {
                 showSearch: true,
                 allowClear: !!this.target,
                 clearIcon: <Icon type="close" />,
+                style: { marginRight: '30px' }
               }}
               getPopupContainer={() =>
                 document.getElementById('schemaContent')
@@ -414,40 +442,57 @@ class DataSchema extends Component<DataSchemaProps> {
               }}
               content={EN[`${problemType}Target`]}
             />}
-            <Show
+            {isAssociation ? <Select
+              title={EN.AssociationVariable}
+              dropdownClassName={'targetSelect'}
+              width={'190px'}
+              options={variableOption}
+              onChange={this.variableSelect}
+              value={variable}
+              disabled={isMissed || isDuplicated}
+              selectOption={{
+                showSearch: true,
+                allowClear: !!variable,
+                clearIcon: <Icon type="close" />,
+                style: { marginRight: '30px' }
+              }}
+              getPopupContainer={el =>
+                el.parentElement
+              }
+            /> : <Show
               name='schema_VariableSelection'
             >
-              {isMissed || isDuplicated ? (
-                <div
-                  className={classnames(styles.schemaSelect, styles.disabled)}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              ) : (
+                {isMissed || isDuplicated ? (
                   <div
-                    className={styles.schemaSelect}
-                    onClick={this.toggleSelect}
+                    className={classnames(styles.schemaSelect, styles.disabled)}
                   >
                     <span>{EN.UnselectUndesirableVariables}</span>
                   </div>
-                )}
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={
-                  <div>
-                    {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
-                    {EN.VariableIDs} <br />
-                    {EN.Variablesthatarederivedfromthetarget} <br />
-                    {EN.Anyothervariablesyou}
-                  </div>
-                }
-              />
-            </Show>
+                ) : (
+                    <div
+                      className={styles.schemaSelect}
+                      onClick={this.toggleSelect}
+                    >
+                      <span>{EN.UnselectUndesirableVariables}</span>
+                    </div>
+                  )}
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={
+                    <div>
+                      {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
+                      {EN.VariableIDs} <br />
+                      {EN.Variablesthatarederivedfromthetarget} <br />
+                      {EN.Anyothervariablesyou}
+                    </div>
+                  }
+                />
+              </Show>}
 
             {isMissed && (
               <div className={styles.schemaMissed}>
@@ -492,7 +537,7 @@ class DataSchema extends Component<DataSchemaProps> {
               disabled={
                 etling ||
                 (isUnsupervised ? false : !this.target) ||
-                (newDataHeader.length < 1) ||
+                (isAssociation ? newDataHeader.length !== 1 : newDataHeader.length < 1) ||
                 isMissed ||
                 isDuplicated
               }
@@ -501,7 +546,7 @@ class DataSchema extends Component<DataSchemaProps> {
             />
           </Show>
 
-          <Show
+          {!isAssociation && <Show
             name='schema_SkipDataQualityCheck'
           >
             <div className={styles.checkBox}>
@@ -522,7 +567,7 @@ class DataSchema extends Component<DataSchemaProps> {
                 content={EN.Ifyouknowthedataisclean}
               />
             </div>
-          </Show>
+          </Show>}
         </div>
         {etling && (
           <ProcessLoading

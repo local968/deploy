@@ -126,6 +126,40 @@ export interface NewVariable {
   exps: Coordinate[]
 }
 
+export interface AssociationOption {
+  type: 'apriori' | 'fptree',
+  fptree: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+  apriori: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+}
+
+export interface AssociationView {
+  target: { key: string, value: number }[]
+  feature: { key: string, value: number }[]
+}
+
+export interface AssociationTrainCommand {
+  command: string,
+  csvLocation: string[],
+  algo: 'apriori' | 'fptree',
+  minSupport: number,
+  minConfidence: number,
+  minLift: number,
+  maxLength: number,
+  featureLabel: string[]
+  targetLabel: string[]
+  projectId: string
+}
+
 class Project {
   visiable: boolean
   @observable init: boolean = false
@@ -310,6 +344,26 @@ class Project {
   @observable showSsPlot: boolean = false;
   @observable metricCorrection: { metric: string, type: string, value: number } = { metric: 'default', type: '', value: 0 }
   @observable fbeta: number = 1
+  @observable associationOption: AssociationOption = {
+    type: 'fptree',
+    fptree: {
+      support: 10,
+      confidence: 0.5,
+      lift: 3,
+      length: 3
+    },
+    apriori: {
+      support: 0.02,
+      confidence: 0.2,
+      lift: 3,
+      length: 3
+    },
+  }
+
+  @observable associationView: AssociationView = {
+    target: [],
+    feature: []
+  }
 
   constructor(id: string, args: Object) {
     this.id = id;
@@ -939,6 +993,23 @@ class Project {
     };
   }
 
+  getAssociationData = () => {
+    return socketStore.ready().then(api => {
+      if (!this.target) throw new Error("error target")
+      if (this.dataHeader.length !== 1) throw new Error("error feature")
+      const feature = this.dataHeader[0]
+      const index = this.originalIndex
+      return api.getAssociationData({
+        feature,
+        target: this.target,
+        index,
+        id: this.id
+      }).then(result => {
+        console.log(result)
+      })
+    })
+  }
+
   @action
   endSchema = async () => {
     this.etling = true
@@ -965,7 +1036,8 @@ class Project {
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
-    if (this.noComputeTemp) {
+    const isAssociation = this.problemType === 'Association'
+    if (this.noComputeTemp || isAssociation) {
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
         if (min < 3) {
@@ -973,6 +1045,22 @@ class Project {
           return await Promise.reject()
         }
         if (min < 5) data.crossCount = min - 1
+      }
+
+      if (isAssociation) {
+        try {
+          await this.getAssociationData()
+        } catch (e) {
+          return antdMessage.error(e.message)
+        }
+        await this.updateProject(Object.assign(this.defaultDataQuality, data, {
+          curStep: 3,
+          mainStep: 3,
+          subStepActive: 1,
+          lastSubStep: 1
+        }))
+        this.etling = false
+        return
       }
       await this.updateProject(Object.assign(this.defaultDataQuality, data))
       const pass = await this.newEtl()
@@ -1434,9 +1522,11 @@ class Project {
   @computed
   get defualtRecommendModel() {
     const { currentSetting, models, measurement, problemType } = this
+    if (problemType === 'Association') return this.models
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+
     return (!currentModels.length ? models : currentModels)
       .map(m => {
         const { score } = m
@@ -1878,6 +1968,43 @@ class Project {
     }, this.nextSubStep(2, 3)))
   }
 
+  associationModeling = () => {
+    if (this.etling) return antdMessage.error('modeling error')
+    this.train2ing = true
+    this.isAbort = false
+    const { type } = this.associationOption
+    const option = this.associationOption[type]
+    const trainData: AssociationTrainCommand = {
+      algo: type,
+      minSupport: option.support,
+      minConfidence: option.confidence,
+      minLift: option.lift,
+      maxLength: option.length,
+      command: 'correlation.train',
+      csvLocation: [this.originalIndex],
+      featureLabel: [this.target, ...this.dataHeader],
+      targetLabel: [this.target],
+      projectId: this.id
+    }
+
+    const updateData = Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: '',
+      settings: this.settings,
+      settingId: this.settingId
+    }, this.nextSubStep(2, 3))
+    this.models = []
+    // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
+    socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
+      const { status, message } = returnValue
+      if (status !== 200) {
+        antdMessage.error(message)
+      }
+    })
+  }
+
   newSetting = () => {
     const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms, informativesLabel } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
@@ -2089,9 +2216,10 @@ class Project {
     if (this.preImportanceLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const feature_label = [...data_label, ...new_label]
+      const all_Label = [...this.dataHeader, ...this.newVariable]
+      // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      // const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = all_Label.filter(v => !readyLabels.includes(v) && v !== this.target)
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
       let cmd = 'clfreg.preTrainImportance'
@@ -2109,7 +2237,7 @@ class Project {
       const command = {
         projectId: this.id,
         command: cmd,
-        feature_label
+        feature_label: all_Label
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]

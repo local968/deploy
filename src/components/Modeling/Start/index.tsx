@@ -1,27 +1,28 @@
 import React, { Component } from 'react';
 import styles from './Start.module.css';
 import { observer, inject } from 'mobx-react';
-import { Modal,Show} from 'components/Common';
+import { Modal, Show } from 'components/Common';
 import { observable } from 'mobx';
-import {  Icon } from 'antd';
+import { Icon } from 'antd';
 import autoIcon from './icon_automatic_modeling.svg';
 import advancedIcon from './icon_advanced_modeling.svg';
 import EN from '../../../constant/en';
 import uuid from 'uuid';
 import moment from 'moment';
 import AdvancedModel from './AdvancedModel'
+import Association from './Association'
 
 interface StartTrainInterface {
   projectStore: any
-  userStore:any
+  userStore: any
 }
-@inject('projectStore','userStore')
+@inject('projectStore', 'userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
   @observable visible = false;
 
-  fastTrain(run=true){
-    if(!run)return;
+  fastTrain(run = true) {
+    if (!run) return;
     const { project } = this.props.projectStore;
     const setting = project.newSetting();
     const name = `auto.${moment().format('MM.DD.YYYY_HH:mm:ss')}`;
@@ -45,7 +46,10 @@ export default class StartTrain extends Component<StartTrainInterface> {
   };
 
   render() {
-    const {start_AutomaticModeling=true} = this.props.userStore.info.role;
+    const { start_AutomaticModeling = true } = this.props.userStore.info.role;
+    const { problemType } = this.props.projectStore.project;
+    const isAssociation = problemType === 'Association'
+    if (isAssociation) return <Association project={this.props.projectStore.project} />
     return (
       <div className={styles.modelStart}>
         <div className={styles.startTitle}>
@@ -53,7 +57,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
         </div>
         <div className={styles.trainWarp}>
           <div className={styles.trainBox}>
-            <div className={styles.trainBlock} onClick={this.fastTrain.bind(this,start_AutomaticModeling)}>
+            <div className={styles.trainBlock} onClick={this.fastTrain.bind(this, start_AutomaticModeling)}>
               <div className={styles.trainRecommend}>
                 <span>
                   <Icon
@@ -84,7 +88,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
             </Show>
 
           </div>
-          <div className={styles.trainSep}/>
+          <div className={styles.trainSep} />
           <div className={styles.trainBox}>
             <div className={styles.trainBlock} onClick={this.advanced}>
               <div className={styles.trainImg}>

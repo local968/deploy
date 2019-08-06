@@ -10,6 +10,7 @@ import axios from 'axios';
 import config from '../../config';
 import { Metric, StatusData } from '../types';
 import { getSampleIndex } from './upload'
+import { promised } from 'q';
 
 const router = Router()
 
@@ -1065,7 +1066,7 @@ wss.register('abortTrain', (message, socket) => {
 
 wss.register('train', async (message, socket, progress) => {
   const { userId, user } = socket.session;
-  const { projectId, data: updateData, version, algorithms } = message;
+  const { projectId, data: updateData, version, algorithms, algo } = message;
   // delete message.data
   Reflect.deleteProperty(message, 'data');
   // 拆分algorithms
@@ -1122,7 +1123,7 @@ wss.register('train', async (message, socket, progress) => {
           }
         });
       } else {
-        algorithms.forEach(al => {
+        if (!!algorithms && !!algorithms.length) algorithms.forEach(al => {
           const stopId = uuid.v4();
           _stopIds.push(stopId);
           commandArr.push({
@@ -1133,6 +1134,18 @@ wss.register('train', async (message, socket, progress) => {
             requestId: stopId,
           });
         });
+        else {
+          const stopId = uuid.v4();
+          commandArr.push({
+            ...message,
+            userId,
+            requestId: stopId,
+            stopId,
+            version,
+            algorithms,
+          });
+          _stopIds.push(stopId);
+        }
       }
     } else {
       const stopId = uuid.v4();
@@ -1163,7 +1176,7 @@ wss.register('train', async (message, socket, progress) => {
       ...updateData,
       stopIds: _stopIds,
     });
-    await checkEtl(projectId, userId);
+    if (!algo) await checkEtl(projectId, userId);
     console.log('finish etl');
 
     const processFn = async queueValue => {
@@ -1228,7 +1241,7 @@ wss.register('train', async (message, socket, progress) => {
           ...{ holdoutChartData: holdoutChartData.chartData },
           accuracyData,
           stats,
-          featureLabel: message.featureLabel,
+          featureLabel: message.featureLabel.filter(f => !message.targetLabel.includes(f)),
           target: message.targetLabel,
           esIndex: message.esIndex,
           settingId: message.settingId
@@ -1661,6 +1674,46 @@ wss.register('deleteIndex', (message, socket) => {
       return checked
     }
     return deleteEsIndex(index)
+  })
+})
+
+wss.register('getAssociationData', (message, socket) => {
+  const { index, feature, target, id } = message
+  const { userId } = socket.session;
+  if (!feature) {
+    return {
+      status: 500,
+      message: 'feature error'
+    }
+  }
+  if (!target) {
+    return {
+      status: 500,
+      message: 'target error'
+    }
+  }
+  const targetAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
+    field: target
+  })
+
+  const featureAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
+    field: feature
+  })
+
+  return Promise.all([targetAgg, featureAgg]).then(([targetResult, featureResult]) => {
+    if (targetResult.status !== 200 || featureResult.status !== 200) return {
+      status: 500,
+      message: 'data error'
+    }
+    const { data: { list: targetList } } = targetResult
+    const { data: { list: featureList } } = featureResult
+
+    return createOrUpdate(id, userId, {
+      associationView: {
+        target: targetList.slice(0, 100),
+        feature: featureList.slice(0, 100)
+      }
+    })
   })
 })
 

@@ -102,8 +102,8 @@ export default class ProjectSide extends Component {
 
     render() {
         const { project, enter, keyword } = this.props;
-        const { mainStep, lastSubStep, noCompute, subStepActive } = project;
-        const step = keyword === 'data' ? (noCompute ? 2 : (mainStep > 2 ? 3 : lastSubStep)) : lastSubStep
+        const { mainStep, lastSubStep, noCompute, subStepActive, problemType } = project;
+        const step = keyword === 'data' ? ((noCompute || problemType === 'Association') ? 2 : (mainStep > 2 ? 3 : lastSubStep)) : lastSubStep
         const list = STEP[keyword]
         const imgs = IMAGES[keyword]
 
