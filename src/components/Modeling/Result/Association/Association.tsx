@@ -42,6 +42,10 @@ const Association = (props: AssociationProps) => {
     setType(value)
   }
 
+  const remodel = () => {
+    project.updateProject(project.nextMainStep(3))
+  }
+
   if (loading) return <ProcessLoading
     style={{ position: 'fixed' }}
   />
@@ -59,7 +63,7 @@ const Association = (props: AssociationProps) => {
           </a>
         </div>
         <div className={styles.button}><span>{EN.AssociatePlots}</span></div>
-        <div className={styles.button}><span>{EN.AssociateReModel}</span></div>
+        <div className={styles.button} onClick={remodel}><span>{EN.AssociateReModel}</span></div>
       </div>
       <div className={styles.content}>
         <div className={styles.result}>
