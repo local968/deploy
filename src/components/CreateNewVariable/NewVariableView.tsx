@@ -993,7 +993,7 @@ InterfaceNewVariableState
       case 'Groupby':
         let nList;
         if (numOfParam === 1) {
-          if (numList.length !== 2)
+          if (numList.length > 2 || numList.length < 1)
             return {
               isPass: false,
               message: `${EN.errorparams}${numList
@@ -1027,7 +1027,7 @@ InterfaceNewVariableState
           if ((vListchecked.params || 0) > 2)
             return { isPass: false, message: `cannot > 2` };
         } else if (numOfParam === 2) {
-          if (numList.length !== 1)
+          if (numList.length > 1)
             return {
               isPass: false,
               message: `${EN.errorparams}${numList
@@ -1045,46 +1045,59 @@ InterfaceNewVariableState
           };
         }
         type = paramList[0].type
-
-        // const nExp = this.expToString(nList.exp);
-        const nListValues =
-          paramList[0].type === 'Numerical'
-            ? ['sum', 'mean', 'min', 'max', 'std', 'median']
-            : ['mode'];
-        // console.log(nExp, nList, 'nExp');
-        if (nList.type === 'Array') {
-          const nListchecked = this.checkArrayParams(
-            nList.exp.slice(1, -1),
-            bracketExps,
-            ({ item, isVariable }) => {
-              // console.log(item, isVariable, 'nListchecked');
-              if (!item)
-                return {
-                  isPass: false,
-                  message: `${subItem.exp} contain ${EN.Emptyexpression} `,
-                };
-              if (isVariable)
-                return { isPass: false, message: `cannot use variable` };
-              if (!nListValues.includes(item.toLowerCase()))
-                return {
-                  isPass: false,
-                  message: `${EN.Unexpectedidentifier} ${item} `,
-                };
-              return { isPass: true, message: 'ok' };
-            },
-            true,
-          );
-          if (!nListchecked.isPass) return nListchecked;
-          num = nListchecked.params || 0;
-        } else {
-          const nParamExp = this.expToString(nList.exp);
-          if (!nListValues.includes(nParamExp.toLowerCase()))
+        if (type === 'Numerical' && !nList) return {
+          isPass: false,
+          message: `${EN.Function}: ${senior.value} ${EN.Missingparams}`,
+        };
+        if (!nList) {
+          if (type === 'Numerical') {
             return {
               isPass: false,
-              message: `${EN.Unexpectedidentifier} ${nParamExp} `,
-            };
-          // if (nList.exp[0].type !== Type.Func) return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ nExp } ` }
+              message: `${EN.errorparams}${numList
+                .map(n => this.expToString(n.exp))
+                .join(',')} `,
+            }
+          }
           num = 1;
+        } else {
+          const nListValues =
+            paramList[0].type === 'Numerical'
+              ? ['sum', 'mean', 'min', 'max', 'std', 'median']
+              : ['mode'];
+          if (nList.type === 'Array') {
+            const nListchecked = this.checkArrayParams(
+              nList.exp.slice(1, -1),
+              bracketExps,
+              ({ item, isVariable }) => {
+                // console.log(item, isVariable, 'nListchecked');
+                if (!item)
+                  return {
+                    isPass: false,
+                    message: `${subItem.exp} contain ${EN.Emptyexpression} `,
+                  };
+                if (isVariable)
+                  return { isPass: false, message: `cannot use variable` };
+                if (!nListValues.includes(item.toLowerCase()))
+                  return {
+                    isPass: false,
+                    message: `${EN.Unexpectedidentifier} ${item} `,
+                  };
+                return { isPass: true, message: 'ok' };
+              },
+              true,
+            );
+            if (!nListchecked.isPass) return nListchecked;
+            num = nListchecked.params || 0;
+          } else {
+            const nParamExp = this.expToString(nList.exp);
+            if (!nListValues.includes(nParamExp.toLowerCase()))
+              return {
+                isPass: false,
+                message: `${EN.Unexpectedidentifier} ${nParamExp} `,
+              };
+            // if (nList.exp[0].type !== Type.Func) return { isPass: false, message: `${ EN.Unexpectedidentifier } ${ nExp } ` }
+            num = 1;
+          }
         }
 
         // // const [vList, nList] = numList
