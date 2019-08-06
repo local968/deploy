@@ -744,7 +744,7 @@ InterfaceNewVariableState
           } must have ${BaseFn.params} params`,
       };
 
-    const isGroupBy = SeniorFn.value === 'Groupby'
+    const isGroupBy = SeniorFn ? SeniorFn.value === 'Groupby' : false
     let stillVariable = true;
     for (let i = 0; i < expArray.length; i++) {
       const exp = expArray[i]
