@@ -4,17 +4,19 @@ import classnames from 'classnames'
 import EN from '../../../../constant/en'
 import { Hint, NumberInput } from 'components/Common';
 import Project from 'stores/Project';
+import { HistogramCategorical } from '../../../Charts';
 
 interface AssociationProps {
   project: Project
 }
 
 const Association = (props: AssociationProps) => {
-  const { project } = props
-  const { associationOption, associationView: { target } } = project
-  const sum = target.reduce((sum, s) => sum + s.value, 0)
+  const { project } = props;
+  const { associationOption, associationView: { target,feature } } = project;
+
+  const sum = target.reduce((sum, s) => sum + s.value, 0);
   // const [tab, setTab] = useState(type)
-  const [state, setState] = useState(associationOption)
+  const [state, setState] = useState(associationOption);
   const { type } = state
   const list = [
     'support',
@@ -40,9 +42,9 @@ const Association = (props: AssociationProps) => {
   }
 
   const associationTrain = () => {
-    project.associationOption = state
+    project.associationOption = state;
     project.associationModeling()
-  }
+  };
 
   return <div className={styles.association}>
     <div className={styles.options}>
@@ -78,8 +80,16 @@ const Association = (props: AssociationProps) => {
       </div>
     </div>
     <div className={styles.views}>
-      <div className={styles.title}><span>{EN.AssociationViewTitle}</span></div>
-      <div className={styles.chart}></div>
+      {/*<div className={styles.title}>*/}
+      {/*  <span>{EN.AssociationViewTitle}</span>*/}
+      {/*</div>*/}
+      {/*<div className={styles.chart}/>*/}
+      <HistogramCategorical
+        title={EN.AssociationViewTitle}
+        x_name={EN.NumberofClusters}
+        data={feature}
+        xAxisName = {feature.map((itm)=>itm.key)}
+      />
       <div className={styles.summary}>
         <div className={styles.summaryRow}><span>{EN.summaryRow1}:{sum / target.length}</span></div>
         <div className={styles.summaryRow}><span>{EN.summaryRow2}:{Math.max(...target.map(s => s.value))}</span></div>
