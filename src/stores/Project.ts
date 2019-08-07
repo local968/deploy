@@ -8,6 +8,8 @@ import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
+import { debounce } from 'lodash';
+
 
 export interface Stats {
   took: number,
@@ -368,7 +370,8 @@ class Project {
   constructor(id: string, args: Object) {
     this.id = id;
     this.visiable = true;
-    this.setProperty(args)
+    this.setProperty(args);
+    // this.getPlots = debounce(this.getPlots,1000)
   }
 
   readData = (path: string) => {
@@ -2582,20 +2585,39 @@ class Project {
     // cannot use replace with js code ($$typeof wrong)
     html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
-  }
+  };
 
-  histogram(field: string) {
-    const { colType, dataViews, etlIndex } = this;
+  // async getPlots(Plots,field:string){
+  //   const result = this[Plots][field];
+  //   console.log(111,result)
+  //
+  //   if(!result){
+  //       return await this.getPlots(Plots,field);
+  //   }
+  //   return result;
+  // }
+
+  async histogram(field: string) {
+    const { colType, dataViews, etlIndex,histgramPlot,newType ,histgramPlots} = this;
     const value: Stats = Reflect.get(dataViews, field);
+    let data;
+    const type = colType[field]|| newType[field];
+
     if (!value) {
-      return {}
+      histgramPlot(field);
+      // const url = await this.getPlots('histgramPlots',field);
+      const url = histgramPlots[field];
+      // console.log(22,url)
+
+      data = {
+        url
+      }
     }
-    if (colType[field] === 'Numerical') {
-      const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
-      const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
-      return {
-        "name": "histogram-numerical",
-        "data": {
+    if (type === 'Numerical') {
+      if(!data){
+        const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
+        const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
+        data = {
           field,
           id: etlIndex,
           interval,
@@ -2603,32 +2625,50 @@ class Project {
           min,
         }
       }
-    } else {
-      const { uniqueValues } = dataViews[field];
+
       return {
-        "name": "histogram-categorical",
-        "data": {
+        "name": "histogram-numerical",
+        data,
+      }
+    } else {
+      if(!data){
+        const { uniqueValues:size } = dataViews[field];
+        data = {
           field,
           id: etlIndex,
-          size: uniqueValues > 8 ? 8 : uniqueValues,
+          size,
         }
+      }
+      return {
+        "name": "histogram-categorical",
+        data,
       }
     }
   }
 
-  univariant(value: string) {
-    const { target, problemType, etlIndex, colType, dataViews } = this;
-    const type = colType[value];
-    const dataUn: Stats = Reflect.get(dataViews, value)
+  async univariant(value: string) {
+    const { target, problemType, etlIndex, colType, dataViews,univariatePlot,univariatePlots,newType } = this;
+    const type = colType[value]||newType[value];
+    const dataUn: Stats = Reflect.get(dataViews, value);
+
+    let data;
+
     if (!dataUn) {
-      return {}
+      univariatePlot(value);
+      // const url = await this.getPlots('univariatePlots',value);
+      const url = univariatePlots[value];
+      // console.log(11,url)
+
+      data = {
+        url
+      }
     }
 
     if (problemType === "Regression") {
       if (type === 'Numerical') {//散点图
         return {
           name: 'regression-numerical',
-          data: {
+          data: data||{
             y: target,
             x: value,
             id: etlIndex,
@@ -2637,7 +2677,7 @@ class Project {
       } else {//回归-分类 箱线图
         return {
           name: 'regression-categorical',
-          data: {
+          data: data||{
             target,
             value,
             id: etlIndex,
@@ -2645,13 +2685,16 @@ class Project {
         };
       }
     } else {//Univariant
-      const { min, max } = dataUn;
-      const data = {
-        target,
-        value,
-        id: etlIndex,
-        interval: Math.floor((max - min) / 20) || 1,
-      };
+      if(!data){
+        const { min, max } = dataUn;
+        data = {
+          target,
+          value,
+          id: etlIndex,
+          interval: Math.floor((max - min) / 20) || 1,
+        };
+      }
+
 
       if (type === 'Numerical') {
         return {
@@ -2668,13 +2711,13 @@ class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (model: any) => {
+  allVariableList = async (model: any) => {
     const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader, informativesLabel } = this;
 
-    console.log(informativesLabel, 'informativesLabel')
+    console.log(informativesLabel, 'informativesLabel');
 
     const list = [];
-    list.push(this.histogram(target));
+    list.push(await this.histogram(target));
 
     const fields = Object.entries(toJS(colType))
       .filter(itm => itm[1] === 'Numerical')
@@ -2697,8 +2740,8 @@ class Project {
     });
 
     for (let itm of allVariables) {
-      list.push(this.histogram(itm));
-      list.push(this.univariant(itm));
+      list.push(await this.histogram(itm));
+      list.push(await this.univariant(itm));
     }
 
     const { validatePlotData, holdoutPlotData } = model;
@@ -2740,7 +2783,7 @@ class Project {
 
   // 点击导出的按钮
   generateReport = async (modelId: string, aaa?: Object) => {
-    console.log(aaa)
+    // console.log(aaa)
     // aaa.routing.history.push('/report')
     console.log(this, 'ttttttttttttttttttttttt')
 
