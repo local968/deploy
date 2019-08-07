@@ -25,6 +25,7 @@ import SSPlot from './SSPlot'
 import PIE from './PIE'
 import HS from './HS'
 import TwinBar from './TwinBar'
+import SPND from './SPND'
 
 export {
   Bar,
@@ -54,4 +55,5 @@ export {
   PIE,
   HS,
   TwinBar,
+  SPND,
 }

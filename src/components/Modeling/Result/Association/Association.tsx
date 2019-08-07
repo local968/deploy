@@ -5,6 +5,7 @@ import config from 'config'
 import Project from 'stores/Project';
 import { ProcessLoading } from 'components/Common';
 import classnames from 'classnames'
+import { SPND } from '../../../Charts';
 
 interface AssociationProps {
   project: Project
@@ -51,7 +52,9 @@ const Association = (props: AssociationProps) => {
   />
 
   const texts = state.correlation[config.isEN ? 0 : 1]
-  const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
+  const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName;
+
+  console.log(state,type)
 
   return <div className={styles.association}>
     <div className={styles.main}>
@@ -89,12 +92,15 @@ const Association = (props: AssociationProps) => {
                 </div>
               </div>
               <div className={styles.chart}>
-
+                <SPND
+                  type={type}
+                  state={state}
+                />
               </div>
             </div>
           </div>
         </div>
-        <div className={styles.empty}></div>
+        <div className={styles.empty}/>
       </div>
     </div>
   </div>
