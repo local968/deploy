@@ -159,7 +159,8 @@ export interface AssociationTrainCommand {
   maxLength: number,
   featureLabel: string[]
   targetLabel: string[]
-  projectId: string
+  projectId: string,
+  problemType: string
 }
 
 class Project {
@@ -2002,7 +2003,8 @@ class Project {
       csvLocation: [this.originalIndex],
       featureLabel: [this.target, ...this.dataHeader],
       targetLabel: [this.target],
-      projectId: this.id
+      projectId: this.id,
+      problemType: this.problemType
     }
 
     const updateData = Object.assign({
@@ -2598,10 +2600,10 @@ class Project {
   // }
 
   async histogram(field: string) {
-    const { colType, dataViews, etlIndex,histgramPlot,newType ,histgramPlots} = this;
+    const { colType, dataViews, etlIndex, histgramPlot, newType, histgramPlots } = this;
     const value: Stats = Reflect.get(dataViews, field);
     let data;
-    const type = colType[field]|| newType[field];
+    const type = colType[field] || newType[field];
 
     if (!value) {
       histgramPlot(field);
@@ -2614,7 +2616,7 @@ class Project {
       }
     }
     if (type === 'Numerical') {
-      if(!data){
+      if (!data) {
         const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
         const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
         data = {
@@ -2631,8 +2633,8 @@ class Project {
         data,
       }
     } else {
-      if(!data){
-        const { uniqueValues:size } = dataViews[field];
+      if (!data) {
+        const { uniqueValues: size } = dataViews[field];
         data = {
           field,
           id: etlIndex,
@@ -2647,8 +2649,8 @@ class Project {
   }
 
   async univariant(value: string) {
-    const { target, problemType, etlIndex, colType, dataViews,univariatePlot,univariatePlots,newType } = this;
-    const type = colType[value]||newType[value];
+    const { target, problemType, etlIndex, colType, dataViews, univariatePlot, univariatePlots, newType } = this;
+    const type = colType[value] || newType[value];
     const dataUn: Stats = Reflect.get(dataViews, value);
 
     let data;
@@ -2668,7 +2670,7 @@ class Project {
       if (type === 'Numerical') {//散点图
         return {
           name: 'regression-numerical',
-          data: data||{
+          data: data || {
             y: target,
             x: value,
             id: etlIndex,
@@ -2677,7 +2679,7 @@ class Project {
       } else {//回归-分类 箱线图
         return {
           name: 'regression-categorical',
-          data: data||{
+          data: data || {
             target,
             value,
             id: etlIndex,
@@ -2685,7 +2687,7 @@ class Project {
         };
       }
     } else {//Univariant
-      if(!data){
+      if (!data) {
         const { min, max } = dataUn;
         data = {
           target,

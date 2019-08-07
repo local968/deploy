@@ -1156,6 +1156,8 @@ wss.register('train', async (message, socket, progress) => {
       _stopIds.push(stopId);
     }
 
+    if (!commandArr.length) return { status: 200, msg: 'ok' };
+
     commandArr.forEach(___co => {
       userLogger.info({
         userId,
@@ -1167,12 +1169,15 @@ wss.register('train', async (message, socket, progress) => {
       });
     });
 
-    if (!commandArr.length) return { status: 200, msg: 'ok' };
     await createOrUpdate(projectId, userId, {
       ...updateData,
       stopIds: _stopIds,
     });
-    if (!algo) await checkEtl(projectId, userId);
+    if (!algo) {
+      await checkEtl(projectId, userId);
+    } else {
+      await deleteModels(userId, projectId)
+    }
     console.log('finish etl');
 
     const processFn = async queueValue => {
