@@ -4,12 +4,12 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Modal, NumberInput } from 'components/Common';
 import { observable } from 'mobx'
-import {  Select } from 'antd'
+import { Select } from 'antd'
 import { formatNumber } from '../../../../util'
 import EN from '../../../../constant/en';
-import {OutlierRange} from "components/Charts";
+import { OutlierRange } from "components/Charts";
 import Project from 'stores/Project';
-const {Option} = Select;
+const { Option } = Select;
 
 interface FixIssueProps {
   saveDataFixes: () => void,
@@ -25,7 +25,7 @@ class FixIssue extends Component<FixIssueProps> {
   @observable editKey = ''
   @observable visible = false
   @observable progress = 0
-  @observable fillMethod = { missing: {}, mismatch: {}, outlier: {} };
+  @observable fillMethod = { missing: this.props.project.nullFillMethodTemp, mismatch: this.props.project.mismatchFillMethodTemp, outlier: this.props.project.outlierFillMethodTemp };
   @observable checked = { null: [], mismatch: [], outlier: [] }
   // @observable outLier = {};
 
@@ -85,9 +85,9 @@ class FixIssue extends Component<FixIssueProps> {
     })
     project.dataHeader = [...dataHeader]
     project.deleteColumns = [...deleteColumns]
-    project.nullFillMethodTemp = { ...project.nullFillMethodTemp, ...realFillMethod.missing }
-    project.mismatchFillMethodTemp = { ...project.mismatchFillMethodTemp, ...realFillMethod.mismatch }
-    project.outlierFillMethodTemp = { ...project.outlierFillMethodTemp, ...realFillMethod.outlier }
+    project.nullFillMethodTemp = { ...realFillMethod.missing }
+    project.mismatchFillMethodTemp = { ...realFillMethod.mismatch }
+    project.outlierFillMethodTemp = { ...realFillMethod.outlier }
     this.props.saveDataFixes()
   }
 
@@ -164,7 +164,7 @@ class FixIssue extends Component<FixIssueProps> {
 
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
-    const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
+    const { mapHeader, colType, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
     const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow / totalRawLines * 100 } : variableIssues.mismatchRow
     const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow / totalRawLines * 100 } : variableIssues.nullRow
     const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow / totalRawLines * 100 } : variableIssues.outlierRow
@@ -285,9 +285,7 @@ class FixIssue extends Component<FixIssueProps> {
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
                 const method = this.fillMethod.mismatch.hasOwnProperty(k) ?
-                  this.fillMethod.mismatch[k] :
-                  mismatchFillMethodTemp.hasOwnProperty(k) ?
-                    mismatchFillMethodTemp[k] : 'mean'
+                  this.fillMethod.mismatch[k] : 'mean'
                 const isOthers = !numArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   {Object.keys(mismatchRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.mismatch.includes(k)} onChange={this.handleCheck('mismatch', k)} /></div>}
@@ -360,10 +358,7 @@ class FixIssue extends Component<FixIssueProps> {
                 const mean = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].mean : 'N/A')
                 const median = !rawDataView ? 'N/A' : (showType === 'Numerical' ? rawDataView[k].median : 'N/A')
                 const method = this.fillMethod.missing.hasOwnProperty(k) ?
-                  this.fillMethod.missing[k] :
-                  nullFillMethodTemp.hasOwnProperty(k) ?
-                    nullFillMethodTemp[k] :
-                    (showType === 'Categorical' ? 'mode' : 'mean')
+                  this.fillMethod.missing[k] : (showType === 'Categorical' ? 'mode' : 'mean')
                 const isOthers = !options.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   {Object.keys(nullRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.null.includes(k)} onChange={this.handleCheck('null', k)} /></div>}
@@ -436,9 +431,7 @@ class FixIssue extends Component<FixIssueProps> {
                 const mean = !rawDataView ? 'N/A' : rawDataView[k].mean
                 const median = !rawDataView ? 'N/A' : rawDataView[k].median
                 const method = this.fillMethod.outlier.hasOwnProperty(k) ?
-                  this.fillMethod.outlier[k] :
-                  outlierFillMethodTemp.hasOwnProperty(k) ?
-                    outlierFillMethodTemp[k] : 'ignore'
+                  this.fillMethod.outlier[k] : 'ignore'
                 const isOthers = !outArray.find(_a => _a.value === method)
                 return <div className={styles.fixesRow} key={i}>
                   {Object.keys(outlierRow).length > 1 && <div className={styles.fixedCheck}><input type="checkbox" checked={this.checked.outlier.includes(k)} onChange={this.handleCheck('outlier', k)} /></div>}
