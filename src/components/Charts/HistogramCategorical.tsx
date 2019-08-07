@@ -8,7 +8,17 @@ import EN from '../../constant/en';
  * Histogram-Categorical
  */
 
-export default function HistogramCategorical(props){
+interface Interface {
+  title?:string
+  data:Array<any>
+  x_name?:string
+  y_name?:string
+  height?:number
+  width?:number
+  xAxisName?:Array<string>
+}
+
+export default function HistogramCategorical(props:Interface){
   let {
     x_name='',
     y_name='',
