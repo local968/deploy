@@ -16,8 +16,8 @@ export default function HistogramCategorical(props){
     height = 330,
     width = 500,
     xAxisName = data.map((itm)=>itm.name),
+    title = `Feature:${x_name}`,
   } = props;
-  let title = `Feature:${x_name}`;
 
   const dt = data.map(itm=>itm.value);
 
