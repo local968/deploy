@@ -165,9 +165,9 @@ class FixIssue extends Component<FixIssueProps> {
   render() {
     const { closeFixes, project, isTarget, nullCount, mismatchCount, outlierCount } = this.props;
     const { mapHeader, colType, mismatchFillMethodTemp, nullFillMethodTemp, outlierFillMethodTemp, totalRawLines, rawDataView, outlierDictTemp, target, missingReasonTemp, dataHeader, deleteColumns, variableIssues, targetIssuesCountsOrigin, nullLineCounts, mismatchLineCounts, outlierLineCounts } = project
-    const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow } : variableIssues.mismatchRow
-    const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow } : variableIssues.nullRow
-    const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow } : variableIssues.outlierRow
+    const mismatchRow = isTarget ? { [target]: targetIssuesCountsOrigin.mismatchRow / totalRawLines * 100 } : variableIssues.mismatchRow
+    const nullRow = isTarget ? { [target]: targetIssuesCountsOrigin.nullRow / totalRawLines * 100 } : variableIssues.nullRow
+    const outlierRow = isTarget ? { [target]: targetIssuesCountsOrigin.outlierRow / totalRawLines * 100 } : variableIssues.outlierRow
 
     let nullNum = 0
     let nullStr = 0
