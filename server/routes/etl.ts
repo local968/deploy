@@ -197,6 +197,7 @@ wss.register('newEtl', async (message, socket, process) => {
       stats[key].type = value;
     })
     .value();
+  const deleteKeys: Set<string> = new Set()
 
   for (let key in stats) {
     const mismatch = project.mismatchFillMethod[key];
@@ -211,7 +212,8 @@ wss.register('newEtl', async (message, socket, process) => {
         stats[key].mismatchFillMethod = { type: 'delete' };
       else if (mismatch === 'zero')
         stats[key].mismatchFillMethod = { type: 'replace', value: 0 };
-      else if (mismatch && mismatch !== 'ignore' && mismatch !== 'column')
+      else if (mismatch === 'column') deleteKeys.add(key)
+      else if (mismatch)
         stats[key].mismatchFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][mismatch],
@@ -239,7 +241,8 @@ wss.register('newEtl', async (message, socket, process) => {
           type: 'replace',
           value: 'NEW_VARIABLE_TYPE',
         };
-      else if (missingValue && missingValue !== 'column')
+      else if (missingValue === 'column') deleteKeys.add(key)
+      else if (missingValue)
         stats[key].missingValueFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][missingValue],
@@ -259,7 +262,9 @@ wss.register('newEtl', async (message, socket, process) => {
       else if (outlier === 'respective') stats[key].outlierFillMethod = { type: 'replaceRespective' };
       else if (outlier === 'zero')
         stats[key].outlierFillMethod = { type: 'replace', value: 0 };
-      else if (outlier && outlier !== 'ignore' && outlier !== 'column')
+      else if (outlier === 'ignore') delete stats[key].outlierFillMethod
+      else if (outlier === 'column') deleteKeys.add(key)
+      else if (outlier)
         stats[key].outlierFillMethod = {
           type: 'replace',
           value: project.rawDataView[key][outlier],
@@ -274,6 +279,13 @@ wss.register('newEtl', async (message, socket, process) => {
       stats[key].originalStats.high = range[1];
     }
   }
+
+  //需要删除的列 不做修改
+  [...deleteKeys].forEach(k => {
+    delete stats[k].mismatchFillMethod
+    delete stats[k].missingValueFillMethod
+    delete stats[k].outlierFillMethod
+  })
 
   if (project.target) {
     stats[project.target].isTarget = true;
