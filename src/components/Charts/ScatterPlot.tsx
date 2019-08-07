@@ -59,7 +59,7 @@ export default function ScatterPlot(props:Interface) {
   };
   return <ReactEcharts
     option={option}
-    style={{height: 400, width: 750}}
+    style={{height: '100%', width: '100%'}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

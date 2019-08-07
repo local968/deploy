@@ -54,8 +54,6 @@ const Association = (props: AssociationProps) => {
   const texts = state.correlation[config.isEN ? 0 : 1]
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName;
 
-  console.log(state,type)
-
   return <div className={styles.association}>
     <div className={styles.main}>
       <div className={styles.title}><span>{EN.AssociateRules}</span></div>

@@ -103,7 +103,7 @@ export default function HistogramCategorical(props:Interface){
 
   return <ReactEcharts
     option={option}
-    style={{height, width}}
+    style={{height:"100%", width:"100%"}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

@@ -51,7 +51,7 @@ export default function NetworkDiagram(props:Interface) {
 				type: 'graph',
 				layout: 'circular',
 				symbolSize: 22,
-				roam: true,
+				roam: 'move',
 				focusNodeAdjacency:true,
 				label: {
 					normal: {
@@ -74,7 +74,7 @@ export default function NetworkDiagram(props:Interface) {
 				links,
 				lineStyle: {
 					normal: {
-						opacity: 0.9,
+						opacity: 1,
 						width: 1,
 						curveness: 0.2
 					}
@@ -85,7 +85,7 @@ export default function NetworkDiagram(props:Interface) {
 
 	return <ReactEcharts
 		option={option}
-		style={{height: 400, width: 750}}
+		style={{height: '100%', width: '100%'}}
 		notMerge={true}
 		lazyUpdate={true}
 		theme="customed"
