@@ -112,6 +112,7 @@
   margin-top: 50px;
   box-shadow:0px 5px 10px 0px rgba(0,0,0,0.3);
   position: relative;
+  max-width: 100%;
 }
 
 .tabs {
@@ -154,5 +155,6 @@
   display: flex;
   flex: auto;
   z-index: 2;
-  background: #fff
+  background: #fff;
+  overflow: auto;
 }
