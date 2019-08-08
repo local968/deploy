@@ -1051,8 +1051,11 @@ class Project {
 
       if (isAssociation) {
         try {
+          this.etlProgress = 50
           await this.getAssociationData()
         } catch (e) {
+          this.etling = false
+          this.etlProgress = 0
           return antdMessage.error(e.message)
         }
         await this.updateProject(Object.assign(this.defaultDataQuality, data, {
