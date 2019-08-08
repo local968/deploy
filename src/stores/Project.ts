@@ -1989,6 +1989,7 @@ class Project {
   }
 
   associationModeling = () => {
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     if (this.etling) return antdMessage.error('modeling error')
     this.train2ing = true
     this.isAbort = false
