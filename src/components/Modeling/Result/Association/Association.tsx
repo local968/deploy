@@ -111,4 +111,8 @@ const Association = (props: AssociationProps) => {
   </div>
 }
 
-export default Association
+export default (props: AssociationProps) => {
+  const { project } = props
+  if (!project.selectModel) return null
+  return <Association project={project} />
+}

@@ -222,10 +222,7 @@ export default class SimplifiedView extends Component<Interface> {
       targetUnique
     } = project;
     const targetUniques = targetUnique || NaN
-    const targetData =
-      colType[target] !== 'Categorical' && dataViews
-        ? dataViews[target] || {}
-        : {};
+    const targetData = dataViews[target]
     const allVariables = [
       ...dataHeader.filter(h => h !== target),
       ...newVariable,
