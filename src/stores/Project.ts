@@ -1031,7 +1031,7 @@ class Project {
     } = {
       target: this.target,
       colType: { ...this.colType },
-      dataHeader: [...this.dataHeader, ...this.deleteColumns],
+      dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
       nullFillMethod: this.nullFillMethod,
       nullFillMethodTemp: this.nullFillMethodTemp,
@@ -1230,7 +1230,7 @@ class Project {
       data.rowIssue = true;
     }
 
-    if (target && (targetIssuesCountsOrigin.mismatchRow + targetIssuesCountsOrigin.nullRow + targetIssuesCountsOrigin.outlierRow) > 0) {
+    if (target && colType[target] === "Numerical" && (targetIssuesCountsOrigin.mismatchRow + targetIssuesCountsOrigin.nullRow + targetIssuesCountsOrigin.outlierRow) > 0) {
       data.targetRowIssue = true
     }
 

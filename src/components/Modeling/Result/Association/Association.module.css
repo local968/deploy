@@ -87,6 +87,11 @@
   position: relative;
   overflow-x: visible;
   width: 0;
+  transition: opacity .5s;
+}
+
+.viewsHidden {
+  opacity: 0;
 }
 
 .view {

@@ -68,7 +68,7 @@ const Association = (props: AssociationProps) => {
           const hint = EN[`Association${t}${key}Hint`]
           const [min, max] = [(type === 'fptree' ? [1, null] : [0, 1]), [0, 1], [0, null], [1, null]][k]
           return <div className={styles.row} key={label}>
-            <div className={styles.label}><label>{label}</label><Hint content={hint} placement='top' /></div>
+            <div className={styles.label}><label title={label}>{label}</label><Hint content={hint} placement='top' /></div>
             <div className={styles.input}><NumberInput value={state[type][v]} max={max} min={min} onBlur={handleChange(v)} /></div>
           </div>
         })}

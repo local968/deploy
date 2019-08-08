@@ -19,6 +19,7 @@ const Association = (props: AssociationProps) => {
     'correlation': null, 'graph': null, 'plot': null
   })
   const [loading, setLoading] = useState(true)
+  const [visible, setVisible] = useState(false)
   const [type, setType] = useState(1)
 
   const arr = ['correlation', 'graph', 'plot']
@@ -47,6 +48,10 @@ const Association = (props: AssociationProps) => {
     project.updateProject(project.nextMainStep(3))
   }
 
+  const changeVisible = () => {
+    setVisible(!visible)
+  }
+
   if (loading) return <ProcessLoading
     style={{ position: 'fixed' }}
   />
@@ -63,7 +68,7 @@ const Association = (props: AssociationProps) => {
             <span>{EN.AssociateExport}</span>
           </a>
         </div>
-        <div className={styles.button}><span>{EN.AssociatePlots}</span></div>
+        <div className={styles.button} onClick={changeVisible}><span>{EN.AssociatePlots}</span></div>
         <div className={styles.button} onClick={remodel}><span>{EN.AssociateReModel}</span></div>
       </div>
       <div className={styles.content}>
@@ -74,7 +79,9 @@ const Association = (props: AssociationProps) => {
             </li>
           })}
         </div>
-        <div className={styles.views}>
+        <div className={classnames(styles.views, {
+          [styles.viewsHidden]: !visible
+        })}>
           <div className={styles.view}>
             <div className={styles.options}>
               <div className={styles.tabs}>
@@ -98,7 +105,7 @@ const Association = (props: AssociationProps) => {
             </div>
           </div>
         </div>
-        <div className={styles.empty}/>
+        <div className={styles.empty} />
       </div>
     </div>
   </div>

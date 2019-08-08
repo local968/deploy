@@ -55,7 +55,6 @@ class DataSchema extends Component<DataSchemaProps> {
     const isAssociation = problemType === 'Association'
     //无监督删除target
     const newDataHeader = isAssociation ? [this.item] : rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
-
     let nullFillMethod = {}
     let outlierFillMethod = {}
     if (!isAssociation) {
