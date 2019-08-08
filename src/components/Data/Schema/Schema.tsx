@@ -119,7 +119,6 @@ class DataSchema extends Component<DataSchemaProps> {
     } else {
       this.item = ''
     }
-    console.log(value, 'variableSelect')
   }
 
   checked = (key, e) => {

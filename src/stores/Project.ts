@@ -1008,8 +1008,6 @@ class Project {
         target: this.target,
         index,
         id: this.id
-      }).then(result => {
-        console.log(result)
       })
     })
   }
