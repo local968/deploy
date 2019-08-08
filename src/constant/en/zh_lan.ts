@@ -1256,7 +1256,9 @@ const ZH_LAN = {
   AssociatePlots: 'Plots',
   AssociateReModel: 'Remodel',
   AssociateScatterPlot: 'Scatter plot',
-  AssociateNetworkDiagram: 'Network Diagram'
+  AssociateNetworkDiagram: 'Network Diagram',
+  MultiClassification: '单标签多分类',
+  MultiClassificationHint: '将实例分为3个或多个的问题。（例如 : 预测多类别客户）',
 };
 
 export default ZH_LAN;

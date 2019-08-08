@@ -1398,7 +1398,9 @@ const EN_LAN = {
   AssociatePlots: 'Plots',
   AssociateReModel: 'Remodel',
   AssociateScatterPlot: 'Scatter plot',
-  AssociateNetworkDiagram: 'Network Diagram'
+  AssociateNetworkDiagram: 'Network Diagram',
+  MultiClassification: 'Multiclass Classification',
+  MultiClassificationHint: 'The problem of classifying instances into one of three or more classes.',
 };
 
 
