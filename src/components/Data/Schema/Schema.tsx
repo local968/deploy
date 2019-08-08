@@ -103,13 +103,13 @@ class DataSchema extends Component<DataSchemaProps> {
     const { role } = this.props.userStore.info;
     const { schema_TargetVariable = true } = role as any;
     if (schema_TargetVariable) {
-      if (!isNaN(+value)) {
-        this.target = value;
-        this.tableRef.current.updateGrids();
-        this.checkList = [...this.checkList.filter(v => v !== value)];
-      } else {
-        this.checkList = [...this.checkList, this.target]
-      }
+      // if (!isNaN(+value)) {
+      this.target = value;
+      this.tableRef.current.updateGrids();
+      this.checkList = [...this.checkList.filter(v => v !== value)];
+      // } else {
+      //   this.checkList = [...this.checkList, this.target]
+      // }
     }
   };
 
@@ -382,7 +382,7 @@ class DataSchema extends Component<DataSchemaProps> {
     const tableData = this.formatTable();
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
     const isAssociation = problemType === 'Association'
-    const newDataHeader = isAssociation ? [this.item] : rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
+    const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
     //target选择列表
     const targetOption = rawHeader.reduce((prev, h) => {
       h = h.trim();
@@ -400,7 +400,7 @@ class DataSchema extends Component<DataSchemaProps> {
 
     const variableOption = { ...targetOption }
     if (this.target) delete variableOption[this.target]
-    const variable = newDataHeader.length === 1 ? newDataHeader[0] : ''
+    const variable = this.item
     if (variable) delete targetOption[variable]
     return (
       <div className={styles.schema}>
@@ -409,8 +409,8 @@ class DataSchema extends Component<DataSchemaProps> {
             <span>i</span>
           </div>
           <div className={styles.schemaText}>
-
-            <span>{isAssociation ? EN.AssociationSchemaTitle : EN.Pleaseselectavariableasthetargetvariable}</span>
+            <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
+            {isAssociation && <span>{EN.AssociationSchemaTitle}</span>}
           </div>
         </div>
         <div className={styles.schemaContent} id="schemaContent">
@@ -537,7 +537,7 @@ class DataSchema extends Component<DataSchemaProps> {
               disabled={
                 etling ||
                 (isUnsupervised ? false : !this.target) ||
-                (isAssociation ? newDataHeader.length !== 1 : newDataHeader.length < 1) ||
+                (isAssociation ? !variable : newDataHeader.length < 1) ||
                 isMissed ||
                 isDuplicated
               }
