@@ -409,8 +409,7 @@ class DataSchema extends Component<DataSchemaProps> {
             <span>i</span>
           </div>
           <div className={styles.schemaText}>
-            <span>{EN.Pleaseselectavariableasthetargetvariable}</span>
-            {isAssociation && <span>{EN.AssociationSchemaTitle}</span>}
+            <span>{isAssociation ? EN.AssociationSchemaTitle : EN.Pleaseselectavariableasthetargetvariable}</span>
           </div>
         </div>
         <div className={styles.schemaContent} id="schemaContent">
