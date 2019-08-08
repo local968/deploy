@@ -1259,6 +1259,10 @@ const ZH_LAN = {
   AssociateNetworkDiagram: 'Network Diagram',
   MultiClassification: '单标签多分类',
   MultiClassificationHint: '将实例分为3个或多个的问题。（例如 : 预测多类别客户）',
+  MultiUnique: '分类数量',
+  MultiUniqueHint1: '最少支持3类，最多支持',
+  MultiUniqueHint2: '类，请输入3-',
+  MultiUniqueHint3: '之间的数字',
 };
 
 export default ZH_LAN;

@@ -877,7 +877,7 @@ class Project {
       statement: this.statement,
       business: this.business,
       problemType: this.changeProjectType,
-      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || ((this.changeProjectType === 'Regression' || this.changeProjectType === 'Clustering') && 0)
+      targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || 0
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
@@ -1028,6 +1028,7 @@ class Project {
       outlierFillMethod: StringObject,
       outlierFillMethodTemp: StringObject,
       crossCount?: number
+      targetUnique?: number
     } = {
       target: this.target,
       colType: { ...this.colType },
@@ -1039,6 +1040,8 @@ class Project {
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
     const isAssociation = this.problemType === 'Association'
+    const isMulti = this.problemType === 'MultiClassification'
+    if (isMulti) data.targetUnique = this.targetUnique
     if (this.noComputeTemp || isAssociation) {
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
