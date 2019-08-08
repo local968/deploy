@@ -60,21 +60,16 @@ class DataSchema extends Component<DataSchemaProps> {
     if (!isAssociation) {
       // 回归默认设置为drop
       if (this.target && this.dataType[this.target] === 'Numerical') {
-        if (!!nullLineCounts[this.target]) {
-          nullFillMethod[this.target] = 'drop'
-        }
-        if (!!outlierLineCounts[this.target]) {
-          outlierFillMethod[this.target] = 'drop'
-        }
+        nullFillMethod[this.target] = 'drop'
+        outlierFillMethod[this.target] = 'drop'
       }
 
       //聚类设置为drop
       if (problemType === 'Clustering') {
         outlierFillMethod = newDataHeader.reduce((prev, h) => {
-          if (this.dataType[h] === 'Numerical' && !!outlierLineCounts[h])
-            prev[h] = 'drop';
+          prev[h] = 'drop';
           return prev;
-        }, outlierFillMethod);
+        }, {});
       }
     }
 
