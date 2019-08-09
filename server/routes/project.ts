@@ -8,7 +8,7 @@ import log4js from 'log4js';
 import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
-import { Metric, StatusData } from '../types';
+import { Metric, StatusData, AssociationOption } from '../types';
 import { getSampleIndex } from './upload'
 import { promised } from 'q';
 
@@ -1706,14 +1706,40 @@ wss.register('getAssociationData', (message, socket) => {
       status: 500,
       message: 'data error'
     }
-    const { data: { list: targetList } } = targetResult
-    const { data: { list: featureList } } = featureResult
+    const { data: targetList } = targetResult
+    const { data: featureList } = featureResult
 
-    return createOrUpdate(id, userId, {
-      associationView: {
-        target: targetList.slice(0, 100),
-        feature: featureList.slice(0, 100)
+    return getProjectField(id, 'rawDataView').then(rawDataView => {
+      const { count, uniqueValues } = rawDataView[feature]
+      const { uniqueValues: targetUnique } = rawDataView[target]
+      const apSupport = count / uniqueValues / uniqueValues
+      const fpSupport = Math.floor(count / uniqueValues) + 1
+      const length = Math.max(Math.floor(Math.log10(targetUnique)), 1)
+      const minAP = 2 / targetUnique
+
+      const options: AssociationOption = {
+        type: 'fptree',
+        fptree: {
+          support: fpSupport,
+          confidence: 0.5,
+          lift: 3,
+          length
+        },
+        apriori: {
+          support: Math.max(apSupport, minAP),
+          confidence: 0.2,
+          lift: 3,
+          length
+        },
       }
+
+      return createOrUpdate(id, userId, {
+        associationView: {
+          target: targetList,
+          feature: featureList
+        },
+        associationOption: options
+      })
     })
   })
 })
