@@ -29,6 +29,11 @@ const Unsupervised = [
     type: EN.Outlier,
     detail: EN.OutlierDetectionHint,
   },
+  {
+    value: 'Association',
+    type: EN.Association,
+    detail: EN.AssociationHint,
+  },
 ];
 
 interface ProblemProps {

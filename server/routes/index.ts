@@ -14,13 +14,23 @@ import './etl';
 
 const router = Router();
 
-router.use("/image", image);
 router.use('/user', user);
+router.use('/api', api);
+
+router.use('/*',function(req, res, next){
+  if(req.session.userId){
+    next()
+  }else{
+    res.status(403);
+    res.send('please login first');
+  }
+});
+
+router.use("/image", image);
 router.use('/upload', upload);
 router.use('/redirect', redirect);
 router.use('/etls', redirectEs);
 router.use("/uploads", redirectUpload);
-router.use('/api', api);
 router.use("/project", project);
 router.use('/data', data)
 router.get('/jupyterLabUrl', (req, res) =>

@@ -260,9 +260,7 @@ function ModelResult(props) {
                   </button>
                   <Popover
                     trigger="click"
-                    getPopupContainer={() =>
-                      (document as any).getElementsByClassName(classes.dict)[0]
-                    }
+                    getPopupContainer={el => el.parentElement}
                     placement="bottomLeft"
                     visible={visible}
                     onVisibleChange={hideDict}
@@ -1257,7 +1255,7 @@ const MappingDict = observer(props => {
       },
     ];
     return [header, ...data];
-  }, [mappingKey]);
+  }, [mappingKey, state.encode, state.origin]);
   return (
     <div className={classes.dictBlock}>
       <div className={classes.dictClose} onClick={hideDict}>

@@ -21,7 +21,7 @@ export interface SummaryProps {
     outlierLineCounts?: NumberObject
     dataView?: any
     totalCount?: number,
-    target?: string,
+    target?: string[],
     mapHeader?: string[],
     problemType?: string
   },
@@ -53,7 +53,7 @@ class Summary extends Component<SummaryProps> {
     const deletePercent = formatNumber((deletedCount / totalCount * 100).toString(), 2)
     const fixedPercent = formatNumber(((totalFixedCount - deletedCount) / totalCount * 100).toString(), 2)
     const cleanPercent = formatNumber((100 - +deletePercent - +fixedPercent).toString(), 2)
-    const variableList = featureLabel.filter(h => h !== target)
+    const variableList = featureLabel.filter(h => !target.includes(h) && !!mapHeader[h])
     const percentList = variableList.map(v => {
       const percent: {
         missing: number
@@ -68,16 +68,30 @@ class Summary extends Component<SummaryProps> {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
+    const targetData = []
     const targetPercent = {
       classesError: 0,
       missing: 0,
       mismatch: 0,
       outlier: 0,
     }
+
     if (hasTarget) {
-      targetPercent.missing = nullLineCounts[target] / totalCount * 100
-      targetPercent.mismatch = (colType[target] === 'Numerical' ? mismatchLineCounts[target] : 0) / totalCount * 100
-      targetPercent.outlier = (colType[target] === 'Numerical' ? outlierLineCounts[target] : 0) / totalCount * 100
+      target.forEach(t => {
+        const d = {
+          classesError: 0,
+          missing: 0,
+          mismatch: 0,
+          outlier: 0,
+        }
+        d.missing = nullLineCounts[t] / totalCount * 100
+        d.mismatch = (colType[t] === 'Numerical' ? mismatchLineCounts[t] : 0) / totalCount * 100
+        d.outlier = (colType[t] === 'Numerical' ? outlierLineCounts[t] : 0) / totalCount * 100
+        targetPercent.missing += d.missing
+        targetPercent.mismatch += d.mismatch
+        targetPercent.outlier += d.outlier
+        targetData.push(d)
+      })
     }
 
     let nullCount = false
@@ -121,24 +135,30 @@ class Summary extends Component<SummaryProps> {
               <div className={styles.summaryCell}><span id={styles.summaryCellSpan} style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
               <div className={styles.summaryCell}><span id={styles.summaryCellSpan} style={{ fontWeight: 'bold' }}>{EN.CleanData}</span></div>
             </div>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryCell}><span id={styles.summaryCellSpan}>{mapHeader[target]}</span></div>
-              <div className={styles.summaryCell}><span id={styles.summaryCellSpan}>{formatNumber((100 - targetPercent.classesError - targetPercent.missing - targetPercent.mismatch - targetPercent.outlier).toString(), 2)}%</span></div>
-            </div>
+            {target.map((v, k) => {
+              const percent = targetData[k]
+              return <div className={styles.summaryTableRow} key={v}>
+                <div className={styles.summaryCell}><span id={styles.summaryCellSpan}>{mapHeader[v]}</span></div>
+                <div className={styles.summaryCell}><span id={styles.summaryCellSpan}>{formatNumber((100 - percent.classesError - percent.missing - percent.mismatch - percent.outlier).toString(), 2)}%</span></div>
+              </div>
+            })}
           </div>
           <div className={styles.summaryTableRight}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span id={styles.summaryCellSpan} style={{ fontWeight: 'bold' }}>{EN.DataComposition} </span></div>
             </div>
-            <div className={styles.summaryTableRow}>
-              <div className={styles.summaryProgressBlock}>
-                <div className={styles.summaryProgress} style={{ width: (100 - targetPercent.classesError - targetPercent.missing - targetPercent.mismatch - targetPercent.outlier) + '%', backgroundColor: '#00c855' }} />
-                <div className={styles.summaryProgress} style={{ width: targetPercent.mismatch + '%', backgroundColor: '#819ffc' }} />
-                <div className={styles.summaryProgress} style={{ width: targetPercent.missing + '%', backgroundColor: '#ff97a7' }} />
-                <div className={styles.summaryProgress} style={{ width: targetPercent.classesError + '%', backgroundColor: '#e72424' }} />
-                <div className={styles.summaryProgress} style={{ width: targetPercent.outlier + '%', backgroundColor: '#f9cf37' }} />
+            {target.map((v, k) => {
+              const percent = targetData[k]
+              return <div className={styles.summaryTableRow} key={v}>
+                <div className={styles.summaryProgressBlock}>
+                  <div className={styles.summaryProgress} style={{ width: (100 - percent.classesError - percent.missing - percent.mismatch - percent.outlier) + '%', backgroundColor: '#00c855' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.mismatch + '%', backgroundColor: '#819ffc' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.missing + '%', backgroundColor: '#ff97a7' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.classesError + '%', backgroundColor: '#e72424' }} />
+                  <div className={styles.summaryProgress} style={{ width: percent.outlier + '%', backgroundColor: '#f9cf37' }} />
+                </div>
               </div>
-            </div>
+            })}
           </div>
         </div>}
         <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: !hasTarget ? '4em' : '3em', marginTop: !hasTarget ? '10px' : 0 }}>

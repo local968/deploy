@@ -8,8 +8,9 @@ import log4js from 'log4js';
 import wss from '../webSocket';
 import axios from 'axios';
 import config from '../../config';
-import { Metric, StatusData } from '../types';
+import { Metric, StatusData, AssociationOption } from '../types';
 import { getSampleIndex } from './upload'
+import { promised } from 'q';
 
 const router = Router()
 
@@ -864,21 +865,23 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
           }
           promise.push(
             status === 100
-              ? updateProjectField(
+              ? createOrUpdate(
                 message.projectId,
                 socket.session.userId,
-                'preImportance',
-                result.data,
+                {
+                  preImportance: result.data
+                }
               )
               : Promise.resolve({}),
           );
           promise.push(
             status === 100
-              ? updateProjectField(
+              ? createOrUpdate(
                 message.projectId,
                 socket.session.userId,
-                'informativesLabel',
-                result.informativesLabel,
+                {
+                  informativesLabel: result.informativesLabel
+                }
               )
               : Promise.resolve({}),
           );
@@ -888,14 +891,8 @@ wss.register('preTrainImportance', async (message, socket, progress) => {
               importanceProgress: 0,
             }),
           );
-          return Promise.all(promise).then(([result1, result2]) => {
-            const realResult = Object.assign(
-              {},
-              result,
-              (result1 || {}).result,
-              (result2 || {}).result,
-            );
-            return Object.assign({}, returnValue, { result: realResult });
+          return Promise.all(promise).then(() => {
+            return returnValue;
           });
         }),
     );
@@ -1065,7 +1062,7 @@ wss.register('abortTrain', (message, socket) => {
 
 wss.register('train', async (message, socket, progress) => {
   const { userId, user } = socket.session;
-  const { projectId, data: updateData, version, algorithms } = message;
+  const { projectId, data: updateData, version, algorithms, algo } = message;
   // delete message.data
   Reflect.deleteProperty(message, 'data');
   // 拆分algorithms
@@ -1122,7 +1119,7 @@ wss.register('train', async (message, socket, progress) => {
           }
         });
       } else {
-        algorithms.forEach(al => {
+        if (!!algorithms && !!algorithms.length) algorithms.forEach(al => {
           const stopId = uuid.v4();
           _stopIds.push(stopId);
           commandArr.push({
@@ -1133,6 +1130,18 @@ wss.register('train', async (message, socket, progress) => {
             requestId: stopId,
           });
         });
+        else {
+          const stopId = uuid.v4();
+          commandArr.push({
+            ...message,
+            userId,
+            requestId: stopId,
+            stopId,
+            version,
+            algorithms,
+          });
+          _stopIds.push(stopId);
+        }
       }
     } else {
       const stopId = uuid.v4();
@@ -1147,6 +1156,8 @@ wss.register('train', async (message, socket, progress) => {
       _stopIds.push(stopId);
     }
 
+    if (!commandArr.length) return { status: 200, msg: 'ok' };
+
     commandArr.forEach(___co => {
       userLogger.info({
         userId,
@@ -1158,12 +1169,15 @@ wss.register('train', async (message, socket, progress) => {
       });
     });
 
-    if (!commandArr.length) return { status: 200, msg: 'ok' };
     await createOrUpdate(projectId, userId, {
       ...updateData,
       stopIds: _stopIds,
     });
-    await checkEtl(projectId, userId);
+    if (!algo) {
+      await checkEtl(projectId, userId);
+    } else {
+      await deleteModels(userId, projectId)
+    }
     console.log('finish etl');
 
     const processFn = async queueValue => {
@@ -1228,7 +1242,7 @@ wss.register('train', async (message, socket, progress) => {
           ...{ holdoutChartData: holdoutChartData.chartData },
           accuracyData,
           stats,
-          featureLabel: message.featureLabel,
+          featureLabel: message.featureLabel.filter(f => !message.targetLabel.includes(f)),
           target: message.targetLabel,
           esIndex: message.esIndex,
           settingId: message.settingId
@@ -1661,6 +1675,72 @@ wss.register('deleteIndex', (message, socket) => {
       return checked
     }
     return deleteEsIndex(index)
+  })
+})
+
+wss.register('getAssociationData', (message, socket) => {
+  const { index, feature, target, id } = message
+  const { userId } = socket.session;
+  if (!feature) {
+    return {
+      status: 500,
+      message: 'feature error'
+    }
+  }
+  if (!target) {
+    return {
+      status: 500,
+      message: 'target error'
+    }
+  }
+  const targetAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
+    field: target
+  })
+
+  const featureAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
+    field: feature
+  })
+
+  return Promise.all([targetAgg, featureAgg]).then(([targetResult, featureResult]) => {
+    if (targetResult.status !== 200 || featureResult.status !== 200) return {
+      status: 500,
+      message: 'data error'
+    }
+    const { data: targetList } = targetResult
+    const { data: featureList } = featureResult
+
+    return getProjectField(id, 'rawDataView').then(rawDataView => {
+      const { count, uniqueValues } = rawDataView[feature]
+      const { uniqueValues: targetUnique } = rawDataView[target]
+      const apSupport = count / uniqueValues / uniqueValues
+      const fpSupport = Math.floor(count / uniqueValues) + 1
+      const length = Math.max(Math.floor(Math.log10(targetUnique)), 1)
+      const minAP = 2 / targetUnique
+
+      const options: AssociationOption = {
+        type: 'fptree',
+        fptree: {
+          support: fpSupport,
+          confidence: 0.5,
+          lift: 3,
+          length
+        },
+        apriori: {
+          support: Math.max(apSupport, minAP),
+          confidence: 0.2,
+          lift: 3,
+          length
+        },
+      }
+
+      return createOrUpdate(id, userId, {
+        associationView: {
+          target: targetList,
+          feature: featureList
+        },
+        associationOption: options
+      })
+    })
   })
 })
 

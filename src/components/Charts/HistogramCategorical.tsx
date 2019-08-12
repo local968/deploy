@@ -8,7 +8,17 @@ import EN from '../../constant/en';
  * Histogram-Categorical
  */
 
-export default function HistogramCategorical(props){
+interface Interface {
+  title?:string
+  data:Array<any>
+  x_name?:string
+  y_name?:string
+  height?:number
+  width?:number
+  xAxisName?:Array<string>
+}
+
+export default function HistogramCategorical(props:Interface){
   let {
     x_name='',
     y_name='',
@@ -16,8 +26,8 @@ export default function HistogramCategorical(props){
     height = 330,
     width = 500,
     xAxisName = data.map((itm)=>itm.name),
+    title = `Feature:${x_name}`,
   } = props;
-  let title = `Feature:${x_name}`;
 
   const dt = data.map(itm=>itm.value);
 
@@ -93,7 +103,7 @@ export default function HistogramCategorical(props){
 
   return <ReactEcharts
     option={option}
-    style={{height, width}}
+    style={{height:"100%", width:"100%"}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

@@ -8,6 +8,8 @@ import { formatNumber } from '../../src/util'
 import request from "../components/Request";
 import EN from '../../src/constant/en'
 import { Coordinate } from "components/CreateNewVariable/types/Coordinate";
+import { debounce } from 'lodash';
+
 
 export interface Stats {
   took: number,
@@ -124,6 +126,41 @@ export interface NewVariable {
   name: string,
   nameArray: string[],
   exps: Coordinate[]
+}
+
+export interface AssociationOption {
+  type: 'apriori' | 'fptree',
+  fptree: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+  apriori: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+}
+
+export interface AssociationView {
+  target: { range: [number, number], list: { key: string, value: number }[] }
+  feature: { range: [number, number], list: { key: string, value: number }[] }
+}
+
+export interface AssociationTrainCommand {
+  command: string,
+  csvLocation: string[],
+  algo: 'apriori' | 'fptree',
+  minSupport: number,
+  minConfidence: number,
+  minLift: number,
+  maxLength: number,
+  featureLabel: string[]
+  targetLabel: string[]
+  projectId: string,
+  problemType: string
 }
 
 class Project {
@@ -310,11 +347,32 @@ class Project {
   @observable showSsPlot: boolean = false;
   @observable metricCorrection: { metric: string, type: string, value: number } = { metric: 'default', type: '', value: 0 }
   @observable fbeta: number = 1
+  @observable associationOption: AssociationOption = {
+    type: 'fptree',
+    fptree: {
+      support: 10,
+      confidence: 0.5,
+      lift: 3,
+      length: 3
+    },
+    apriori: {
+      support: 0.02,
+      confidence: 0.2,
+      lift: 3,
+      length: 3
+    },
+  }
+
+  @observable associationView: AssociationView = {
+    target: { range: [1, 1], list: [] },
+    feature: { range: [1, 1], list: [] },
+  }
 
   constructor(id: string, args: Object) {
     this.id = id;
     this.visiable = true;
-    this.setProperty(args)
+    this.setProperty(args);
+    // this.getPlots = debounce(this.getPlots,1000)
   }
 
   readData = (path: string) => {
@@ -939,6 +997,21 @@ class Project {
     };
   }
 
+  getAssociationData = () => {
+    return socketStore.ready().then(api => {
+      if (!this.target) throw new Error("error target")
+      if (this.dataHeader.length !== 1) throw new Error("error feature")
+      const feature = this.dataHeader[0]
+      const index = this.originalIndex
+      return api.getAssociationData({
+        feature,
+        target: this.target,
+        index,
+        id: this.id
+      })
+    })
+  }
+
   @action
   endSchema = async () => {
     this.etling = true
@@ -958,14 +1031,15 @@ class Project {
     } = {
       target: this.target,
       colType: { ...this.colType },
-      dataHeader: [...this.dataHeader, ...this.deleteColumns],
+      dataHeader: [...this.dataHeader],
       noCompute: this.noComputeTemp,
       nullFillMethod: this.nullFillMethod,
       nullFillMethodTemp: this.nullFillMethodTemp,
       outlierFillMethod: this.outlierFillMethod,
       outlierFillMethodTemp: this.outlierFillMethodTemp,
     }
-    if (this.noComputeTemp) {
+    const isAssociation = this.problemType === 'Association'
+    if (this.noComputeTemp || isAssociation) {
       if (this.problemType === 'Classification') {
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
         if (min < 3) {
@@ -973,6 +1047,25 @@ class Project {
           return await Promise.reject()
         }
         if (min < 5) data.crossCount = min - 1
+      }
+
+      if (isAssociation) {
+        try {
+          this.etlProgress = 50
+          await this.getAssociationData()
+        } catch (e) {
+          this.etling = false
+          this.etlProgress = 0
+          return antdMessage.error(e.message)
+        }
+        await this.updateProject(Object.assign(this.defaultDataQuality, data, {
+          curStep: 3,
+          mainStep: 3,
+          subStepActive: 1,
+          lastSubStep: 1
+        }))
+        this.etling = false
+        return
       }
       await this.updateProject(Object.assign(this.defaultDataQuality, data))
       const pass = await this.newEtl()
@@ -1137,7 +1230,7 @@ class Project {
       data.rowIssue = true;
     }
 
-    if (target && (targetIssuesCountsOrigin.mismatchRow + targetIssuesCountsOrigin.nullRow + targetIssuesCountsOrigin.outlierRow) > 0) {
+    if (target && colType[target] === "Numerical" && (targetIssuesCountsOrigin.mismatchRow + targetIssuesCountsOrigin.nullRow + targetIssuesCountsOrigin.outlierRow) > 0) {
       data.targetRowIssue = true
     }
 
@@ -1323,6 +1416,7 @@ class Project {
       };
       return api.createNewVariable(command).then((returnValue: BaseResponse) => {
         const { status, result } = returnValue
+        console.log(result, 'createNewVariable')
         if (status < 0) {
           antdMessage.error(result.processError)
           return false
@@ -1336,11 +1430,25 @@ class Project {
           return prev
         }, {} as { [key: string]: NewVariable })
         const expression = Object.assign({}, this.expression, variableExp)
+        const uptData: {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+          newVariableViews?
+        } = {
+          newVariable,
+          trainHeader,
+          expression,
+          newType,
+        }
+        if (result.dataView) uptData.newVariableViews = result.dataView
         return this.updateProject({
           newVariable,
           trainHeader,
           expression,
           newType,
+          newVariableViews: result.dataView
         }).then(() => true)
       })
     })
@@ -1434,9 +1542,11 @@ class Project {
   @computed
   get defualtRecommendModel() {
     const { currentSetting, models, measurement, problemType } = this
+    if (problemType === 'Association') return this.models
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+
     return (!currentModels.length ? models : currentModels)
       .map(m => {
         const { score } = m
@@ -1878,6 +1988,45 @@ class Project {
     }, this.nextSubStep(2, 3)))
   }
 
+  associationModeling = () => {
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
+    if (this.etling) return antdMessage.error('modeling error')
+    this.train2ing = true
+    this.isAbort = false
+    const { type } = this.associationOption
+    const option = this.associationOption[type]
+    const trainData: AssociationTrainCommand = {
+      algo: type,
+      minSupport: option.support,
+      minConfidence: option.confidence,
+      minLift: option.lift,
+      maxLength: option.length,
+      command: 'correlation.train',
+      csvLocation: [this.originalIndex],
+      featureLabel: [this.target, ...this.dataHeader],
+      targetLabel: [this.target],
+      projectId: this.id,
+      problemType: this.problemType
+    }
+
+    const updateData = Object.assign({
+      train2Finished: false,
+      train2ing: true,
+      train2Error: false,
+      selectId: '',
+      settings: this.settings,
+      settingId: this.settingId
+    }, this.nextSubStep(2, 3))
+    this.models = []
+    // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
+    socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
+      const { status, message } = returnValue
+      if (status !== 200) {
+        antdMessage.error(message)
+      }
+    })
+  }
+
   newSetting = () => {
     const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms, informativesLabel } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
@@ -2089,9 +2238,10 @@ class Project {
     if (this.preImportanceLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
       const readyLabels = this.preImportance ? Object.keys(this.preImportance) : []
-      const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
-      const feature_label = [...data_label, ...new_label]
+      const all_label = [...this.dataHeader, ...this.newVariable]
+      // const data_label = this.dataHeader.filter(v => !readyLabels.includes(v) && v !== this.target)
+      // const new_label = this.newVariable.filter(v => !readyLabels.includes(v) && v !== this.target)
+      const feature_label = all_label.filter(v => !readyLabels.includes(v) && v !== this.target)
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
       let cmd = 'clfreg.preTrainImportance'
@@ -2109,7 +2259,7 @@ class Project {
       const command = {
         projectId: this.id,
         command: cmd,
-        feature_label
+        feature_label: all_label
       };
       // if (new_label.length) {
       //   const variables = [...new Set(new_label.map(label => label.split("_")[1]))]
@@ -2439,20 +2589,39 @@ class Project {
     // cannot use replace with js code ($$typeof wrong)
     html = html + `<${script}>window.r2Report=${jsonData}</${script}>${jsChunkTag}${jsTag}${cssChunkTag}${cssTag}</${body}>`
     return html
-  }
+  };
 
-  histogram(field: string) {
-    const { colType, dataViews, etlIndex } = this;
+  // async getPlots(Plots,field:string){
+  //   const result = this[Plots][field];
+  //   console.log(111,result)
+  //
+  //   if(!result){
+  //       return await this.getPlots(Plots,field);
+  //   }
+  //   return result;
+  // }
+
+  async histogram(field: string) {
+    const { colType, dataViews, etlIndex, histgramPlot, newType, histgramPlots } = this;
     const value: Stats = Reflect.get(dataViews, field);
+    let data;
+    const type = colType[field] || newType[field];
+
     if (!value) {
-      return {}
+      histgramPlot(field);
+      // const url = await this.getPlots('histgramPlots',field);
+      const url = histgramPlots[field];
+      // console.log(22,url)
+
+      data = {
+        url
+      }
     }
-    if (colType[field] === 'Numerical') {
-      const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
-      const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
-      return {
-        "name": "histogram-numerical",
-        "data": {
+    if (type === 'Numerical') {
+      if (!data) {
+        const { max, min, std_deviation_bounds: { lower, upper } } = dataViews[field];
+        const interval = (Math.max(upper, max) - Math.min(lower, min)) / 100;
+        data = {
           field,
           id: etlIndex,
           interval,
@@ -2460,32 +2629,50 @@ class Project {
           min,
         }
       }
-    } else {
-      const { uniqueValues } = dataViews[field];
+
       return {
-        "name": "histogram-categorical",
-        "data": {
+        "name": "histogram-numerical",
+        data,
+      }
+    } else {
+      if (!data) {
+        const { uniqueValues: size } = dataViews[field];
+        data = {
           field,
           id: etlIndex,
-          size: uniqueValues > 8 ? 8 : uniqueValues,
+          size,
         }
+      }
+      return {
+        "name": "histogram-categorical",
+        data,
       }
     }
   }
 
-  univariant(value: string) {
-    const { target, problemType, etlIndex, colType, dataViews } = this;
-    const type = colType[value];
-    const dataUn: Stats = Reflect.get(dataViews, value)
+  async univariant(value: string) {
+    const { target, problemType, etlIndex, colType, dataViews, univariatePlot, univariatePlots, newType } = this;
+    const type = colType[value] || newType[value];
+    const dataUn: Stats = Reflect.get(dataViews, value);
+
+    let data;
+
     if (!dataUn) {
-      return {}
+      univariatePlot(value);
+      // const url = await this.getPlots('univariatePlots',value);
+      const url = univariatePlots[value];
+      // console.log(11,url)
+
+      data = {
+        url
+      }
     }
 
     if (problemType === "Regression") {
       if (type === 'Numerical') {//散点图
         return {
           name: 'regression-numerical',
-          data: {
+          data: data || {
             y: target,
             x: value,
             id: etlIndex,
@@ -2494,7 +2681,7 @@ class Project {
       } else {//回归-分类 箱线图
         return {
           name: 'regression-categorical',
-          data: {
+          data: data || {
             target,
             value,
             id: etlIndex,
@@ -2502,13 +2689,16 @@ class Project {
         };
       }
     } else {//Univariant
-      const { min, max } = dataUn;
-      const data = {
-        target,
-        value,
-        id: etlIndex,
-        interval: Math.floor((max - min) / 20) || 1,
-      };
+      if (!data) {
+        const { min, max } = dataUn;
+        data = {
+          target,
+          value,
+          id: etlIndex,
+          interval: Math.floor((max - min) / 20) || 1,
+        };
+      }
+
 
       if (type === 'Numerical') {
         return {
@@ -2525,13 +2715,13 @@ class Project {
   }
 
   //在这里获取所以直方图折线图数据
-  allVariableList = (model: any) => {
+  allVariableList = async (model: any) => {
     const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader, informativesLabel } = this;
 
-    console.log(informativesLabel, 'informativesLabel')
+    console.log(informativesLabel, 'informativesLabel');
 
     const list = [];
-    list.push(this.histogram(target));
+    list.push(await this.histogram(target));
 
     const fields = Object.entries(toJS(colType))
       .filter(itm => itm[1] === 'Numerical')
@@ -2554,8 +2744,8 @@ class Project {
     });
 
     for (let itm of allVariables) {
-      list.push(this.histogram(itm));
-      list.push(this.univariant(itm));
+      list.push(await this.histogram(itm));
+      list.push(await this.univariant(itm));
     }
 
     const { validatePlotData, holdoutPlotData } = model;
@@ -2597,7 +2787,7 @@ class Project {
 
   // 点击导出的按钮
   generateReport = async (modelId: string, aaa?: Object) => {
-    console.log(aaa)
+    // console.log(aaa)
     // aaa.routing.history.push('/report')
     console.log(this, 'ttttttttttttttttttttttt')
 
