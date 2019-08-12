@@ -45,7 +45,7 @@ const Association = (props: AssociationProps) => {
     project.associationOption = state;
     project.associationModeling()
   };
-  const minAp = Math.ceil(2 / rawDataView[target].uniqueValues * 1000) / 1000
+  const minAp = 2 / rawDataView[target].uniqueValues
   return <div className={styles.association}>
     <div className={styles.options}>
       <div className={styles.tabs}>
