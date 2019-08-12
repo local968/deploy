@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: data api
+  description: deploy2 data api
+
+servers:
+  - url: http://localhost:8080/data
+    description: local test server
+
+paths:
+  /{projectId}/clean:
+    get:
+      summary: get clean data
+      parameters:
+        - in: path
+          name: projectId
+          schema:
+            type: integer
+          required: true
+          description: 项目ID
+          example: 1
+        - in: query
+          name: size
+          schema:
+            type: integer
+          example: 5000
+          description: 单次返回数据量大小
+        - in: query
+          name: scroll
+          schema:
+            type: integer
+          example: 1
+          description: 请求状态保留时间(单位:分钟)
+        - in: query
+          name: token
+          schema:
+            type: string
+          example: 12345
+          description: 请求token, 用于获取请求状态的唯一标识
+      responses:
+        200:
+          description: successful response
+          headers:
+            token:
+              schema:
+                type: string
+              description: 此次请求的状态token, 如果请求时未指定token, 该token会自动生成, 下次请求必须用该token 以保持请求状态
+            scroll_id:
+              schema:
+                type: string
+              description: 由请求传入的token所获取到的scroll_id, 如果不存在该
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema: {}
+
