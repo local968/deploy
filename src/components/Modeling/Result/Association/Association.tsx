@@ -52,9 +52,7 @@ const Association = (props: AssociationProps) => {
     setVisible(!visible)
   }
 
-  if (loading) return <ProcessLoading
-    style={{ position: 'fixed' }}
-  />
+  if (loading) return <ProcessLoading />
 
   const texts = state.correlation[config.isEN ? 0 : 1]
   const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName;

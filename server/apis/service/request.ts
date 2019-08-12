@@ -1,6 +1,5 @@
 import request from 'superagent'
 import config from '../../../config'
-const {STRAPI_TOKEN} = config;
 
 const get = (url,query={})=>{
   return new Promise((resolve,reject)=>{
@@ -47,7 +46,7 @@ const put = (params)=>{
   } = params;
 
   return new Promise((resolve,reject)=>{
-    let req = request.put(url).send(data)
+    request.put(url).send(data)
       .set('Content-Type', 'application/json; charset=utf-8')
       .redirects(0)
       .end(function(err, res){
@@ -63,11 +62,7 @@ const put = (params)=>{
 
 const _delete = (url)=>{
   return new Promise((resolve,reject)=>{
-    let req = request.del(url);
-    if(STRAPI_TOKEN){
-      req = req.set('Authorization', `Bearer ${STRAPI_TOKEN}`)
-    }
-    req.redirects(0)
+    request.del(url).redirects(0)
       .end(function(err, res){
         if (err || !res.ok) {
           reject(err)

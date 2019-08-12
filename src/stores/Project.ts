@@ -145,8 +145,8 @@ export interface AssociationOption {
 }
 
 export interface AssociationView {
-  target: { key: string, value: number }[]
-  feature: { key: string, value: number }[]
+  target: { range: [number, number], list: { key: string, value: number }[] }
+  feature: { range: [number, number], list: { key: string, value: number }[] }
 }
 
 export interface AssociationTrainCommand {
@@ -364,8 +364,8 @@ class Project {
   }
 
   @observable associationView: AssociationView = {
-    target: [],
-    feature: []
+    target: { range: [1, 1], list: [] },
+    feature: { range: [1, 1], list: [] },
   }
 
   constructor(id: string, args: Object) {

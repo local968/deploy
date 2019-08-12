@@ -265,3 +265,19 @@ export interface GenerateNextScheduleTimeOptions {
   time?;
   repeatPeriod?;
 }
+
+export interface AssociationOption {
+  type: 'apriori' | 'fptree',
+  fptree: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+  apriori: {
+    support: number,
+    confidence: number,
+    lift: number,
+    length: number
+  },
+}
