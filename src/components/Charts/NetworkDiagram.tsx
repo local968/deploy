@@ -51,7 +51,7 @@ export default function NetworkDiagram(props:Interface) {
 				type: 'graph',
 				layout: 'circular',
 				symbolSize: 22,
-				roam: 'move',
+				roam: false,
 				focusNodeAdjacency:true,
 				label: {
 					normal: {
