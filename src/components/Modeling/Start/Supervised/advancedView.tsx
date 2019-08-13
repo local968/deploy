@@ -246,7 +246,8 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
       // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
       [{ value: "auc", label: 'AUC' }, { value: "log_loss", label: 'LogLoss' }] : problemType === 'Regression' ?
         [{ value: "r2", label: <div>R<sup>2</sup></div> }, { value: "mse", label: 'MSE' }, { value: "rmse", label: 'RMSE' }] :
-        [{ value: "log_loss", label: 'LogLoss' }]
+        [{ value: "macro_auc", label: 'Macro AUC' }, { value: "macro_f1", label: 'Macro F1' }, { value: "micro_f1", label: 'Micro F1' }, { value: "macro_recall", label: 'Macro Recall' }, { value: "micro_recall", label: 'Micro Recall' }, { value: "macro_precision", label: 'Macro Precision' }, { value: "micro_precision", label: 'Micro Precision' }]
+
     const customFieldList = dataHeader.filter(v => colType[v] === "Numerical")
     // const algorithmList = problemType === "Classification" ? ClassificationAlgorithms : RegressionAlgorithms
     let featureList = []

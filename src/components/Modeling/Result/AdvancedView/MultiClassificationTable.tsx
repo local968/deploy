@@ -25,64 +25,91 @@ const Headers: TableHeader[] = [
     sort: true,
   },
   {
-    label: 'Normalized RMSE',
-    value: 'nrmse',
+    label: 'Accuracy',
+    value: 'acc',
     sort: true,
     hint: EN.RootMeanSquareErrorRMSEmeasures
   },
   {
-    label: 'RMSE',
-    value: 'rmse',
+    label: 'macro-P',
+    value: 'macro-P',
     sort: true,
     hint: EN.RootMeanSquareErrorprediction
   },
   {
-    label: 'MSLE',
-    value: 'msle',
+    label: 'macro-R',
+    value: 'macro-R',
     sort: true,
   },
   {
-    label: 'RMSLE',
-    value: 'rmsle',
+    label: 'macro-F1',
+    value: 'macro-F1',
     sort: true,
     hint: EN.RMSLEissimilarwithRMSE
   },
+  // {
+  //   label: 'AP',
+  //   value: 'AP',
+  //   sort: true,
+  //   hint: EN.MeanSquaredErro
+  // },
+  // {
+  //   label: 'mAP',
+  //   value: 'mAP',
+  //   sort: true,
+  //   hint: EN.MeanAbsoluteError
+  // },
   {
-    label: 'MSE',
-    value: 'mse',
-    sort: true,
-    hint: EN.MeanSquaredErro
-  },
-  {
-    label: 'MAE',
-    value: 'mae',
-    sort: true,
-    hint: EN.MeanAbsoluteError
-  },
-  {
-    label: 'R²',
-    value: 'r2',
+    label: 'Kappa',
+    value: 'Kappa',
     sort: true,
     hint: EN.R2isastatisticalmeasure
   },
+  // {
+  //   label: 'AUC',
+  //   value: 'AUC',
+  //   sort: true,
+  //   hint: EN.TheadjustedR2tells
+  // },
+  // {
+  //   label: 'AUCPR',
+  //   value: 'AUCPR',
+  //   sort: true,
+  //   hint: EN.TheadjustedR2tells
+  // },
   {
-    label: 'Adjust R²',
-    value: 'adjustR2',
+    label: 'MacroAUC',
+    value: 'MacroAUC',
     sort: true,
     hint: EN.TheadjustedR2tells
-  }
+  },
+  // {
+  //   label: 'F-measure',
+  //   value: 'F-measure',
+  //   sort: true,
+  //   hint: EN.TheadjustedR2tells
+  // },
+  // {
+  //   label: 'Gini',
+  //   value: 'Gini',
+  //   sort: true,
+  //   hint: EN.TheadjustedR2tells
+  // },
+  {
+    label: 'HammingLoss',
+    value: 'HammingLoss',
+    sort: true,
+    hint: EN.TheadjustedR2tells
+  },
+  // {
+  //   label: 'ZeroOneLoss',
+  //   value: 'ZeroOneLoss',
+  //   sort: true,
+  //   hint: EN.TheadjustedR2tells
+  // }
 ]
 
-const MetricOptions = [{
-  display: 'MSE',
-  key: 'mse'
-}, {
-  display: 'RMSE',
-  key: 'rmse'
-}, {
-  display: <div>R<sup>2</sup></div>,
-  key: 'r2'
-}]
+const MetricOptions = [{ key: "macro_auc", display: 'Macro AUC' }, { key: "macro_f1", display: 'Macro F1' }, { key: "micro_f1", display: 'Micro F1' }, { key: "macro_recall", display: 'Macro Recall' }, { key: "micro_recall", display: 'Micro Recall' }, { key: "macro_precision", display: 'Macro Precision' }, { key: "micro_precision", display: 'Micro Precision' }]
 
 interface MultiClassificationTableProps {
   project: Project,
@@ -117,64 +144,102 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
 
   const sortMethods = (aModel, bModel) => {
     switch (sort.key) {
-      case 'nrmse':
+      case 'macrop':
         {
-          const aModelData = isHoldout ? aModel.score.holdoutScore.nrmse : aModel.score.validateScore.nrmse
-          const bModelData = isHoldout ? bModel.score.holdoutScore.nrmse : bModel.score.validateScore.nrmse
+          const aModelData = isHoldout ? aModel.score.holdoutScore.macro_P : aModel.score.validateScore.macro_P
+          const bModelData = isHoldout ? bModel.score.holdoutScore.macro_P : bModel.score.validateScore.macro_P
           return (aModelData - bModelData) * sort.value
         }
-      case 'rmse':
+      case 'macror':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmse) : (aModel.score.validateScore.rmse)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmse) : (bModel.score.validateScore.rmse)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.macro_R) : (aModel.score.validateScore.macro_R)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.macro_R) : (bModel.score.validateScore.macro_R)
           return (aModelData - bModelData) * sort.value
         }
-      case 'msle':
+      case 'macrof1':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.msle) : (aModel.score.validateScore.msle)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.msle) : (bModel.score.validateScore.msle)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.macro_F1) : (aModel.score.validateScore.macro_F1)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.macro_F1) : (bModel.score.validateScore.macro_F1)
           return (aModelData - bModelData) * sort.value
         }
-      case 'rmsle':
+      case 'acc':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.rmsle) : (aModel.score.validateScore.rmsle)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.rmsle) : (bModel.score.validateScore.rmsle)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.Accuracy) : (aModel.score.validateScore.Accuracy)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.Accuracy) : (bModel.score.validateScore.Accuracy)
           return (aModelData - bModelData) * sort.value
         }
-      case 'mse':
+      case 'ap':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.mse) : (aModel.score.validateScore.mse)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.mse) : (bModel.score.validateScore.mse)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.AP) : (aModel.score.validateScore.AP)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.AP) : (bModel.score.validateScore.AP)
           return (aModelData - bModelData) * sort.value
         }
-      case 'mae':
+      case 'map':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.mae) : (aModel.score.validateScore.mae)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.mae) : (bModel.score.validateScore.mae)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.mAP) : (aModel.score.validateScore.mAP)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.mAP) : (bModel.score.validateScore.mAP)
           return (aModelData - bModelData) * sort.value
         }
-      case 'r2':
+      case 'kappa':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.r2) : (aModel.score.validateScore.r2)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.r2) : (bModel.score.validateScore.r2)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.Kappa) : (aModel.score.validateScore.Kappa)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.Kappa) : (bModel.score.validateScore.Kappa)
           return (aModelData - bModelData) * sort.value
         }
-      case 'adjustR2':
+      case 'auc':
         {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.adjustR2) : (aModel.score.validateScore.adjustR2)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.adjustR2) : (bModel.score.validateScore.adjustR2)
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.auc) : (aModel.score.validateScore.auc)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.auc) : (bModel.score.validateScore.auc)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'aucpr':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.aucpr) : (aModel.score.validateScore.aucpr)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.aucpr) : (bModel.score.validateScore.aucpr)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'macroauc':
+        {
+          const aModelData = isHoldout ? (aModel.holdoutChartData.roc_auc.macro) : (aModel.chartData.roc_auc.macro)
+          const bModelData = isHoldout ? (bModel.holdoutChartData.roc_auc.macro) : (bModel.chartData.roc_auc.macro)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'fmeasure':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.fmeasure) : (aModel.score.validateScore.fmeasure)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.fmeasure) : (bModel.score.validateScore.fmeasure)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'gini':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.gini) : (aModel.score.validateScore.gini)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.gini) : (bModel.score.validateScore.gini)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'hammingLoss':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.HammingLoss) : (aModel.score.validateScore.HammingLoss)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.HammingLoss) : (bModel.score.validateScore.HammingLoss)
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'zeroOneLoss':
+        {
+          const aModelData = isHoldout ? (aModel.score.holdoutScore.ZeroOneLoss) : (aModel.score.validateScore.ZeroOneLoss)
+          const bModelData = isHoldout ? (bModel.score.holdoutScore.ZeroOneLoss) : (bModel.score.validateScore.ZeroOneLoss)
           return (aModelData - bModelData) * sort.value
         }
       case 'validation':
         {
-          const aModelData = (aModel.score.validateScore[metric || 'r2'])
-          const bModelData = (bModel.score.validateScore[metric || 'r2'])
+          const [t, p] = metric.split("_")
+          const aModelData = metric === 'macro_auc' ? aModel.chartData.roc_auc.macro : p === 'f1' ? aModel.score.validateScore[`${t}_F1`] : aModel.score.validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          const bModelData = metric === 'macro_auc' ? bModel.chartData.roc_auc.macro : p === 'f1' ? bModel.score.validateScore[`${t}_F1`] : bModel.score.validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
           return (aModelData - bModelData) * sort.value
         }
       case 'holdout':
         {
-          const aModelData = (aModel.score.holdoutScore[metric || 'r2'])
-          const bModelData = (bModel.score.holdoutScore[metric || 'r2'])
+          const [t, p] = metric.split("_")
+          const aModelData = metric === 'macro_auc' ? aModel.holdoutChartData.roc_auc.macro : p === 'f1' ? aModel.score.holdoutScore[`${t}_F1`] : aModel.score.holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          const bModelData = metric === 'macro_auc' ? bModel.holdoutChartData.roc_auc.macro : p === 'f1' ? bModel.score.holdoutScore[`${t}_F1`] : bModel.score.holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
           return (aModelData - bModelData) * sort.value
         }
       case 'time':
@@ -263,10 +328,14 @@ interface MultiClassificationTableRowProps {
 const MultiClassificationTableRow = observer((props: MultiClassificationTableRowProps) => {
   const { model, project, metric, detail, handleDetail } = props
   const { isHoldout, mapHeader, newVariable, selectModel, recommendModel } = project
-  const { score } = model
+  const { score, holdoutChartData, chartData } = model
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
+  const [t, p] = metric.split("_")
+  const validate = metric === 'macro_auc' ? chartData.roc_auc.macro : p === 'f1' ? score.validateScore[`${t}_F1`] : score.validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+  const holdout = metric === 'macro_auc' ? holdoutChartData.roc_auc.macro : p === 'f1' ? score.holdoutScore[`${t}_F1`] : score.holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
 
   const modelScore = isHoldout ? score.holdoutScore : score.validateScore
+  const modelChartData = isHoldout ? holdoutChartData : chartData
   const isRecommend = recommendModel.id === model.id
   const handleResult = (id) => () => {
     handleDetail(id)
@@ -295,17 +364,17 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
           <span className={styles.icon}><Icon type='down' style={detail ? { transform: 'rotateZ(180deg)' } : {}} /></span>
         </div>
         <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.nrmse.toString())}>{formatNumber(modelScore.nrmse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.rmse.toString())}>{formatNumber(modelScore.rmse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.msle.toString())}>{formatNumber(modelScore.msle.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.rmsle.toString())}>{formatNumber(modelScore.rmsle.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.mse.toString())}>{formatNumber(modelScore.mse.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.mae.toString())}>{formatNumber(modelScore.mae.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.r2.toString())}>{formatNumber(modelScore.r2.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.adjustR2.toString())}>{formatNumber(modelScore.adjustR2.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Accuracy.toString())}>{formatNumber(modelScore.Accuracy.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_P.toString())}>{formatNumber(modelScore.macro_P.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_R.toString())}>{formatNumber(modelScore.macro_R.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_F1.toString())}>{formatNumber(modelScore.macro_F1.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Kappa.toString())}>{formatNumber(modelScore.Kappa.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelChartData.roc_auc.macro.toString())}>{formatNumber(modelChartData.roc_auc.macro.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.HammingLoss.toString())}>{formatNumber(modelScore.HammingLoss.toString())}</span></div>
+        {/* <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.adjustR2.toString())}>{formatNumber(modelScore.adjustR2.toString())}</span></div> */}
         <div className={styles.scoreCell}>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber(model.score.validateScore[metric].toString())}>{formatNumber(model.score.validateScore[metric].toString())}</span></div>
-          <div className={styles.cell}><span className={styles.text} title={formatNumber(model.score.holdoutScore[metric].toString())}>{formatNumber(model.score.holdoutScore[metric].toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(validate.toString())}>{formatNumber(validate.toString())}</span></div>
+          <div className={styles.cell}><span className={styles.text} title={formatNumber(holdout.toString())}>{formatNumber(holdout.toString())}</span></div>
         </div>
       </div>
     </Tooltip>

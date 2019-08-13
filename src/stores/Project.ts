@@ -592,7 +592,7 @@ class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'log_loss' || ''
+    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
 
     return {
       train2Finished: false,
@@ -891,7 +891,7 @@ class Project {
       problemType: this.changeProjectType,
       targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || 0
     };
-    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'log_loss' || ''
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl(false)
       if (this.originalIndex) await this.deleteIndex(this.originalIndex)
