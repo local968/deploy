@@ -140,6 +140,7 @@ class ScheduleOperation extends Component {
       </span>
       <span className={styles.deploymentStyle}>
         {EN.Predictwith}{' '}{EN.DataSource}
+        <br /><span title={s.schedule.file}>{s.schedule.file}</span>
         {/* {s.deployment.deploymentOptions.option === 'data'
     ? EN.DataSource
     : EN.APISource} */}

@@ -9,6 +9,7 @@ export interface Schedule {
   type: string;
   estimatedTime: number;
   ends?: number | string | unknown;
+  file: string;
   threshold?: unknown | null;
   prevSchedule?: unknown | null;
   status: string;

@@ -345,6 +345,7 @@ export default class Deployment extends Component<Interface> {
           projectId={cd.projectId}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;
+            cddo['file'] = options.sqlTable
             cddo['source'] = 'database';
             cddo['sourceOptions'] = options;
             cd.save();

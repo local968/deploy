@@ -27,6 +27,7 @@ async function scheduleHandler() {
       schedule.mapHeader = deployment[`${schedule.type}Options`].mapHeader
       await api.upsertSchedule(schedule)
     }
+    schedule.file = deployment[`${schedule.type}Options`].file
     // database download in checkUserFileRestriction
     let restrictQuery;
     try {

@@ -247,6 +247,7 @@ class SchedulePerformance extends Component<SchedulePerformanceProps> {
 
         <span className={styles.deploymentStyle}>
           {EN.Predictwith} {EN.DataSource}
+          <br /><span title={s.schedule.file}>{s.schedule.file}</span>
           {/* {s.deployment.performanceOptions.source === 'file' || s.deployment.performanceOptions.source === 'database'
             ? EN.DataSource
             : EN.APISource} */}

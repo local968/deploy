@@ -311,6 +311,7 @@ export default class Performance extends Component {
           title={EN.ValidationDataSource + " - " + EN.Database}
           onSubmit={action(options => {
             // options.csvLocation = options.result.result.csvLocation;
+            cddo['file'] = options.sqlTable
             cdpo['source'] = 'database';
             cdpo['sourceOptions'] = options;
             cd.save();
