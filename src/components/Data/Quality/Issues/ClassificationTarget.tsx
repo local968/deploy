@@ -107,17 +107,17 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
       targetUnique
     } = project
     const targetUniques = targetUnique || NaN
-    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length === 1;
+    const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length < targetUniques;
     const isMore = Object.keys(targetCounts).length > targetUniques;
     const isNa = isNaN(targetUniques)
     const isGood = targetArrayTemp.length || (isNaN(targetUniques) ? !Object.keys(targetCounts).includes('') : (!isLess && !isMore));
     const hasNull = !isGood && Object.keys(targetCounts).includes('');
-    const error = isLess && !hasNull;
+    const error = (Object.keys(targetCounts).filter(_k => _k !== '').length + (hasNull ? 1 : 0)) < targetUniques;
     const nullPercent = ((targetCounts[''] || 0) / (totalRawLines || 1)) * 85;
     const text =
       (isGood && EN.Targetvariablequalityisgood) || (isNa ? EN.Thetargetvariablehassomenoise :
         `${EN.YourtargetvariableHas}${
-        error ? EN.onlyOnevalue : EN.Thantwouniquealues
+        error ? `${EN.Less}${targetUniques}${EN.ge}`/**onlyOnevalue */ : `${EN.More}${targetUniques}${EN.ge}`//Thantwouniquealues
         }`);
     return (
       <div className={styles.block}>

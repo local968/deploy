@@ -1398,7 +1398,13 @@ const EN_LAN = {
   AssociatePlots: 'Plots',
   AssociateReModel: 'Remodel',
   AssociateScatterPlot: 'Scatter plot',
-  AssociateNetworkDiagram: 'Network Diagram'
+  AssociateNetworkDiagram: 'Network Diagram',
+  MultiClassification: 'Multiclass Classification',
+  MultiClassificationHint: 'The problem of classifying instances into one of three or more classes.',
+  MultiUnique: '分类数量',
+  MultiUniqueHint1: '最少支持3类，最多支持',
+  MultiUniqueHint2: '类，请输入3-',
+  MultiUniqueHint3: '之间的数字',
 };
 
 

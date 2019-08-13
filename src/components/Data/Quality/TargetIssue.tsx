@@ -134,11 +134,11 @@ class TargetIssue extends Component<TargetIssueProps> {
     if (!isNum) {
       const curUnique = targetArrayTemp.length || Object.keys(targetCounts).filter(k => k !== '').length
       const hasNull = !targetArrayTemp.length ? !!nullCount : false;
-      const isNa = isNaN(targetUniques)
+      // const isNa = isNaN(targetUniques)
       if (hasNull)
-        warnings.push(isNa ? EN.Thetargetvariablehassomenoise : `${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`);
+        warnings.push(EN.Thetargetvariablehassomenoise);//isNa ? EN.Thetargetvariablehassomenoise : `${EN.YourtargetvariableHas}${EN.Thantwouniquealues}`
       if (curUnique < targetUniques && !hasNull)
-        warnings.push(targetUniques === 2 ? `${EN.YourtargetvariableHas}${EN.onlyOnevalue}` : `error`);
+        warnings.push(`${EN.YourtargetvariableHas}${EN.Less}${targetUniques}${EN.ge}`);
       if (curUnique === targetUniques && !hasNull) {
         const min = Math.min(...Object.values(targetCounts));
         if (min < 3) warnings.push(EN.Itisrecommendedthatyou);
@@ -148,13 +148,13 @@ class TargetIssue extends Component<TargetIssueProps> {
       warnings.push(EN.Yourtargetvariableisempty);
     const updateCondition = (column, type) => () => {
       ['missing', 'mismatch', 'outlier'].forEach(t => {
-        if(t === type) return
+        if (t === type) return
         const index = this[t].indexOf(column)
-        if(index !== -1) this[t].splice(index, 1)
+        if (index !== -1) this[t].splice(index, 1)
       })
       const index = this[type].indexOf(column)
-      if ( index !== -1 ) this[type].splice(index,1)
-      if( index === -1 ) this[type].push(column)
+      if (index !== -1) this[type].splice(index, 1)
+      if (index === -1) this[type].push(column)
       reloadData(0, 500, this.missing, this.mismatch, this.outlier)
     }
     const cannotContinue =
@@ -206,7 +206,8 @@ class TargetIssue extends Component<TargetIssueProps> {
                     <div className={styles.point} />
                     {!isNum ? (
                       <span>
-                        {EN.Yourtargetvariablehasmorethantwouniquevalues}
+                        {/* {EN.Yourtargetvariablehasmorethantwouniquevalues} */}
+                        {EN.Thetargetvariablehassomenoise}
                       </span>
                     ) : (
                         <span>
@@ -297,7 +298,7 @@ class TargetIssue extends Component<TargetIssueProps> {
                   >
                     <div className={styles.issueBackground}>
                       <div className={styles.mismatch}></div>
-                      <div className={classnames({[styles.issueActive]: this.mismatch.indexOf(target) !== -1 })}></div>
+                      <div className={classnames({ [styles.issueActive]: this.mismatch.indexOf(target) !== -1 })}></div>
                     </div>
                     <span>{targetPercent.mismatch}%</span>
                   </div>
@@ -307,11 +308,11 @@ class TargetIssue extends Component<TargetIssueProps> {
                     className={styles.errorBlock}
                     onClick={updateCondition(target, 'missing')}
                   >
-                   <div className={styles.issueBackground}>
-                     <div className={styles.missing}></div>
-                     <div className={classnames({[styles.issueActive]: this.missing.indexOf(target) !== -1 })}></div>
-                   </div>
-                   <span>{targetPercent.missing}%</span>
+                    <div className={styles.issueBackground}>
+                      <div className={styles.missing}></div>
+                      <div className={classnames({ [styles.issueActive]: this.missing.indexOf(target) !== -1 })}></div>
+                    </div>
+                    <span>{targetPercent.missing}%</span>
                   </div>
                 )}
                 {!!targetPercent.outlier && (
@@ -319,11 +320,11 @@ class TargetIssue extends Component<TargetIssueProps> {
                     className={styles.errorBlock}
                     onClick={updateCondition(target, 'outlier')}
                   >
-                   <div className={styles.issueBackground}>
-                     <div className={styles.outlier}></div>
-                     <div className={classnames({[styles.issueActive]: this.outlier.indexOf(target) !== -1 })}></div>
-                   </div>
-                   <span>{targetPercent.outlier}%</span>
+                    <div className={styles.issueBackground}>
+                      <div className={styles.outlier}></div>
+                      <div className={classnames({ [styles.issueActive]: this.outlier.indexOf(target) !== -1 })}></div>
+                    </div>
+                    <span>{targetPercent.outlier}%</span>
                   </div>
                 )}
               </div>

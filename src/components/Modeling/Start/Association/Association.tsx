@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import styles from './Association.module.css'
 import classnames from 'classnames'
 import EN from '../../../../constant/en'
@@ -6,6 +6,7 @@ import { Hint, NumberInput } from 'components/Common';
 import Project from 'stores/Project';
 import { HistogramCategorical } from '../../../Charts';
 import { formatNumber } from '../../../../util'
+import request from 'components/Request';
 
 interface AssociationProps {
   project: Project
@@ -13,11 +14,27 @@ interface AssociationProps {
 
 const Association = (props: AssociationProps) => {
   const { project } = props;
-  const { associationOption, associationView, target, rawDataView, totalRawLines } = project;
+  const { associationOption, associationView, target, rawDataView } = project;
 
-  // const [tab, setTab] = useState(type)
+  const [chartData, upChartData] = useState([]);
   const [state, setState] = useState(associationOption);
-  const { type } = state
+
+  useEffect(()=>{
+      request.post({
+        url:'/graphics/new',
+        data:{
+          url:associationView.plot,
+        }
+      }).then((data:any)=>{
+        upChartData(data.keys.map((name,index)=>{
+          return {
+            name,
+            value:data.values[index],
+          }
+        }))
+      })
+  },[]);
+  const { type } = state;
   const list = [
     'support',
     'confidence',
@@ -28,7 +45,7 @@ const Association = (props: AssociationProps) => {
   const changeTab = value => () => {
     if (type === value) return
     setState({ ...state, type: value })
-  }
+  };
 
   const handleChange = key => num => {
     const data = {
@@ -45,7 +62,7 @@ const Association = (props: AssociationProps) => {
     project.associationOption = state;
     project.associationModeling()
   };
-  const minAp = 2 / rawDataView[target].uniqueValues
+  const minAp = 2 / rawDataView[target].uniqueValues;
   return <div className={styles.association}>
     <div className={styles.options}>
       <div className={styles.tabs}>
@@ -80,22 +97,17 @@ const Association = (props: AssociationProps) => {
       </div>
     </div>
     <div className={styles.views}>
-      {/*<div className={styles.title}>*/}
-      {/*  <span>{EN.AssociationViewTitle}</span>*/}
-      {/*</div>*/}
-      {/*<div className={styles.chart}/>*/}
-      <HistogramCategorical
+       <HistogramCategorical
         title={EN.AssociationViewTitle}
         x_name={EN.NumberofClusters}
-        data={associationView.feature.list}
-        xAxisName={associationView.feature.list.map((itm) => itm.key)}
+        data={chartData}
       />
       <div className={styles.summary}>
-        <div className={styles.summaryRow}><span>{EN.summaryRow1}:{formatNumber((totalRawLines / rawDataView[target].uniqueValues).toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow2}:{formatNumber(associationView.target.range[1].toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow3}:{formatNumber(associationView.target.range[0].toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow4}:{formatNumber(totalRawLines.toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow5}:{formatNumber(rawDataView[target].uniqueValues.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow1}:{formatNumber(associationView.view.average.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow2}:{formatNumber(associationView.view.max.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow3}:{formatNumber(associationView.view.min.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow4}:{formatNumber(associationView.view.total.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow5}:{formatNumber(associationView.view.users.toString())}</span></div>
       </div>
     </div>
   </div>
