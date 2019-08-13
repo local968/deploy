@@ -19,7 +19,7 @@ const Association = (props: AssociationProps) => {
     'correlation': null, 'graph': null, 'plot': null
   })
   const [loading, setLoading] = useState(true)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
   const [type, setType] = useState(1)
 
   const arr = ['correlation', 'graph', 'plot']
