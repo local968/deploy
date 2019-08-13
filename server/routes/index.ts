@@ -7,6 +7,7 @@ import redirectUpload from "./redirectUpload"
 import image from "./image"
 import api from './api';
 import project from './project';
+import data from './data'
 import './deployment';
 import './database';
 import './etl';
@@ -31,6 +32,7 @@ router.use('/redirect', redirect);
 router.use('/etls', redirectEs);
 router.use("/uploads", redirectUpload);
 router.use("/project", project);
+router.use('/data', data)
 router.get('/jupyterLabUrl', (req, res) =>
   res.send(process.env.JUPYTER_LAB || '/notebook/lab'),
 );
