@@ -555,8 +555,10 @@ async function getBaseEtl(id) {
     'dataHeader',
     'colType',
     'stats',
+    'targetUnique',
   ]);
-  const { etlIndex, target, problemType, dataHeader, colType, stats } = data;
+  const { etlIndex, target, problemType, dataHeader, colType, stats, targetUnique } = data;
+  const command = problemType === 'MultiClassification' ? 'multi.etl' : 'top.etlBase'
   const colMap = _.chain(stats)
     .entries()
     .filter(([, metric]: [string, Metric]) =>
@@ -574,6 +576,7 @@ async function getBaseEtl(id) {
       return prev;
     }, {})
     .value();
+  const classNames = !target ? [] : stats[target].type !== 'Categorical' ? [] : stats[target].categoricalMap.map(v => v.key)
   const etlData: {
     command: string,
     csvLocation: string[],
@@ -581,15 +584,19 @@ async function getBaseEtl(id) {
     featureLabel: string[],
     colType: { [key: string]: string },
     colMap: { [key: string]: Metric },
-    targetLabel: string[]
+    targetLabel: string[],
+    classificationType: number,
+    classNames: string[]
   } = {
-    command: 'top.etlBase',
+    command,
     csvLocation: [etlIndex],
     problemType,
     featureLabel: dataHeader,
     colType,
     colMap,
-    targetLabel: []
+    targetLabel: [],
+    classificationType: targetUnique,
+    classNames
   };
   if (target) etlData.targetLabel.push(target)
   return etlData
@@ -1678,69 +1685,50 @@ wss.register('deleteIndex', (message, socket) => {
   })
 })
 
-wss.register('getAssociationData', (message, socket) => {
-  const { index, feature, target, id } = message
+wss.register('getAssociationData', (message, socket, progress) => {
+  const { index, featureLabel, id, _id } = message
   const { userId } = socket.session;
-  if (!feature) {
-    return {
-      status: 500,
-      message: 'feature error'
+
+  return command({
+    command: 'correlation.dataView',
+    projectId: id,
+    userId,
+    featureLabel,
+    csvLocation: [index],
+    requestId: _id,
+    plotNum: 100
+  }, (processValue) => {
+    const { status } = processValue
+    if (status < 0 || status === 100) return processValue
+  }).then((result: any) => {
+    const { status, result: { dataView, parameter, plotData } } = result
+    if (status !== 100) return result
+    const associationView = {
+      view: {
+        average: dataView.average_length,
+        max: dataView.max_length,
+        min: dataView.min_length,
+        total: dataView.total_items,
+        users: dataView['total_transactions/users']
+      },
+      plot: plotData
     }
-  }
-  if (!target) {
-    return {
-      status: 500,
-      message: 'target error'
+    const associationOption = {
+      type: 'fptree',
+      fptree: {
+        support: parameter.support_threshold,
+        confidence: parameter.confidence_threshold,
+        lift: parameter.min_lift,
+        length: parameter.max_length
+      },
+      apriori: {
+        support: parameter.min_support,
+        confidence: parameter.min_confidence,
+        lift: parameter.min_lift,
+        length: parameter.max_length
+      },
     }
-  }
-  const targetAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
-    field: target
-  })
-
-  const featureAgg = axios.post(`${esServicePath}/etls/${index}/association`, {
-    field: feature
-  })
-
-  return Promise.all([targetAgg, featureAgg]).then(([targetResult, featureResult]) => {
-    if (targetResult.status !== 200 || featureResult.status !== 200) return {
-      status: 500,
-      message: 'data error'
-    }
-    const { data: targetList } = targetResult
-    const { data: featureList } = featureResult
-
-    return getProjectField(id, 'rawDataView').then(rawDataView => {
-      const { count, uniqueValues } = rawDataView[feature]
-      const { uniqueValues: targetUnique } = rawDataView[target]
-      const apSupport = count / uniqueValues / uniqueValues
-      const fpSupport = Math.floor(count / uniqueValues) + 1
-      const length = Math.max(Math.floor(Math.log10(targetUnique)), 1)
-      const minAP = 2 / targetUnique
-
-      const options: AssociationOption = {
-        type: 'fptree',
-        fptree: {
-          support: fpSupport,
-          confidence: 0.5,
-          lift: 3,
-          length
-        },
-        apriori: {
-          support: Math.max(apSupport, minAP),
-          confidence: 0.2,
-          lift: 3,
-          length
-        },
-      }
-
-      return createOrUpdate(id, userId, {
-        associationView: {
-          target: targetList,
-          feature: featureList
-        },
-        associationOption: options
-      })
-    })
+    return createOrUpdate(id, userId, { associationOption, associationView })
   })
 })
 

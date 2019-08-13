@@ -50,35 +50,35 @@ const AMQPLIB_FRAMEMAX = process.env.AMQPLIB_FRAMEMAX || "0";
 const AMQPLIB_HEARTBEAT = process.env.AMQPLIB_HEARTBEAT || "0";
 const AMQPLIB_VHOST = process.env.AMQPLIB_VHOST || "/";
 
-const QUEUE_RESULT = process.env.QUEUE_RESULT || "result.top.pipeline;result.top.ping;result.top.listCommand;result.top.histgramPlot;result.top.etlBase;result.top.dataView;result.top.createNewVariable;result.top.correlationMatrix;result.top.univariatePlot;result.outlier.train;result.outlier.preTrainImportance;result.outlier.ping;result.outlier.outlierPlot;result.outlier.listCommand;result.outlier.etl;result.outlier.deploy;result.outlier.applyWeights;result.clustering.train;result.clustering.ssPlot;result.clustering.preTrainImportance;result.clustering.ping;result.clustering.listCommand;result.clustering.etlOutlier;result.clustering.etl;result.clustering.doOutlier;result.clustering.deploy;result.clustering.applyWeights;result.clfreg.univariatePlot;result.clfreg.train;result.clfreg.preTrainImportance;result.clfreg.permutationImportance;result.clfreg.etl;result.clfreg.deploy;result.correlation.train";
-const BACK_API_SERVICE = process.env.BACK_API_SERVICE  || '//192.168.0.88:8081';
+const QUEUE_RESULT = process.env.QUEUE_RESULT || "result.top.pipeline;result.top.ping;result.top.listCommand;result.top.histgramPlot;result.top.etlBase;result.top.dataView;result.top.createNewVariable;result.top.correlationMatrix;result.top.univariatePlot;result.outlier.train;result.outlier.preTrainImportance;result.outlier.ping;result.outlier.outlierPlot;result.outlier.listCommand;result.outlier.etl;result.outlier.deploy;result.outlier.applyWeights;result.clustering.train;result.clustering.ssPlot;result.clustering.preTrainImportance;result.clustering.ping;result.clustering.listCommand;result.clustering.etlOutlier;result.clustering.etl;result.clustering.doOutlier;result.clustering.deploy;result.clustering.applyWeights;result.clfreg.univariatePlot;result.clfreg.train;result.clfreg.preTrainImportance;result.clfreg.permutationImportance;result.clfreg.etl;result.clfreg.deploy;result.correlation.train;result.multi.etl;result.multi.train;result.correlation.dataView";
+const BACK_API_SERVICE = process.env.BACK_API_SERVICE || '//192.168.0.88:8081';
 const IS_EN = process.env.IS_EN || false;
 const YOUR_AGE = process.env.YOUR_AGE || '部署行数已达到出当前权限最大限制。';
 const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前权限最大限制。';
-const YOUR_USAGE = process.env.YOUR_USAGE  || '您的并发项目数量已达到当前许可证的最大限制。。';
+const YOUR_USAGE = process.env.YOUR_USAGE || '您的并发项目数量已达到当前许可证的最大限制。。';
 const SPLIT_COMMAND = process.env.SPLIT_COMMAND || false;
 const STRAPI = process.env.STRAPI || '//192.168.0.23';
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN || '';
 const redis =
   REDIS_TYPE === "2"
     ? {
-        sentinels: REDIS_SENTINEL_HOSTS.split(",").map(host => ({
-          host: host.split(":")[0],
-          port: host.split(":")[1]
-        })),
-        name: REDIS_USERNAME,
-        password: REDIS_PASSWORD
-      }
+      sentinels: REDIS_SENTINEL_HOSTS.split(",").map(host => ({
+        host: host.split(":")[0],
+        port: host.split(":")[1]
+      })),
+      name: REDIS_USERNAME,
+      password: REDIS_PASSWORD
+    }
     : {
-        host: REDIS_HOST.split(":")[0],
-        port: REDIS_HOST.split(":")[1],
-        name: REDIS_USERNAME,
-        password: REDIS_PASSWORD
-      };
+      host: REDIS_HOST.split(":")[0],
+      port: REDIS_HOST.split(":")[1],
+      name: REDIS_USERNAME,
+      password: REDIS_PASSWORD
+    };
 
 const config = {
   host: HOST,
-  isEN:IS_EN,
+  isEN: IS_EN,
   port: BACKEND_PORT,
   redis,
   requestQueue: REQUEST_QUEUE,
@@ -99,9 +99,9 @@ const config = {
     }
   },
   supportMail: "support@r2.ai",
-  yourAge:YOUR_AGE,
-  yourModel:YOUR_MODEL,
-  yourUsage:YOUR_USAGE,
+  yourAge: YOUR_AGE,
+  yourModel: YOUR_MODEL,
+  yourUsage: YOUR_USAGE,
   services: {
     APP_LOGIN_BFF,
     AUTH_SERVICE,

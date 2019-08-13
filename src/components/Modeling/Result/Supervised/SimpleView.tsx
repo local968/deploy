@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { withRouter } from 'react-router'
 import ClassificationResult from './Classification/ClassificationResult';
 import RegressionResult from './Regression/RegressionResult';
+import MultiClassification from './MultiClassification'
 import Model from 'stores/Model';
 import Project from 'stores/Project';
 const Classification = 'Classification';
@@ -28,7 +29,9 @@ class SimpleView extends Component<SimpleViewProps> {
     const { problemType } = project;
     return problemType === Classification ?
       <ClassificationResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} /> :
-      <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} />
+      problemType === 'MultiClassification' ?
+        <MultiClassification models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} /> :
+        <RegressionResult models={models} project={project} exportReport={exportReport} sort={sort} handleSort={handleSort} />
   }
 }
 

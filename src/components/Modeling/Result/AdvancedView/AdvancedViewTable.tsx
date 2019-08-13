@@ -9,6 +9,7 @@ import { observer } from 'mobx-react';
 import ClassificationTable from './ClassificationTable'
 import RegressionTable from './RegressionTable'
 import ClusteringTable from './ClusteringTable'
+import MultiClassificationTable from './MultiClassificationTable'
 
 interface AdvancedViewTableProps {
   project: Project,
@@ -59,13 +60,15 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
         return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
       case "Clustering":
         return <ClusteringTable sort={sort} handleSort={handleSort} project={project} models={models} currentSettingId={currentSettingId} />
+      case "MultiClassification":
+        return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
       default:
         return null
     }
   }
 
   return <div className={styles.main}>
-    {(problemType === 'Classification' || problemType === 'Regression') && <div className={styles.option}>
+    {(problemType === 'Classification' || problemType === 'Regression' || problemType === 'MultiClassification') && <div className={styles.option}>
       {problemType === 'Classification' && <div className={styles.metricFbeta}>
         <span>{EN.FbetaValue}<Hint content={EN.FbetaValueHint} /></span>
         <InputNumber min={0.1} max={10} step={0.1} style={{ marginLeft: 10 }} onChange={handleBeta} value={fbeta} />

@@ -145,8 +145,14 @@ export interface AssociationOption {
 }
 
 export interface AssociationView {
-  target: { range: [number, number], list: { key: string, value: number }[] }
-  feature: { range: [number, number], list: { key: string, value: number }[] }
+  view: {
+    average: number
+    max: number
+    min: number
+    total: number
+    users: number
+  },
+  plot: string
 }
 
 export interface AssociationTrainCommand {
@@ -364,8 +370,14 @@ class Project {
   }
 
   @observable associationView: AssociationView = {
-    target: { range: [1, 1], list: [] },
-    feature: { range: [1, 1], list: [] },
+    view: {
+      average: 0,
+      max: 0,
+      min: 0,
+      total: 0,
+      users: 0,
+    },
+    plot: '',
   }
 
   constructor(id: string, args: Object) {
@@ -580,7 +592,7 @@ class Project {
 
   @computed
   get defaultTrain() {
-    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score'
+    const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'log_loss' || ''
 
     return {
       train2Finished: false,
@@ -879,7 +891,7 @@ class Project {
       problemType: this.changeProjectType,
       targetUnique: ((this.changeProjectType === 'Classification' || this.changeProjectType === 'Outlier') && 2) || 0
     };
-    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || ''
+    updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'log_loss' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
       await this.abortTrainByEtl(false)
       if (this.originalIndex) await this.deleteIndex(this.originalIndex)
@@ -1002,12 +1014,12 @@ class Project {
       if (!this.target) throw new Error("error target")
       if (this.dataHeader.length !== 1) throw new Error("error feature")
       const feature = this.dataHeader[0]
+      const featureLabel = [this.target, feature]
       const index = this.originalIndex
       return api.getAssociationData({
-        feature,
-        target: this.target,
+        featureLabel,
         index,
-        id: this.id
+        id: this.id,
       })
     })
   }
@@ -1043,8 +1055,8 @@ class Project {
     const isMulti = this.problemType === 'MultiClassification'
     if (isMulti) data.targetUnique = this.targetUnique
     if (this.noComputeTemp || isAssociation) {
-      if (this.problemType === 'Classification') {
-        const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, 2))
+      if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
+        const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, this.targetUnique))
         if (min < 3) {
           console.error("数量太小");
           return await Promise.reject()
@@ -1134,7 +1146,7 @@ class Project {
       dataHeader: this.dataHeader.filter(h => !this.deleteColumns.includes(h))
     }
 
-    if (this.problemType === 'Classification') {
+    if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
       const min = Math.min(...Object.values(this.targetCounts))
       if (min < 3) {
         console.error("数量太小");
@@ -1219,10 +1231,13 @@ class Project {
       targetIssue: false,
       targetRowIssue: false
     }
-    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, target, variableIssueCount, targetIssuesCountsOrigin, targetUnique } = this;
+    const { colType, totalRawLines, targetCounts, rawDataView, rawHeader, targetArrayTemp, target, variableIssueCount, targetIssuesCountsOrigin, targetUnique } = this;
     const targetUniques = targetUnique || NaN
     if (colType[target] === "Categorical") {
-      data.targetIssue = Object.keys(targetCounts).length > targetUniques;
+      const isLess = Object.keys(targetCounts).filter(_k => _k !== '').length === 1;
+      const isMore = Object.keys(targetCounts).length > targetUniques;
+      const isGood = !!targetArrayTemp.length || (isNaN(targetUniques) ? !Object.keys(targetCounts).includes('') : (!isLess && !isMore));
+      data.targetIssue = !isGood;
     } else if (colType[target] === "Numerical") {
       const dataview = Reflect.get(rawDataView, target)
       const unique = dataview.uniqueValues || 1000
@@ -1582,7 +1597,7 @@ class Project {
 
   @action
   fastTrain = () => {
-    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
+    // if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -1676,6 +1691,7 @@ class Project {
         };
         break;
       case 'Classification':
+        const min = Math.min(...Object.values(this.targetCounts))
         command = 'clfreg.train';
         trainData = {
           problemType,
@@ -1718,7 +1734,7 @@ class Project {
         if (this.totalLines > 10000) {
           trainData.validationRate = 0.2
         } else {
-          trainData.nfold = 5
+          trainData.nfold = Math.min(min, 5)
         }
         break;
       case 'Regression':
@@ -1761,6 +1777,53 @@ class Project {
           trainData.validationRate = 0.2
         } else {
           trainData.nfold = 5
+        }
+        break;
+      case 'MultiClassification':
+        const Multimin = Math.min(...Object.values(this.targetCounts))
+        command = 'multi.train';
+        trainData = {
+          problemType,
+          featureLabel,
+          targetLabel: [target],
+          projectId: id,
+          version: '1,2,3,4',
+          command,
+          sampling: 'no',
+          speedVSaccuracy: 5,
+          ensembleSize: 20,
+          randSeed: 0,
+          measurement: "log_logss",
+          settingName: setting.name,
+          settingId: setting.id,
+          holdoutRate: 0.2,
+          algorithms: [
+            'adaboost',
+            'bernoulli_nb',
+            'decision_tree',
+            'extra_trees',
+            'gaussian_nb',
+            'gradient_boosting',
+            'k_nearest_neighbors',
+            'lda',
+            'liblinear_svc',
+            'libsvm_svc',
+            'multinomial_nb',
+            'passive_aggressive',
+            'qda',
+            'random_forest',
+            'sgd',
+            'xgradient_boosting',
+            'r2-logistics',
+          ],
+          featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
+          esIndex: this.etlIndex,
+          mapHeader: realLabel
+        };
+        if (this.totalLines > 10000) {
+          trainData.validationRate = 0.2
+        } else {
+          trainData.nfold = Math.min(Multimin, 5)
         }
         break;
       default:
