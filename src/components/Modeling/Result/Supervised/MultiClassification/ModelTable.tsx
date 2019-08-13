@@ -124,7 +124,7 @@ export default class ModelTable extends Component<Interface> {
               <span>
                 <Hint content={EN.RootMeanSquareErrorprediction} />
                 <i style={{ width: 4 }} />
-                kappa
+                Kappa
                 {sort.key !== 'kappa' ? (
                   <Icon type="minus" />
                 ) : (
@@ -143,7 +143,7 @@ export default class ModelTable extends Component<Interface> {
             >
               <span>
                 <Hint content={EN.R2isastatisticalmeasure} />
-                <i style={{ width: 4 }} />auc
+                <i style={{ width: 4 }} />Macro-AUC
                 {sort.key !== 'auc' ? (
                   <Icon type="minus" />
                 ) : (

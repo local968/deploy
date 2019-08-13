@@ -1561,13 +1561,13 @@ class Project {
   get defualtRecommendModel() {
     const { currentSetting, models, measurement, problemType } = this
     if (problemType === 'Association') return this.models
-    const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score')
+    const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score' || problemType === 'MultiClassification' && 'macro_auc')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
 
     return (!currentModels.length ? models : currentModels)
       .map(m => {
-        const { score } = m
+        const { score, chartData, holdoutChartData } = m
         const { validateScore, holdoutScore } = score
         let validate, holdout
         if (problemType === 'Classification') {
@@ -1579,6 +1579,10 @@ class Project {
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
           validate = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
           holdout = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
+        } else if (problemType === 'Classification') {
+          const [t, p] = currentMeasurement.split("_")
+          validate = currentMeasurement === 'measurement' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          holdout = currentMeasurement === 'measurement' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }

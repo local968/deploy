@@ -39,14 +39,14 @@ export default class RegressionView extends Component<Interface> {
       mapHeader,
       target,
       newVariable,
-      selectModel,
       stopIds,
+      dataViews
     } = project;
     if (!current) return null;
     const currentPerformance = current
-      ? (current.score.validateScore.r2 > 0.5 && EN.Acceptable) ||
-      EN.NotAcceptable
-      : '';
+      ? (current.chartData.roc_auc.macro > 0.8 && EN.GOOD) ||
+      (current.chartData.roc_auc.macro > 0.6 && EN.OK) ||
+      EN.NotSatisfied : ''
     const newMapHeader = {
       ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),
       ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}),
@@ -77,7 +77,13 @@ export default class RegressionView extends Component<Interface> {
                 <a className={styles.nohover}>&nbsp;{mapHeader[target]}</a>
               </span>
             </div>
-            <Performance current={current} />
+            <div className={styles.row}>
+              <span>
+                {EN.MultiUnique} :
+                <a className={styles.nohover}>&nbsp;{dataViews[target].uniqueValues}</a>
+              </span>
+            </div>
+            {/* <Performance current={current} /> */}
           </div>
           {/* <PVA
             key="pva"

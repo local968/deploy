@@ -31,18 +31,18 @@ const Headers: TableHeader[] = [
     hint: EN.RootMeanSquareErrorRMSEmeasures
   },
   {
-    label: 'macro-P',
+    label: 'Macro-P',
     value: 'macro-P',
     sort: true,
     hint: EN.RootMeanSquareErrorprediction
   },
   {
-    label: 'macro-R',
+    label: 'Macro-R',
     value: 'macro-R',
     sort: true,
   },
   {
-    label: 'macro-F1',
+    label: 'Macro-F1',
     value: 'macro-F1',
     sort: true,
     hint: EN.RMSLEissimilarwithRMSE
@@ -78,7 +78,7 @@ const Headers: TableHeader[] = [
   //   hint: EN.TheadjustedR2tells
   // },
   {
-    label: 'MacroAUC',
+    label: 'Macro-AUC',
     value: 'MacroAUC',
     sort: true,
     hint: EN.TheadjustedR2tells
