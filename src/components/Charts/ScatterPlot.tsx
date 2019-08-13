@@ -51,7 +51,6 @@ export default function ScatterPlot(props:Interface) {
       name : 'confidence'
     },
     series: [{
-      name: 'price-area',
       type: 'scatter',
       symbolSize: 5,
       data,

@@ -19,6 +19,8 @@ export default function NetworkDiagram(props:Interface) {
 	}));
 	const links = [];
 
+	let edgeSymbolSize = 10;
+
 	Object.entries(_data).forEach(itm=>{
 		const [source,value] = itm;
 		const keys = Object.keys(value);
@@ -26,6 +28,7 @@ export default function NetworkDiagram(props:Interface) {
 			const {color,weight} = value[target];
 			const [r,g,b,a] = color;
 			const _color = `rgba(${r*256},${g*256},${b*256},${a})`;
+			edgeSymbolSize = Math.max(edgeSymbolSize,2*weight);
 			links.push({
 				source,
 				target,
@@ -40,10 +43,6 @@ export default function NetworkDiagram(props:Interface) {
 	});
 
 	const option  = {
-		// title: {
-		// 	text: 'Graph 简单示例'
-		// },
-		// tooltip: {},
 		animationDurationUpdate: 1500,
 		animationEasingUpdate: 'quinticInOut',
 		series : [
@@ -59,7 +58,7 @@ export default function NetworkDiagram(props:Interface) {
 					}
 				},
 				edgeSymbol: ['circle', 'arrow'],
-				edgeSymbolSize: [4, 10],
+				edgeSymbolSize,
 				circular: {
 					rotateLabel: true
 				},
