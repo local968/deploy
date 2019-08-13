@@ -16,6 +16,7 @@ const router = Router();
 
 router.use('/user', user);
 router.use('/api', api);
+router.use('/data', data)
 
 router.use('/*',function(req, res, next){
   if(req.session.userId){
@@ -32,7 +33,6 @@ router.use('/redirect', redirect);
 router.use('/etls', redirectEs);
 router.use("/uploads", redirectUpload);
 router.use("/project", project);
-router.use('/data', data)
 router.get('/jupyterLabUrl', (req, res) =>
   res.send(process.env.JUPYTER_LAB || '/notebook/lab'),
 );

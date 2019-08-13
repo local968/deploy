@@ -50,6 +50,10 @@ paths:
               schema:
                 type: string
               description: 由请求传入的token所获取到的scroll_id, 如果不存在该
+            isEmpty:
+              schema:
+                type: string
+              description: is empty 变量列表
           content:
             application/json:
               schema:

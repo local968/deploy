@@ -15,6 +15,11 @@ import _ from 'lodash';
 const etlServicePath = config.services.ETL_SERVICE;
 const router = express.Router();
 
+router.get('/token/:token/delete', async (req, res) => {
+  await redis.delete('FetchCleanData:' + req.params.token)
+  res.json({status: 200, message: 'ok'})
+})
+
 router.get('/:projectId/clean', async (req, res) => {
   const token = req.query.token || uuid.v4()
   const scroll = req.query.scroll || '1'
@@ -22,15 +27,20 @@ router.get('/:projectId/clean', async (req, res) => {
   const projectId = req.params.projectId
   if(!projectId) return res.status(400).json({error: 'need project id'})
   try {
-    let scroll_id = await redis.get('FetchCleanData:' + token)
+    const tokenResult = await redis.get('FetchCleanData:' + token)
+    let [scroll_id, isEmpty, originalIndex] = tokenResult ? tokenResult.split(':') : [null, null, null]
     let requestBody
     if (scroll_id) {
-      requestBody = { setting: { scroll: scroll + 'm', scroll_id } }
+      requestBody = { setting: { scroll: scroll + 'm', scroll_id, isEmpty, originalIndex } }
       res.setHeader('scroll_id', scroll_id)
+      res.setHeader('isEmpty', isEmpty)
     } else {
-      const [originalIndex, etlIndex] = (await redis.hmget(`project:${projectId}`, 'originalIndex', 'etlIndex')).map(JSON.parse)
+      const projectResult = (await redis.hmget(`project:${projectId}`, 'originalIndex', 'etlIndex', 'missingReason')).map(JSON.parse)
+      const [_originalIndex, etlIndex, missingReason] = projectResult
+      originalIndex = _originalIndex
+      isEmpty = Object.keys(missingReason).map(key => missingReason[key] === 'blank' ? key : null).filter(key => key !== null).join(',')
       requestBody = {
-        setting: { originalIndex, etlIndex, scroll: scroll + 'm' },
+        setting: { originalIndex, etlIndex, scroll: scroll + 'm', isEmpty },
         size
       }
     }
@@ -38,7 +48,7 @@ router.get('/:projectId/clean', async (req, res) => {
     if (response.status !== 200) return res.status(response.status).json(response.data)
     const data = response.data.data
     scroll_id = response.data.scroll_id
-    await redis.set('FetchCleanData:' + token, scroll_id, 'EX', scroll * 60)
+    await redis.set('FetchCleanData:' + token, scroll_id + ':' + isEmpty + ':' + originalIndex, 'EX', scroll * 60)
     res.setHeader('token', token)
     return res.json(data)
   } catch (e) {
