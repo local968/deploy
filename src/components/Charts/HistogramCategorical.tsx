@@ -23,8 +23,6 @@ export default function HistogramCategorical(props:Interface){
     x_name='',
     y_name='',
     data=[],
-    height = 330,
-    width = 500,
     xAxisName = data.map((itm)=>itm.name),
     title = `Feature:${x_name}`,
   } = props;
