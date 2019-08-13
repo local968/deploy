@@ -1940,9 +1940,9 @@ class Project {
         };
         break;
       default:
-        command = 'clfreg.train';
+        command = problemType === 'MultiClassification' ? 'multi.train' : 'clfreg.train';
         let featureList: string[] = []
-        if (problemType === "Classification") {
+        if (problemType === "Classification" || problemType === 'MultiClassification') {
           if (this.algorithms.some(al => [
             'adaboost',
             'decision_tree',
@@ -2310,7 +2310,7 @@ class Project {
       const feature_label = all_label.filter(v => !readyLabels.includes(v) && v !== this.target)
       if (!feature_label.length || feature_label.length === 0) return Promise.resolve()
 
-      let cmd = 'clfreg.preTrainImportance'
+      let cmd = `${this.problemType === 'MultiClassification' ? 'multi' : 'clfreg'}.preTrainImportance`
       // switch (this.problemType) {
       //   case 'Clustering':
       //     cmd = 'clustering.train';

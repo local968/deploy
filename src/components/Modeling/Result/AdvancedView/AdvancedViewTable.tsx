@@ -61,7 +61,7 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
       case "Clustering":
         return <ClusteringTable sort={sort} handleSort={handleSort} project={project} models={models} currentSettingId={currentSettingId} />
       case "MultiClassification":
-        return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+        return <MultiClassificationTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
       default:
         return null
     }

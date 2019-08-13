@@ -293,7 +293,7 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
           <div className={styles.metricBg}></div>
           <div className={styles.metric}>
             <span className={styles.metricText} >{EN.MeasurementMetric}</span>
-            <Select size="large" value={metric} onChange={handleChange} style={{ width: '120px', fontSize: '1.125rem' }} getPopupContainer={el => el.parentElement}>
+            <Select size="large" value={metric} onChange={handleChange} style={{ width: '140px', fontSize: '1rem' }} getPopupContainer={el => el.parentElement}>
               {MetricOptions.map(mo => <Option value={mo.key} key={mo.key} >{mo.display}</Option>)}
             </Select>
           </div>
