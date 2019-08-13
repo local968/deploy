@@ -32,10 +32,24 @@ export interface ChartDataRoc {
   Youden: number[],
 }
 
+export interface MultiRoc {
+  macro: number,
+  micro: number
+}
+
+export interface MultiDataRoc {
+  macro: number[],
+  micro: number[]
+}
+
 export interface ChartData {
-  roc: ChartDataRoc,
-  lift: unknown,
-  density: unknown
+  roc?: ChartDataRoc,
+  lift?: unknown,
+  density?: unknown,
+  fpr?: MultiDataRoc,
+  roc_auc?: MultiRoc,
+  thresholds?: MultiDataRoc,
+  tpr?: MultiDataRoc,
 }
 
 export interface ClaregScore {
@@ -54,6 +68,17 @@ export interface ClaregScore {
   r2?: number
   rmse?: number
   rmsle?: number
+  Kappa?: number,
+  Accuracy?: number
+  HammingLoss?: number
+  Jaccard?: number
+  MCC?: number
+  macro_F1?: number
+  macro_P?: number
+  macro_R?: number
+  micro_F1?: number
+  micro_P?: number
+  micro_R?: number
 }
 
 export interface Score {

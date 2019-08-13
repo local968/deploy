@@ -84,18 +84,18 @@ const Association = (props: AssociationProps) => {
       {/*  <span>{EN.AssociationViewTitle}</span>*/}
       {/*</div>*/}
       {/*<div className={styles.chart}/>*/}
-      <HistogramCategorical
+      {/* <HistogramCategorical
         title={EN.AssociationViewTitle}
         x_name={EN.NumberofClusters}
-        data={associationView.feature.list}
+        data={associationView.plot}
         xAxisName={associationView.feature.list.map((itm) => itm.key)}
-      />
+      /> */}
       <div className={styles.summary}>
-        <div className={styles.summaryRow}><span>{EN.summaryRow1}:{formatNumber((totalRawLines / rawDataView[target].uniqueValues).toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow2}:{formatNumber(associationView.target.range[1].toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow3}:{formatNumber(associationView.target.range[0].toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow4}:{formatNumber(totalRawLines.toString())}</span></div>
-        <div className={styles.summaryRow}><span>{EN.summaryRow5}:{formatNumber(rawDataView[target].uniqueValues.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow1}:{formatNumber(associationView.view.average.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow2}:{formatNumber(associationView.view.max.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow3}:{formatNumber(associationView.view.min.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow4}:{formatNumber(associationView.view.total.toString())}</span></div>
+        <div className={styles.summaryRow}><span>{EN.summaryRow5}:{formatNumber(associationView.view.users.toString())}</span></div>
       </div>
     </div>
   </div>

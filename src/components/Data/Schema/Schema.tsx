@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Checkbox, message, Icon } from 'antd';
-import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Show, Table } from 'components/Common';
+import { Confirm, ContinueButton, HeaderInfo, Hint, ProcessLoading, Select, Show, Table, NumberInput } from 'components/Common';
 import EN from '../../../constant/en';
 import EditHeader from './EditHeader';
 import { ProjectStore } from 'stores/ProjectStore';
@@ -30,6 +30,7 @@ class DataSchema extends Component<DataSchemaProps> {
   @observable visiable = false;
   @observable target = this.props.projectStore.project.target;
   @observable item = this.props.projectStore.project.dataHeader.length === 1 ? this.props.projectStore.project.dataHeader[0] : ''
+  @observable uniques = this.props.projectStore.project.targetUnique
   tableRef: React.RefObject<Table>;
 
   constructor(props) {
@@ -50,9 +51,10 @@ class DataSchema extends Component<DataSchemaProps> {
 
   onConfirm = () => {
     const { project } = this.props.projectStore;
-    const { rawHeader, problemType, outlierLineCounts, nullLineCounts } = project;
+    const { rawHeader, problemType } = project;
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
     const isAssociation = problemType === 'Association'
+    const isMulti = problemType === 'MultiClassification'
     //无监督删除target
     const newDataHeader = isAssociation ? [this.item] : rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
     let nullFillMethod = {}
@@ -83,7 +85,7 @@ class DataSchema extends Component<DataSchemaProps> {
       nullFillMethodTemp: nullFillMethod
     };
 
-    project.setProperty(data);
+    project.setProperty({ ...data, ...(isMulti ? { targetUnique: this.uniques } : {}) });
     try {
       this.props.projectStore.project.endSchema();
     } catch (e) {
@@ -101,11 +103,23 @@ class DataSchema extends Component<DataSchemaProps> {
       this.target = value;
       this.tableRef.current.updateGrids();
       this.checkList = [...this.checkList.filter(v => v !== value)];
+
+      // const { project } = this.props.projectStore
+      // const isMulti = project.problemType === 'MultiClassification'
+      // if (isMulti && value) {
+      //   const maxCounts = project.rawDataView[value].uniqueValues
+      //   if (maxCounts === 3) this.uniques = 3
+      // }
+
       // } else {
       //   this.checkList = [...this.checkList, this.target]
       // }
     }
   };
+
+  handleUnique = value => {
+    this.uniques = value
+  }
 
   variableSelect = value => {
     if (!isNaN(+value)) {
@@ -370,11 +384,14 @@ class DataSchema extends Component<DataSchemaProps> {
       noComputeTemp,
       headerTemp: { isMissed, isDuplicated },
       mapHeader,
+      rawDataView
     } = project;
     // const targetOption = {};
     const tableData = this.formatTable();
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
     const isAssociation = problemType === 'Association'
+    const isMulti = problemType === 'MultiClassification'
+    const maxCounts = 100//this.target ? rawDataView[this.target].uniqueValues : 0
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
     //target选择列表
     const targetOption = rawHeader.reduce((prev, h) => {
@@ -385,7 +402,13 @@ class DataSchema extends Component<DataSchemaProps> {
         if (problemType === 'Regression') {
           if (this.dataType[h] === 'Numerical') prev[h] = mapHeader[h];
         } else {
-          if (this.dataType[h] === 'Categorical') prev[h] = mapHeader[h];
+          if (this.dataType[h] === 'Categorical') {
+            // if (isMulti) {
+            //   if (rawDataView[h].uniqueValues > 2) prev[h] = mapHeader[h];
+            // } else {
+            prev[h] = mapHeader[h];
+            // }
+          }
         }
       }
       return prev;
@@ -425,6 +448,25 @@ class DataSchema extends Component<DataSchemaProps> {
                 document.getElementById('schemaContent')
               }
             />
+            {isMulti && <div className={styles.multiInput}>
+              <span>{EN.MultiUnique}</span>
+              {maxCounts > 3 && <Hint
+                themeStyle={{
+                  fontSize: '1.5rem',
+                  lineHeight: '2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                content={
+                  <div>
+                    {EN.MultiUniqueHint1}{maxCounts}
+                    {EN.MultiUniqueHint2}{maxCounts}
+                    {EN.MultiUniqueHint3}
+                  </div>
+                }
+              />}
+              <NumberInput min={3} max={maxCounts} value={this.uniques || ''} isInt={true} disabled={!this.target} onBlur={this.handleUnique} />
+            </div>}
             {isUnsupervised && <Hint
               themeStyle={{
                 fontSize: '1.5rem',
@@ -530,6 +572,7 @@ class DataSchema extends Component<DataSchemaProps> {
                 etling ||
                 (isUnsupervised ? false : !this.target) ||
                 (isAssociation ? !variable : newDataHeader.length < 1) ||
+                (isMulti ? (this.uniques < 3 || this.uniques > maxCounts) : false) ||
                 isMissed ||
                 isDuplicated
               }

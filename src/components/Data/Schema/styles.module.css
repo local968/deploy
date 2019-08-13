@@ -254,3 +254,22 @@
 .isAssociation {
     margin-left: 0
 }
+
+.multiInput {
+    display: flex;
+    flex: none;
+    margin-right: 30px;
+    align-items: center;
+}
+
+.multiInput span {
+    font-size: 1.125rem;
+    line-height: 1.3
+}
+
+.multiInput input {
+    font-size: 1.125rem;
+    width: 120px;
+    height: 30px;
+    margin-left: 10px;
+}
