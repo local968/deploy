@@ -1,7 +1,6 @@
 import request from './request'
 import config from '../../../config'
 
-
 const add = async (duser,project_id)=>{
   const url = `${config.STRAPI}/projects`;
   return request.post({
