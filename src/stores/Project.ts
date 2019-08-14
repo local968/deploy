@@ -586,6 +586,26 @@ class Project {
         'sgd',
         'xgradient_boosting',
       ]
+    } else if (this.problemType === "MultiClassification") {
+      algorithms = [
+        'adaboost',
+        'bernoulli_nb',
+        'decision_tree',
+        'extra_trees',
+        'gaussian_nb',
+        'gradient_boosting',
+        'k_nearest_neighbors',
+        'lda',
+        'liblinear_svc',
+        'libsvm_svc',
+        'multinomial_nb',
+        'passive_aggressive',
+        'qda',
+        'random_forest',
+        'sgd',
+        'xgradient_boosting',
+        'r2-logistics',
+      ]
     }
     return algorithms.filter(a => !disableList.includes(a))
   }
