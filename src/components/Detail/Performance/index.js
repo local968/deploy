@@ -64,22 +64,22 @@ export default class Performance extends Component {
     this.charset = value
   }
 
- show = key => action(() => (this.dialog = key));
+  show = key => action(() => (this.dialog = key));
   closeDialog = action(() => (this.dialog = null));
 
   modelChange = action(value => {
     this.tempModelName = value
   })
 
-    onSaveModel = action(() => {
-        const cd = this.props.deploymentStore.currentDeployment
-        if (this.modelEditing && this.tempModelName) {
-            cd.modelName = this.tempModelName;
-            cd.save();
-            this.tempModelName = false;
-        }
-        this.modelEditing = !this.modelEditing
-    })
+  onSaveModel = action(() => {
+    const cd = this.props.deploymentStore.currentDeployment
+    if (this.modelEditing && this.tempModelName) {
+      cd.modelName = this.tempModelName;
+      cd.save();
+      this.tempModelName = false;
+    }
+    this.modelEditing = !this.modelEditing
+  })
 
   pause = action(() => {
     if (!this.uploadOperator) return
@@ -93,18 +93,18 @@ export default class Performance extends Component {
   })
 
 
-    // isDisable (modelId) {
-    //     if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
-    //         return true
-    //     }else {
-    //         return false
-    //     }
-    // }
+  // isDisable (modelId) {
+  //     if(modelId.indexOf('Agg') != -1 || modelId.indexOf('DBSCAN1') != -1 || modelId.indexOf('SpectralClustering') != -1 ){
+  //         return true
+  //     }else {
+  //         return false
+  //     }
+  // }
 
 
 
 
-    render() {
+  render() {
     const { deploymentStore, userStore, routing, match } = this.props;
     const cd = deploymentStore.currentDeployment;
 
@@ -139,7 +139,7 @@ export default class Performance extends Component {
       operator: (opeartor) => {
         this.uploadOperator = opeartor
       },
-      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy'},
+      params: { projectId: cd.projectId, userId: userStore.info.id, type: 'deploy' },
       mapHeader: cd.mapHeader,
       charset: this.charset
     }
@@ -151,61 +151,60 @@ export default class Performance extends Component {
         )} */}
         {/* {!cdpo.enable && (
           <React.Fragment> */}
-            {
-              cd.modelType !== 'Outlier' && cd.modelType !== 'Clustering' &&(
-                <div className={styles.block}>
-                  <span className={styles.label}>
-                    <span className={styles.text}>{EN.Model}</span>
-                  </span>
-                  <div className={styles.selections}>
-                    <span className={styles.modelName}>{cd.modelName}</span>
-                    {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
-                  </div>
-                </div>
-              )
-            }
+        {
+          cd.modelType !== 'Outlier' && cd.modelType !== 'Clustering' && (
+            <div className={styles.block}>
+              <span className={styles.label}>
+                <span className={styles.text}>{EN.Model}</span>
+              </span>
+              <div className={styles.selections}>
+                <span className={styles.modelName}>{cd.modelName}</span>
+                {/* <img alt="model" src={infoIcon} className={styles.infoIcon} /> */}
+              </div>
+            </div>
+          )
+        }
 
-            {
-              cd.modelType === 'Outlier' &&(
-                <div className={styles.blocks}>
-                  <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
-                    <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
-                      {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
-                        <OptGroup key={settingName} label={settingName}>
-                          {models.map(model =>  !!model ? <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option> : null
-                          )}
-                        </OptGroup>)}
-                    </Select> : cd.modelName}</span>
-                    <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
-                    <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
-                  </div>
-              )}
+        {
+          cd.modelType === 'Outlier' && (
+            <div className={styles.blocks}>
+              <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
+                <Select style={{ width: 400 }} className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                  {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
+                    <OptGroup key={settingName} label={settingName}>
+                      {models.map(model => !!model ? <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option> : null
+                      )}
+                    </OptGroup>)}
+                </Select> : cd.modelName}</span>
+              <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
+              <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
+            </div>
+          )}
 
-              {
-                cd.modelType === 'Clustering' &&(
-                  <div className={styles.blocks}>
-                    <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
-                      <Select style={{width:400}}  className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
-                        {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) =>
-                          {
-                            let clusteringLists = [];
-                            clusteringLists = models.filter(model =>{
-                              return (model !== null && model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1  && model.modelId.indexOf('SpectralClustering') == -1)
-                            })
-                            console.log(clusteringLists, 'clusteringListsclusteringLists')
-                            return (
-                              <OptGroup key={settingName} label={settingName}>
-                                {clusteringLists.map(model =>  model !== null && <Option  key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
-                                )}
-                              </OptGroup>
-                            )
-                          }
+        {
+          cd.modelType === 'Clustering' && (
+            <div className={styles.blocks}>
+              <span className={styles.labels}>{EN.Model}: {this.modelEditing ?
+                <Select style={{ width: 400 }} className={styles.selectionss} value={this.tempModelName || cd.modelName} onChange={this.modelChange}>
+                  {cd.modelList && Object.entries(cd.modelList).map(([settingName, models]) => {
+                    let clusteringLists = [];
+                    clusteringLists = models.filter(model => {
+                      return (model !== null && model.modelId.indexOf('Agg') == -1 && model.modelId.indexOf('DBSCAN1') == -1 && model.modelId.indexOf('SpectralClustering') == -1)
+                    })
+                    console.log(clusteringLists, 'clusteringListsclusteringLists')
+                    return (
+                      <OptGroup key={settingName} label={settingName}>
+                        {clusteringLists.map(model => model !== null && <Option key={model.modelId} alt={model.performance} value={model.name}>{model.name}</Option>
                         )}
-                    </Select> : cd.modelName}</span>
-                    <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
-                    <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
-                  </div>
-                )}
+                      </OptGroup>
+                    )
+                  }
+                  )}
+                </Select> : cd.modelName}</span>
+              <Hint themeStyle={{ fontSize: '1rem' }} content={cd.currentModel && cd.currentModel.performance} />
+              <a className={styles.labels} onClick={this.onSaveModel}>{this.modelEditing ? EN.Save : EN.Change}</a>
+            </div>
+          )}
 
         <div className={styles.block}>
           <span className={styles.label}>
@@ -221,16 +220,16 @@ export default class Performance extends Component {
             <a className={styles.download} href={`/upload/dataDefinition?projectId=${cd.projectId}&type=performance`} >
               {EN.Download}
             </a>
-          <label className={styles.chooseCharset}>{EN.choosecharset}</label>
-          <Select
-            style={{ width: '8rem' }}
-            value={this.charset}
-            onChange={this.charsetChange}
-          >
-            <Option value="utf-8">{EN.UTF_8}</Option>
-            <Option value="gbk">{EN.GBK}</Option>
-            <Option value="big5">{EN.BIG5}</Option>
-          </Select>
+            <label className={styles.chooseCharset}>{EN.choosecharset}</label>
+            <Select
+              style={{ width: '8rem' }}
+              value={this.charset}
+              onChange={this.charsetChange}
+            >
+              <Option value="utf-8">{EN.UTF_8}</Option>
+              <Option value="gbk">{EN.GBK}</Option>
+              <Option value="big5">{EN.BIG5}</Option>
+            </Select>
 
           </div>
         </div>
@@ -465,6 +464,21 @@ const MeasurementMetric = observer(({ cdpo, selectionOption, type }) => (
           <Option value="CVNN">CVNN</Option>
           <Option value="CH">CH Index</Option>
           <Option value="silhouette_euclidean">Silhouette Score</Option>
+        </Select>
+      )}
+      {type === 'MultiClassification' && (
+        <Select
+          className={styles.select}
+          value={cdpo.measurementMetric}
+          onChange={value => selectionOption('measurementMetric', value)()}
+        >
+          <Option value="macro_auc">Macro AUC</Option>
+          <Option value="macro_f1">Macro F1</Option>
+          <Option value="micro_f1">Micro F1</Option>
+          <Option value="macro_recall">Macro Recall</Option>
+          <Option value="micro_recall">Micro Recall</Option>
+          <Option value="macro_precision">Macro Precision</Option>
+          <Option value="micro_precision">Micro Precision</Option>
         </Select>
       )}
 

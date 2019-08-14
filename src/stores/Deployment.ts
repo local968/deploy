@@ -78,6 +78,9 @@ export default class Deploy {
       case 'Clustering':
         default_measurementMetric = 'CVNN';
         break;
+      case 'MultiClassification':
+        default_measurementMetric = 'macro_auc';
+        break;
     }
 
     this.performanceOptions = {

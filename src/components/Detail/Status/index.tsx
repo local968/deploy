@@ -167,6 +167,13 @@ const isExcessThreshold = schedule => {
     CVNN: 'CVNN',
     CH: 'CH',
     Silhouette_Score: 'silhouette_euclidean',
+    macro_auc: 'Kappa',
+    macro_f1: 'macro_F1',
+    micro_f1: 'micro_F1',
+    macro_recall: 'macro_R',
+    micro_recall: 'micro_R',
+    macro_precision: 'macro_P',
+    micro_precision: 'micro_P',
   };
   return {
     R2: (threshold, real) => threshold > real,
@@ -180,6 +187,13 @@ const isExcessThreshold = schedule => {
     CVNN: (threshold, real) => threshold > real,
     CH: (threshold, real) => threshold > real,
     silhouette_euclidean: (threshold, real) => threshold > real,
+    macro_auc: (threshold, real) => threshold > real,
+    macro_f1: (threshold, real) => threshold > real,
+    micro_f1: (threshold, real) => threshold > real,
+    macro_recall: (threshold, real) => threshold > real,
+    micro_recall: (threshold, real) => threshold > real,
+    macro_precision: (threshold, real) => threshold > real,
+    micro_precision: (threshold, real) => threshold > real,
   }[schedule.threshold.type](
     schedule.threshold.value,
     schedule.result.score[nameMap[schedule.threshold.type]],
@@ -337,6 +351,39 @@ class SchedulePerformance extends Component<SchedulePerformanceProps> {
               )} Silhouette Score:${this.showScore(
                 s.schedule.result.score,
                 'silhouette_euclidean',
+              )}`
+              : ' - '}
+          </span>
+        )}
+
+        {s.deployment.modelType === 'MultiClassification' && (
+          <span
+            className={classnames(styles.performance, {
+              [styles.issue]: isExcessThreshold(s.schedule),
+            })}
+          >
+            {s.schedule.result && s.schedule.status === 'finished'
+              ? `Macro AUC:${this.showScore(
+                s.schedule.result.score,
+                'Kappa',
+              )} Macro F1:${this.showScore(
+                s.schedule.result.score,
+                'macro_F1',
+              )} Micro F1:${this.showScore(
+                s.schedule.result.score,
+                'micro_F1',
+              )} Macro Recall:${this.showScore(
+                s.schedule.result.score,
+                'macro_R',
+              )} Micro Recall:${this.showScore(
+                s.schedule.result.score,
+                'micro_R',
+              )} Macro Precision:${this.showScore(
+                s.schedule.result.score,
+                'macro_P',
+              )} Micro Precision:${this.showScore(
+                s.schedule.result.score,
+                'micro_P',
               )}`
               : ' - '}
           </span>
