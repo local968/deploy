@@ -305,6 +305,7 @@ class DataSchema extends Component<DataSchemaProps> {
             this.props.projectStore.project.rawDataView[key].count * 0.1,
             1000,
           );
+        const canTransforToNumerical = this.props.projectStore.project.rawDataView[key].doubleUniqueValue > 0
         const colValue = this.dataType[key];
         selectData.content = (
           <select value={colValue} onChange={this.select.bind(null, key)}>
@@ -314,7 +315,7 @@ class DataSchema extends Component<DataSchemaProps> {
             {canTransforToCategorical && (
               <option value="Categorical">{EN.Categorical}</option>
             )}
-            <option value="Numerical">{EN.Numerical}</option>
+            {canTransforToNumerical && <option value="Numerical">{EN.Numerical}</option>}
           </select>
         );
         selectData.title = {
@@ -465,7 +466,7 @@ class DataSchema extends Component<DataSchemaProps> {
                   </div>
                 }
               />}
-              <NumberInput min={3} max={maxCounts} value={this.uniques || ''} isInt={true} disabled={!this.target} onBlur={this.handleUnique} />
+              <NumberInput min={3} max={maxCounts} value={this.uniques || ''} isInt={true} onBlur={this.handleUnique} />
             </div>}
             {isUnsupervised && <Hint
               themeStyle={{
