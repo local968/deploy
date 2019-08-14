@@ -23,7 +23,7 @@ async function scheduleHandler() {
 
     let deployment = await api.getDeployment(schedule.deploymentId);
     if (!deployment) return;
-    if( deployment[`${schedule.type}Options`].source === 'file' ) {
+    if (deployment[`${schedule.type}Options`].source === 'file') {
       schedule.mapHeader = deployment[`${schedule.type}Options`].mapHeader
       await api.upsertSchedule(schedule)
     }
@@ -55,7 +55,7 @@ async function scheduleHandler() {
           deployment.projectId,
           deployment.modelName
         );
-      }catch(e) {
+      } catch (e) {
         console.error(e)
         schedule.status = 'issue';
         schedule.updatedDate = moment().unix();
@@ -63,7 +63,7 @@ async function scheduleHandler() {
         await api.upsertSchedule(schedule);
       }
       // etl failed
-      if(fileId === false) return
+      if (fileId === false) return
       const fileName = deployment[`${schedule.type}Options`].file;
       const ext = '.' + fileName.split('.')[fileName.split('.').length - 1];
       const newFeatureLabel = await api.getFeatureLabel(deployment.projectId);
@@ -74,6 +74,9 @@ async function scheduleHandler() {
           break;
         case 'Outlier':
           cmd = 'outlier.deploy';
+          break;
+        case 'MultiClassification':
+          cmd = 'multi.deploy';
           break;
         default:
           cmd = 'clfreg.deploy';
@@ -225,72 +228,72 @@ const deploy = (deployment, threshold = null) => {
   const cddo = deployment.deploymentOptions;
   const cdpo = deployment.performanceOptions;
   threshold === null &&
-  cddo &&
-  api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
-    const nextScheduleTime = generateNextScheduleTime(
-      cddo.frequency,
-      cddo.frequencyOptions,
-    );
-    if (!schedule && !nextScheduleTime) return;
-    if (schedule) {
-      // update estimated time
-      schedule.estimatedTime = nextScheduleTime;
-      schedule.updatedDate = moment().unix();
-      schedule.ends =
-        cddo.frequency === 'once' ? 1 : cddo.frequencyOptions.ends;
-      if (threshold) schedule.threshold = threshold;
-      api.upsertSchedule(schedule).catch(catchError);
-    } else {
-      api
-        .upsertSchedule(
-          generateSchedule(
-            deployment.id,
-            deployment.modelName,
-            'deployment',
-            nextScheduleTime,
-            cddo.frequency === 'once'
-              ? cddo.frequencyOptions.time
-              : cddo.frequencyOptions.ends,
-            threshold,
-          ),
-        )
-        .catch(catchError);
-    }
-  });
+    cddo &&
+    api.getLastWaitingSchedule(deployment.id, 'deployment').then(schedule => {
+      const nextScheduleTime = generateNextScheduleTime(
+        cddo.frequency,
+        cddo.frequencyOptions,
+      );
+      if (!schedule && !nextScheduleTime) return;
+      if (schedule) {
+        // update estimated time
+        schedule.estimatedTime = nextScheduleTime;
+        schedule.updatedDate = moment().unix();
+        schedule.ends =
+          cddo.frequency === 'once' ? 1 : cddo.frequencyOptions.ends;
+        if (threshold) schedule.threshold = threshold;
+        api.upsertSchedule(schedule).catch(catchError);
+      } else {
+        api
+          .upsertSchedule(
+            generateSchedule(
+              deployment.id,
+              deployment.modelName,
+              'deployment',
+              nextScheduleTime,
+              cddo.frequency === 'once'
+                ? cddo.frequencyOptions.time
+                : cddo.frequencyOptions.ends,
+              threshold,
+            ),
+          )
+          .catch(catchError);
+      }
+    });
 
   threshold &&
-  cdpo &&
-  api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
-    const nextScheduleTime = generateNextScheduleTime(
-      cdpo.frequency,
-      cdpo.frequencyOptions,
-    );
-    if (!schedule && !nextScheduleTime) return;
-    if (schedule) {
-      // update estimated time
-      schedule.estimatedTime = nextScheduleTime;
-      schedule.updatedDate = moment().unix();
-      schedule.ends =
-        cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
-      if (threshold) schedule.threshold = threshold;
-      api.upsertSchedule(schedule).catch(catchError);
-    } else {
-      api
-        .upsertSchedule(
-          generateSchedule(
-            deployment.id,
-            deployment.modelName,
-            'performance',
-            nextScheduleTime,
-            cdpo.frequency === 'once'
-              ? cdpo.frequencyOptions.time
-              : cdpo.frequencyOptions.ends,
-            threshold,
-          ),
-        )
-        .catch(catchError);
-    }
-  });
+    cdpo &&
+    api.getLastWaitingSchedule(deployment.id, 'performance').then(schedule => {
+      const nextScheduleTime = generateNextScheduleTime(
+        cdpo.frequency,
+        cdpo.frequencyOptions,
+      );
+      if (!schedule && !nextScheduleTime) return;
+      if (schedule) {
+        // update estimated time
+        schedule.estimatedTime = nextScheduleTime;
+        schedule.updatedDate = moment().unix();
+        schedule.ends =
+          cdpo.frequency === 'once' ? 1 : cdpo.frequencyOptions.ends;
+        if (threshold) schedule.threshold = threshold;
+        api.upsertSchedule(schedule).catch(catchError);
+      } else {
+        api
+          .upsertSchedule(
+            generateSchedule(
+              deployment.id,
+              deployment.modelName,
+              'performance',
+              nextScheduleTime,
+              cdpo.frequency === 'once'
+                ? cdpo.frequencyOptions.time
+                : cdpo.frequencyOptions.ends,
+              threshold,
+            ),
+          )
+          .catch(catchError);
+      }
+    });
 };
 
 const generateSchedule = (
@@ -444,11 +447,11 @@ const generateNextScheduleTime = (
   const nextTime =
     frequency === 'once'
       ? options.time === 'completed'
-      ? now
-      : options.time
+        ? now
+        : options.time
       : lastTime
-      ? nextTimeStrategies[options.repeatPeriod]()
-      : startTimeStrategies[options.repeatPeriod]();
+        ? nextTimeStrategies[options.repeatPeriod]()
+        : startTimeStrategies[options.repeatPeriod]();
 
   return nextTime;
 };

@@ -1797,7 +1797,7 @@ class Project {
           speedVSaccuracy: 5,
           ensembleSize: 20,
           randSeed: 0,
-          measurement: "log_logss",
+          measurement: "macro_auc",
           settingName: setting.name,
           settingId: setting.id,
           holdoutRate: 0.2,
