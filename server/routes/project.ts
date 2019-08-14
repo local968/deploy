@@ -68,28 +68,29 @@ async function query(key, offset, limit, userId) {
   const count = projectIdList.length;
   const result = { count, list: [] };
   const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName', 'problemType', 'train2ing'];
+  const Array = [];
+  for(let r of projectIdList.splice(offset, limit)){
+    const project = await redis.hmget("project:" + r, Field);
+    if(project[0]!==null){
+      Array.push(project);
+    }else{
+      projectService.remove(r);
+    }
+  }
 
-  const promiseArray = projectIdList.splice(offset, limit).map(r => {
-    return redis.hmget("project:" + r, Field)
-  });
-  return Promise.all(promiseArray).then(array => {
-    return Promise.all(
-      array.map((item: any) => {
-        const obj = {};
-        item.forEach((v, k) => {
-          try {
-            v = JSON.parse(v)
-          } catch (e) { }
-          obj[Field[k]] = v
-        });
-        return Promise.resolve(obj)
-      }),
-    ).then(list => {
-      result.list = list;
-      return result;
+  Array.map((item: any) => {
+    const obj = {};
+    item.forEach((v, k) => {
+      try {
+        v = JSON.parse(v)
+      } catch (e) { }
+      obj[Field[k]] = v
     });
+    result.list.push(obj)
   });
-  // });
+
+  return result;
+
 }
 
 export function createOrUpdate(id, userId, data, isCreate = false) {
@@ -99,8 +100,8 @@ export function createOrUpdate(id, userId, data, isCreate = false) {
   return promise.then(checked => {
     if (checked.status === 444) return {
       status: 200,
-      me4ssage: 'ok'
-    }
+      message: 'ok'
+    };
     if (checked.status !== 200) return checked;
     const time = moment().unix();
     data.updateTime = time;
