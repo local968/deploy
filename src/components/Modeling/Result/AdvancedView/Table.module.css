@@ -106,7 +106,7 @@ span.text {
 
 .rowBody {
   display: flex;
-  flex: auto;
+  flex: none;
   flex-direction: column;
   position: relative;
 }
