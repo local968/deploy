@@ -2426,7 +2426,7 @@ class Project {
     socketStore.ready().then(api => {
       const command = {
         projectId: this.id,
-        command: 'clfreg.univariatePlot',
+        command: `${this.problemType === 'MultiClassification' ? 'multi' : 'clfreg'}.univariatePlot`,
         feature_label: [field]
       };
       // if (field) {

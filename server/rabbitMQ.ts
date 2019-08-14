@@ -33,6 +33,7 @@ export default class RabbitMQ {
       })
       .then(conn => {
         this.amqplib = conn;
+        console.error('************** mq 连接成功');
         conn.on('close', () => {
           this.amqplib = undefined;
           console.error('************** mq 连接失败，开始重连');

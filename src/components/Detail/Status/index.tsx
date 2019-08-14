@@ -167,7 +167,7 @@ const isExcessThreshold = schedule => {
     CVNN: 'CVNN',
     CH: 'CH',
     Silhouette_Score: 'silhouette_euclidean',
-    macro_auc: 'Kappa',
+    macro_auc: 'macro_auc',
     macro_f1: 'macro_F1',
     micro_f1: 'micro_F1',
     macro_recall: 'macro_R',
@@ -365,7 +365,7 @@ class SchedulePerformance extends Component<SchedulePerformanceProps> {
             {s.schedule.result && s.schedule.status === 'finished'
               ? `Macro AUC:${this.showScore(
                 s.schedule.result.score,
-                'Kappa',
+                'macro_auc',
               )} Macro F1:${this.showScore(
                 s.schedule.result.score,
                 'macro_F1',

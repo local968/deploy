@@ -71,11 +71,11 @@ const Association = (props: AssociationProps) => {
       </div>
       <div className={styles.content}>
         <div className={styles.result}>
-          {texts.map((t, k) => {
+          {!!texts.length ? texts.map((t, k) => {
             return <li className={styles.row} key={k}>
               <span>{k + 1}: {t}</span>
             </li>
-          })}
+          }) : EN.AssociateNotFind}
         </div>
         <div className={classnames(styles.views, {
           [styles.viewsHidden]: !visible
