@@ -20,11 +20,11 @@ const selectable = [
     type: EN.ContinuousValuesRegression,
     detail: <p>{EN.Topredictacontinuous}</p>,
   },
-  // {
-  //   value: 'MultiClassification',
-  //   type: EN.MultiClassification,
-  //   detail: <p>{EN.MultiClassificationHint}</p>,
-  // },
+  {
+    value: 'MultiClassification',
+    type: EN.MultiClassification,
+    detail: <p>{EN.MultiClassificationHint}</p>,
+  },
 ];
 
 const Unsupervised = [
