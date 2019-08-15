@@ -32,18 +32,18 @@ const Headers: TableHeader[] = [
   },
   {
     label: 'Macro-P',
-    value: 'macro-P',
+    value: 'macrop',
     sort: true,
     hint: EN.RootMeanSquareErrorprediction
   },
   {
     label: 'Macro-R',
-    value: 'macro-R',
+    value: 'macror',
     sort: true,
   },
   {
     label: 'Macro-F1',
-    value: 'macro-F1',
+    value: 'macrof1',
     sort: true,
     hint: EN.RMSLEissimilarwithRMSE
   },
@@ -61,7 +61,7 @@ const Headers: TableHeader[] = [
   // },
   {
     label: 'Kappa',
-    value: 'Kappa',
+    value: 'kappa',
     sort: true,
     hint: EN.R2isastatisticalmeasure
   },
@@ -79,7 +79,7 @@ const Headers: TableHeader[] = [
   // },
   {
     label: 'Macro-AUC',
-    value: 'MacroAUC',
+    value: 'macroauc',
     sort: true,
     hint: EN.TheadjustedR2tells
   },
@@ -97,7 +97,7 @@ const Headers: TableHeader[] = [
   // },
   {
     label: 'HammingLoss',
-    value: 'HammingLoss',
+    value: 'hammingLoss',
     sort: true,
     hint: EN.TheadjustedR2tells
   },
@@ -168,66 +168,66 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
           const bModelData = isHoldout ? (bModel.score.holdoutScore.Accuracy) : (bModel.score.validateScore.Accuracy)
           return (aModelData - bModelData) * sort.value
         }
-      case 'ap':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.AP) : (aModel.score.validateScore.AP)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.AP) : (bModel.score.validateScore.AP)
-          return (aModelData - bModelData) * sort.value
-        }
-      case 'map':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.mAP) : (aModel.score.validateScore.mAP)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.mAP) : (bModel.score.validateScore.mAP)
-          return (aModelData - bModelData) * sort.value
-        }
+      // case 'ap':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.AP) : (aModel.score.validateScore.AP)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.AP) : (bModel.score.validateScore.AP)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
+      // case 'map':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.mAP) : (aModel.score.validateScore.mAP)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.mAP) : (bModel.score.validateScore.mAP)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
       case 'kappa':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.Kappa) : (aModel.score.validateScore.Kappa)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.Kappa) : (bModel.score.validateScore.Kappa)
           return (aModelData - bModelData) * sort.value
         }
-      case 'auc':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.auc) : (aModel.score.validateScore.auc)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.auc) : (bModel.score.validateScore.auc)
-          return (aModelData - bModelData) * sort.value
-        }
-      case 'aucpr':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.aucpr) : (aModel.score.validateScore.aucpr)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.aucpr) : (bModel.score.validateScore.aucpr)
-          return (aModelData - bModelData) * sort.value
-        }
+      // case 'auc':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.auc) : (aModel.score.validateScore.auc)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.auc) : (bModel.score.validateScore.auc)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
+      // case 'aucpr':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.aucpr) : (aModel.score.validateScore.aucpr)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.aucpr) : (bModel.score.validateScore.aucpr)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
       case 'macroauc':
         {
           const aModelData = isHoldout ? (aModel.holdoutChartData.roc_auc.macro) : (aModel.chartData.roc_auc.macro)
           const bModelData = isHoldout ? (bModel.holdoutChartData.roc_auc.macro) : (bModel.chartData.roc_auc.macro)
           return (aModelData - bModelData) * sort.value
         }
-      case 'fmeasure':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.fmeasure) : (aModel.score.validateScore.fmeasure)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.fmeasure) : (bModel.score.validateScore.fmeasure)
-          return (aModelData - bModelData) * sort.value
-        }
-      case 'gini':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.gini) : (aModel.score.validateScore.gini)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.gini) : (bModel.score.validateScore.gini)
-          return (aModelData - bModelData) * sort.value
-        }
+      // case 'fmeasure':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.fmeasure) : (aModel.score.validateScore.fmeasure)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.fmeasure) : (bModel.score.validateScore.fmeasure)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
+      // case 'gini':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.gini) : (aModel.score.validateScore.gini)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.gini) : (bModel.score.validateScore.gini)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
       case 'hammingLoss':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.HammingLoss) : (aModel.score.validateScore.HammingLoss)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.HammingLoss) : (bModel.score.validateScore.HammingLoss)
           return (aModelData - bModelData) * sort.value
         }
-      case 'zeroOneLoss':
-        {
-          const aModelData = isHoldout ? (aModel.score.holdoutScore.ZeroOneLoss) : (aModel.score.validateScore.ZeroOneLoss)
-          const bModelData = isHoldout ? (bModel.score.holdoutScore.ZeroOneLoss) : (bModel.score.validateScore.ZeroOneLoss)
-          return (aModelData - bModelData) * sort.value
-        }
+      // case 'zeroOneLoss':
+      //   {
+      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.ZeroOneLoss) : (aModel.score.validateScore.ZeroOneLoss)
+      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.ZeroOneLoss) : (bModel.score.validateScore.ZeroOneLoss)
+      //     return (aModelData - bModelData) * sort.value
+      //   }
       case 'validation':
         {
           const [t, p] = metric.split("_")
