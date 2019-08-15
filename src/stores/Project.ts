@@ -380,6 +380,9 @@ class Project {
     plot: '',
   }
 
+  @observable correlationMatrixLoading: boolean = false
+  @observable correlationMatrixData: string = ''
+
   constructor(id: string, args: Object) {
     this.id = id;
     this.visiable = true;
@@ -662,7 +665,9 @@ class Project {
       settingId: '',
       settings: [],
       metricCorrection: { metric: 'default', type: '', value: 0 },
-      fbeta: 1
+      fbeta: 1,
+      correlationMatrixLoading: false,
+      correlationMatrixData: ''
     } as {
       train2Finished: boolean,
       train2ing: boolean,
@@ -711,7 +716,9 @@ class Project {
       settingId: string,
       settings: Settings[],
       metricCorrection: { metric: string, type: string, value: number },
-      fbeta: number
+      fbeta: number,
+      correlationMatrixLoading: boolean,
+      correlationMatrixData: string
     }
   }
 
@@ -2321,6 +2328,32 @@ class Project {
       // list.forEach(m => {
       //   this.setModel(m)
       // });
+    })
+  }
+
+  correlationMatrix = () => {
+    if (this.correlationMatrixLoading) return Promise.resolve()
+    return socketStore.ready().then(api => {
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] === 'Numerical')
+      if (this.target) featureLabel.push(this.target)
+      const command = {
+        command: 'top.correlationMatrix',
+        featureLabel,
+        projectId: this.id,
+      }
+      this.correlationMatrixLoading = true
+      return api.correlationMatrix(command)
+        .then((returnValue: BaseResponse) => {
+          const { status, result } = returnValue
+          if (status < 0) {
+            return antdMessage.error(result['processError'])
+          }
+          // this.setProperty({
+          //   preImportance: result.preImportance,
+          //   informativesLabel: result.informativesLabel,
+          //   preImportanceLoading: false
+          // })
+        })
     })
   }
 

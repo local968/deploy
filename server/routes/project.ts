@@ -1530,6 +1530,30 @@ wss.register('outlierPlot', (message, socket) => {
   // })
 });
 
+wss.register('correlationMatrix', (message, socket) => {
+  const { projectId, _id, command: _command, featureLabel } = message
+  const { userId } = socket.session
+  return createOrUpdate(projectId, userId, {
+    correlationMatrixLoading: true,
+  }).then(() => command({
+    command: _command,
+    projectId,
+    requestId: _id,
+    featureLabel,
+    userId
+  }, progressValue => {
+    const { status } = progressValue
+    if (status < 0 || status === 100) return progressValue
+  })).then(returnValue => {
+    const { status, result } = returnValue
+    if (status < 0) return returnValue
+    return createOrUpdate(projectId, userId, {
+      correlationMatrixLoading: false,
+      correlationMatrixData: result.correlationMatrixData
+    })
+  })
+})
+
 function queryModelList(id: any, process: any) {
   const key = `project:${id}:models`;
   return redis.smembers(key).then(ids => {
