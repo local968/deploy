@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
-import { BoxPlots, TSENOne, UnivariantPlots } from '../../../Charts';
+import { BoxPlots, FitBar, TSENOne, UnivariantPlots } from '../../../Charts';
 
 interface Interface {
   type:any
@@ -14,6 +14,12 @@ interface Interface {
 export default class ScatterPlot extends Component<Interface> {
   render() {
     const { type, style, data, message, colType,renameVariable } = this.props;
+
+    if(type === "MultiClassification"){
+      return <FitBar
+         message={data}
+      />
+    }
     if (type === 'Regression') {
       //散点图
       if (colType === 'Numerical') {

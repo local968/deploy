@@ -70,7 +70,7 @@ class ModelComp extends Component<ModelCompProps> {
                 <RocChart
                   models={models}
                   selectAll={select}
-                  x_name={EN.FalsePositiveDate}
+                  x_name={EN.FalsePositiveRate}
                   y_name={EN.TruePositiveRate}
                   mom='roc'
                   x='FPR'

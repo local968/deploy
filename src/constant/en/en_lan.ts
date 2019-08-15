@@ -962,7 +962,7 @@ const EN_LAN = {
   Speedms1000rows: 'Speed(s/1000rows)',
   Percentage: 'Percentage',
   TruePositiveRate: 'True Positive Rate',
-  FalsePositiveDate: 'False Positive Rate',
+  FalsePositiveRate: 'False Positive Rate',
   GOOD: 'GOOD',
   Yourusageofnumberofdeploylineshas: 'Your usage of number of deploy lines has reached the max restricted by your current license.',
   Aftercompleted: 'After completed',
