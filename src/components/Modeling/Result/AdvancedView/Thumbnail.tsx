@@ -7,6 +7,7 @@ interface Interface {
   value:any
   thumbnail:any
   onClick:any
+  style?:Object
 }
 
 export default class Thumbnail extends Component<Interface>{
@@ -28,16 +29,19 @@ export default class Thumbnail extends Component<Interface>{
     this.props.onClick(this.props.value);
   };
   render() {
-    const { selectedIcon, hoverIcon, normalIcon, text } = this.props.thumbnail;
+    const { selectedIcon, hoverIcon, normalIcon, text} = this.props.thumbnail;
     const { clickActive, hoverActive } = this.state;
+    const {style={}} = this.props;
     const icon = clickActive
       ? selectedIcon
       : hoverActive
       ? hoverIcon
       : normalIcon;
+    console.log(11,style)
     return (
       <div
         className={styles.thumbnail}
+        style={style}
         onClick={this.handleClick}
       >
         <img src={icon} alt="icon" />

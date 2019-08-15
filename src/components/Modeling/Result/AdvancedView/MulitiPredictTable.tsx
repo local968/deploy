@@ -1,8 +1,8 @@
-import { Table } from 'antd';
-import * as React from 'react';
+import * as React from 'react'
 import _ from 'lodash';
 import styles from './AdvancedView.module.css'
 import EN from '../../../../constant/en';
+import { Table } from 'antd'
 
 import config from 'config'
 
@@ -92,11 +92,10 @@ export default function MulitiPredictTable(props: Interface) {
   data.push(last_last);
   return <section
     className={styles.mytable}
-    style={{
-      transform:(isEN?"rotate(0180deg)":"")
-    }}
   >
-    <div>{EN.ActualLabel}</div>
+    <div className={styles.leftTitle} style={{
+      transform:(isEN?"rotate(0180deg)":"")
+    }}>{EN.ActualLabel}</div>
     <Table
       columns={columns}
       pagination={false}

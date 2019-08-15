@@ -55,7 +55,7 @@
   margin: 30px 10%;
   display: flex;
 }
-.mytable >:first-child{
+.leftTitle{
   writing-mode: vertical-lr;
   height: fit-content;
   padding-right: 10px;
