@@ -118,7 +118,7 @@ export default class ModelResult extends Component<ModelResultProps> {
 
   render() {
     const { project } = this.props.projectStore;
-    const { models, isHoldout } = project;
+    const { models, isHoldout, problemType } = project;
     const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
     if (!models.length) return null;
     if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
@@ -181,7 +181,7 @@ export default class ModelResult extends Component<ModelResultProps> {
                 <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
             </a>)}
-          {this.view === 'advanced' && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
+          {(problemType !== 'MultiClassification' && this.view === 'advanced') && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
             <span>{`${EN.CreatePmml}`}</span>
           </button> : !selectModel.pmmlData ?
               <Tooltip title={EN.CannotExportPmml}>
