@@ -27,7 +27,7 @@ export default function NetworkDiagram(props:Interface) {
 		keys.map(target=>{
 			const {color,weight} = value[target];
 			const [r,g,b,a] = color;
-			const _color = `rgba(${r*256},${g*256},${b*256},${a})`;
+			const _color = `rgba(${r*255},${g*255},${b*255},${a})`;
 			edgeSymbolSize = Math.max(edgeSymbolSize,2*weight);
 			links.push({
 				source,

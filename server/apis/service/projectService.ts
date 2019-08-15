@@ -29,8 +29,8 @@ const remove = async (project_id)=>{
   return request.delete(url)
 };
 
-module.exports = {
+export {
   add,
   list,
   remove,
-};
+}

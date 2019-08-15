@@ -30,7 +30,7 @@ export default class SimplifiedView extends Component<Interface> {
   componentDidMount() {
     // this.props.project
     //   .dataView()
-    // .then(() => 
+    // .then(() =>
     this.props.project.preTrainImportance()
     // );
   }
@@ -158,7 +158,7 @@ export default class SimplifiedView extends Component<Interface> {
   reloadTable = () => {
     // this.props.project
     //   .dataView()
-    //   .then(() => 
+    //   .then(() =>
     this.props.project.preTrainImportance()
     // );
   };
@@ -219,7 +219,8 @@ export default class SimplifiedView extends Component<Interface> {
       totalLines,
       dataViewProgress,
       importanceProgress,
-      targetUnique
+      targetUnique,
+      problemType,
     } = project;
     const targetUniques = targetUnique || NaN
     const targetData = dataViews[target]
@@ -315,6 +316,7 @@ export default class SimplifiedView extends Component<Interface> {
                       result={this.result[target]}
                       data={this.chartData[target]}
                       renameVariable={renameVariable}
+                      across = {problemType === 'MultiClassification'}
                     />
                   }
                 />

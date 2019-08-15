@@ -74,7 +74,7 @@ async function query(key, offset, limit, userId) {
     if (project[0] !== null) {
       Array.push(project);
     } else {
-      projectService.remove(r);
+      await projectService.remove(r);
     }
   }
 

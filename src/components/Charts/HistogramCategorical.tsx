@@ -16,6 +16,7 @@ interface Interface {
   height?:number
   width?:number
   xAxisName?:Array<string>
+  across?:boolean
 }
 
 export default function HistogramCategorical(props:Interface){
@@ -25,6 +26,7 @@ export default function HistogramCategorical(props:Interface){
     data=[],
     xAxisName = data.map((itm)=>itm.name),
     title = `Feature:${x_name}`,
+    across,
   } = props;
 
   const dt = data.map(itm=>itm.value);
@@ -39,6 +41,62 @@ export default function HistogramCategorical(props:Interface){
   const fontSize = 15;
 
   title = _.chunk([...title],35).map(itm=>itm.join('')).join('\n');
+
+  let _data = data.map((itm)=>itm.value);
+  const series = [{
+    data: _data,
+    type: 'bar',
+    label:{
+      show:true,
+    },
+    itemStyle:{},
+    barGap:'-100%',
+  }];
+  const dataZoom = {
+    type: 'inside',
+    zoomLock:true,
+    start: 0,
+    end: 100 / data.length * 8,
+    orient:"horizontal",
+  };
+
+  if(across){
+    _data.reverse();
+    series[0].data = _data.map((itm,index)=>{
+        if(index%2){
+          return '-'
+        }
+        return itm
+    });
+    series[0].itemStyle={
+      normal:{
+        color : '#b2bcc4'
+      }
+    };
+    series.push({
+      data: _data.map((itm,index)=>{
+        if(index%2){
+          return itm
+        }
+        return '-'
+      }),
+      type: 'bar',
+      barGap:'-100%',
+      label:{
+        show:true,
+      },
+      itemStyle:{
+        normal:{
+          color : '#ffcc78'
+        }
+      }
+    });
+    /////////////////////////
+    dataZoom.orient = "vertical";
+    dataZoom.start = 100;
+    dataZoom.end = 100 - 100 / data.length * 8;
+  }
+
   const option = {
     title: {
       text: title,
@@ -66,8 +124,8 @@ export default function HistogramCategorical(props:Interface){
     },
     xAxis: {
       name:x_name,
-      type: 'category',
-      data: xAxisName,
+      type: across?"value":'category',
+      data: across?null:xAxisName,
       nameLocation:'middle',
       nameTextStyle,
       nameGap:25,
@@ -79,24 +137,14 @@ export default function HistogramCategorical(props:Interface){
     yAxis: {
       name:y_name,
       nameTextStyle,
-      type: 'value',
+      type: across?'category':"value",
+      data: across?xAxisName.reverse():null,
     },
-    dataZoom:{
-      type: 'inside',
-      zoomLock:true,
-      start: 0,
-      end: 100 / data.length * 8
-    },
+    dataZoom,
     grid:{
       x:`${Math.floor(+max+1)}`.length * 10 +20,
     },
-    series: [{
-      data: data.map((itm)=>itm.value),
-      type: 'bar',
-      label:{
-        show:true,
-      },
-    }],
+    series,
   };
 
   return <ReactEcharts

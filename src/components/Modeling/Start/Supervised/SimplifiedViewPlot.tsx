@@ -10,12 +10,13 @@ interface Interface {
   value?:any
   result:any
   renameVariable?:any
+  across?:boolean
 }
 
 export default class SimplifiedViewPlot extends Component<Interface> {
 
   render() {
-    const { type, style, data, target,value,result,renameVariable={}} = this.props;
+    const { type, style, data, target,value,result,renameVariable={},across} = this.props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
@@ -36,6 +37,7 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         x_name={target||value}
         data={data}
         xAxisName = {data.map((itm)=>target?(renameVariable[itm.name]||itm.name):itm.name)}
+        across = {across}
       />
     </div>
   }
