@@ -26,6 +26,7 @@ import PIE from './PIE'
 import HS from './HS'
 import TwinBar from './TwinBar'
 import SPND from './SPND'
+import FitBar from './FitBar'
 
 export {
   Bar,
@@ -56,4 +57,5 @@ export {
   HS,
   TwinBar,
   SPND,
+  FitBar,
 }
