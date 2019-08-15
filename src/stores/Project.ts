@@ -1628,7 +1628,7 @@ class Project {
 
   @action
   fastTrain = () => {
-    // if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
+    if (this.train2ing) return antdMessage.error("Your project is already training, please stop it first.")
     const {
       id,
       problemType,
@@ -2332,6 +2332,7 @@ class Project {
   }
 
   correlationMatrix = () => {
+    if (this.correlationMatrixData) return Promise.resolve()
     if (this.correlationMatrixLoading) return Promise.resolve()
     return socketStore.ready().then(api => {
       const featureLabel = this.dataHeader.filter(h => this.colType[h] === 'Numerical')
