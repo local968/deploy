@@ -2,7 +2,7 @@ import ReactEcharts from "echarts-for-react";
 import React from "react";
 import echarts from 'echarts'
 import _ from 'lodash'
-import { toJS } from 'mobx';
+import EN from "../../constant/en";
 
 interface Interface {
 	message:any
@@ -122,7 +122,7 @@ export default function FitBar(props:Interface){
 		data:__data,
 		encode: {
 			x: [0, 1],
-			y: 5,
+			y: 7,
 			// tooltip: [0, 1, 2],
 			itemName: 3
 		},
@@ -134,11 +134,9 @@ export default function FitBar(props:Interface){
 			formatter:params=>{
 				const {marker,value} = params;
 				const [x_start,x_end,yp,,,,x_name,y_name] = value;
-				console.log(params)
-				console.log(y_names)
 				return`
-					${marker}${x_name}:${+(x_end-x_start).toFixed(3)*100}%<br/>
-					${y_name}:${yp.toFixed(3)*100}%
+					${marker}${x_name}:${((x_end-x_start)*100).toFixed(3)}%<br/>
+					${y_name}:${(yp*100).toFixed(3)}%
 				`
 			}
 		},
@@ -147,17 +145,34 @@ export default function FitBar(props:Interface){
 			max:1,
 			show:false,
 		},
-		yAxis: {
+		yAxis: [{
+		  min:0,
 			max:1,
-		},
+      axisLine:{
+			  show:false
+      },
+      axisLabel:{
+        show:false
+      },
+      name:"收缩压分组（mmHg)"
+		},{
+		  min:0,
+      max:1,
+      axisLine:{
+        show:false
+      },
+      name:EN.Scale,
+    }],
 		series,
-		// dataZoom:{
-		// 	type: 'inside',
-		// 	zoomLock:true,
-		// 	start: 0,
-		// 	end: 0.5,
-		// 	// orient:"horizontal",
-		// }
+		dataZoom:{
+			type: 'slider',
+      filterMode:"none",
+      rangeMode:['percent','percent']
+		},
+    grid:{
+      top:50,
+      bottom:100,
+    }
 	};
 
 

@@ -131,7 +131,7 @@ export default function HistogramCategorical(props:Interface){
       nameGap:25,
       axisLabel:{
         interval:0,
-        rotate:30,
+        rotate:across?0:30,
       },
     },
     yAxis: {
