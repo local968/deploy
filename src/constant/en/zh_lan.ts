@@ -806,7 +806,7 @@ const ZH_LAN = {
   Speedms1000rows: '建模速度(行/秒)',
   Percentage: '百分比',
   TruePositiveRate: '真阳率',
-  FalsePositiveDate: '假阳率',
+  FalsePositiveRate: '假阳率',
   GOOD: '优秀',
   Yourusageofnumberofdeploylineshas: '部署行数已达到出当前权限最大限制。',
   Aftercompleted: '点击"完成"后',

@@ -27,6 +27,7 @@ import HS from './HS'
 import TwinBar from './TwinBar'
 import SPND from './SPND'
 import FitBar from './FitBar'
+import MultiRoc from './MultiRoc'
 
 export {
   Bar,
@@ -58,4 +59,5 @@ export {
   TwinBar,
   SPND,
   FitBar,
+  MultiRoc,
 }

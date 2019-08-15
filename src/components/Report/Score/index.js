@@ -1002,7 +1002,7 @@ class ModelComp extends Component {
               <TabPane tab={EN.ROCCurves} key="4">
                 <RocChart
                   models={models}
-                  x_name={EN.FalsePositiveDate}
+                  x_name={EN.FalsePositiveRate}
                   y_name={EN.TruePositiveRate}
                   mom='roc'
                   x='FPR'

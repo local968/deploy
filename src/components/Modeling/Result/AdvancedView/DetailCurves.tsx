@@ -100,7 +100,7 @@ export default class DetailCurves extends Component<Interface> {
           <ROCCurves
             height={300}
             width={600}
-            x_name={EN.FalsePositiveDate}
+            x_name={EN.FalsePositiveRate}
             y_name={EN.TruePositiveRate}
             model={model}
             isHoldout={isHoldout}
