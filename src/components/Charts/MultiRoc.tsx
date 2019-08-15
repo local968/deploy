@@ -39,7 +39,7 @@ export default function MultiRoc(props: Interface) {
     .forEach(itm => {
       series.push({
         data: _.zip(fpr[itm], tpr[itm]),
-        symbolSize: 0,
+        symbolSize: 1,
         type: 'line',
         name:`ROC curve of class ${itm}(area = ${roc_auc[itm].toFixed(2)})`,
       });
@@ -47,7 +47,7 @@ export default function MultiRoc(props: Interface) {
 
   const option = {
     title:{
-      text: 'Some extension of Receiver operating characteristic to multi-class',
+      // text: 'Some extension of Receiver operating characteristic to multi-class',
     },
     xAxis: {
       type: 'value',

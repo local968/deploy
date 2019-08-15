@@ -10,7 +10,7 @@ import Report from 'components/Report'
 import ErrorBoundary from 'components/Common/ErrorBoundary';
 import Stores from 'stores';
 import styles from './styles.module.css';
-import { LocaleProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 import config from 'config'
 
@@ -31,7 +31,7 @@ class App extends Component {
       <ErrorBoundary>
         {
           isEN ?
-            <LocaleProvider >
+            <ConfigProvider >
               <Provider {...stores}>
                 {r2Report ? <Report /> : <Router history={history}>
                   <div className={styles.app}>
@@ -46,8 +46,8 @@ class App extends Component {
                   </div>
                 </Router>}
               </Provider>
-            </LocaleProvider> :
-            <LocaleProvider locale={zh_CN}>
+            </ConfigProvider> :
+            <ConfigProvider locale={zh_CN}>
               <Provider {...stores}>
                 {r2Report ? <Report /> : <Router history={history}>
                   <div className={styles.app}>
@@ -61,7 +61,7 @@ class App extends Component {
                   </div>
                 </Router>}
               </Provider>
-            </LocaleProvider>
+            </ConfigProvider>
         }
 
       </ErrorBoundary>

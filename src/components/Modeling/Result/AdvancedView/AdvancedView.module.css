@@ -50,3 +50,11 @@
   flex: none;
   margin-top: 20px;
 }
+
+.mytable{
+  margin-top: 30px;
+}
+
+.mytable strong{
+  color:#ff0000;
+}
