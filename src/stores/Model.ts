@@ -151,6 +151,8 @@ class Model {
   @observable target: string[] = [];
   @observable esIndex: string = '';
   @observable accuracyData: NumberObject = {}
+  @observable getPmml: boolean = false
+  @observable pmmlData: string = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
@@ -447,6 +449,13 @@ class Model {
   getOutlierData = () => {
     return socketStore.ready().then(api => {
       return api.getOutlierData({ id: this.id, projectId: this.projectId, rate: this.rate, esIndex: this.esIndex })
+    })
+  }
+
+  createPmml = () => {
+    this.getPmml = true
+    return socketStore.ready().then(api => {
+      return api.createPmml({ command: 'clfreg.pmml', id: this.id, projectId: this.projectId })
     })
   }
   // outlierPlot = (featureList) => {
