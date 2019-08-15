@@ -37,9 +37,10 @@ export default class Modeling extends Component<ModelingProps> {
   }
 
   componentDidMount() {
+    const { projectStore: { project }, routing } = this.props;
+    if (!project) return
+    project.correlationMatrix()
     this.autorun = autorun(() => {
-      const { projectStore: { project }, routing } = this.props;
-      if (!project) return
       const { curStep, subStepActive, id } = project;
       if (curStep !== 3) return
       let url = ''
