@@ -2,6 +2,11 @@ import { Table } from 'antd';
 import * as React from 'react';
 import _ from 'lodash';
 import styles from './AdvancedView.module.css'
+import EN from '../../../../constant/en';
+
+import config from 'config'
+
+const {isEN} = config;
 
 interface Interface {
   project: any;
@@ -19,7 +24,7 @@ export default function MulitiPredictTable(props: Interface) {
   const columns: any = [
     {
       title: ' ',
-      width: 50,
+      width: 100,
       dataIndex: 'title_title',
       key: 'title_title',
       fixed: 'left',
@@ -29,9 +34,11 @@ export default function MulitiPredictTable(props: Interface) {
   title.forEach(itm => {
     columns.push({
       title: itm,
-      width: 90,
+      width: 100,
       dataIndex: itm,
       key: itm,
+      // fixed: 'left',
+      align:"center",
     });
   });
 
@@ -42,12 +49,16 @@ export default function MulitiPredictTable(props: Interface) {
         dataIndex: 'total_total',
         key: 'total_total',
         fixed: 'right',
+        width: 100,
+        align:"center",
       },
       {
         title: 'Error',
         dataIndex: 'error_error',
         key: 'error_error',
         fixed: 'right',
+        width: 100,
+        align:"center",
       },
     ],
   );
@@ -81,12 +92,18 @@ export default function MulitiPredictTable(props: Interface) {
   data.push(last_last);
   return <section
     className={styles.mytable}
+    style={{
+      transform:(isEN?"rotate(0180deg)":"")
+    }}
   >
+    <div>{EN.ActualLabel}</div>
     <Table
       columns={columns}
       pagination={false}
+      title={()=><div style={{textAlign:'center'}}>{EN.PredictedLabel}</div>}
+      bordered={true}
       size={'small'}
       dataSource={data}
-      scroll={{ x: 300, y: 300 }} />
+      scroll={{ x: true, y: 300 }} />
   </section>
 }

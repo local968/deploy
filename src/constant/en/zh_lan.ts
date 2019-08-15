@@ -1265,6 +1265,8 @@ const ZH_LAN = {
   MultiUniqueHint1: '最少支持3类，最多支持',
   MultiUniqueHint2: '类，请输入3-',
   MultiUniqueHint3: '之间的数字',
+  PredictedLabel:"预测标签",
+  ActualLabel:"实际标签",
 };
 
 export default ZH_LAN;

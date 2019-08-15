@@ -1407,6 +1407,8 @@ const EN_LAN = {
   MultiUniqueHint1: '最少支持3类，最多支持',
   MultiUniqueHint2: '类，请输入3-',
   MultiUniqueHint3: '之间的数字',
+  PredictedLabel:"Predicted label",
+  ActualLabel:"Actual label",
 };
 
 

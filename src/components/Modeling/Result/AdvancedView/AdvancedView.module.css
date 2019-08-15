@@ -52,7 +52,14 @@
 }
 
 .mytable{
-  margin-top: 30px;
+  margin: 30px 10%;
+  display: flex;
+}
+.mytable >:first-child{
+  writing-mode: vertical-lr;
+  height: fit-content;
+  padding-right: 10px;
+  padding-top: 60px;
 }
 
 .mytable strong{
