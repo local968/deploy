@@ -381,7 +381,7 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
     {detail && <MultiClassificationDetailCurves
       project={project}
       model={model}
-      // mapHeader={newMapHeader}
+      mapHeader={newMapHeader}
     />}
   </div>
 })
