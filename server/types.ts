@@ -9,8 +9,9 @@ export interface Metric {
   missingValueFillMethod?: FillMethod,
   outlierFillMethod?: FillMethod,
   mapFillMethod?: { [value: string]: FillMethod },
-  categoricalMap?: { key: string, doc_count: number }[]
+  categoricalMap?: { key: string, doc_count: number }[],
   originalCategoricalMap?: { key: string, doc_count: number }[]
+  // mapValue?: {[x:string]: number}
 }
 
 export interface FillMethod {
