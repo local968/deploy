@@ -110,17 +110,22 @@ export default class ModelResult extends Component<ModelResultProps> {
     this.currentSettingId = settingId
   });
 
+  createPmml = () => {
+    this.props.projectStore.project.selectModel.createPmml().then(result => {
+      if (result.status < 0) message.error(result['processError'])
+    })
+  }
+
   render() {
     const { project } = this.props.projectStore;
     const { models, isHoldout } = project;
-    const { id, etlIndex, fileName, selectModel, target, loadModel, settings, problemType } = project
+    const { id, etlIndex, fileName, selectModel, target, loadModel, settings } = project
     if (!models.length) return null;
     if (loadModel) return <ProcessLoading style={{ position: 'fixed' }} />
     // const { view } = this;
 
     const modelName = selectModel.modelName;
     const cannotDownload = !isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
-    const hasPmml = !!selectModel.pmml
 
     const type = isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
@@ -176,16 +181,18 @@ export default class ModelResult extends Component<ModelResultProps> {
                 <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
             </a>)}
-          {this.view === 'advanced' && (!hasPmml ?
-            <Tooltip title={EN.CannotExportPmml}>
-              <button className={classnames(styles.button, styles.disabled)}>
-                <span>{`${EN.DownloadPmml}`}</span>
-              </button>
-            </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
-              <button className={styles.button}>
-                <span>{`${EN.DownloadPmml}`}</span>
-              </button>
-            </a>)}
+          {this.view === 'advanced' && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
+            <span>{`${EN.CreatePmml}`}</span>
+          </button> : !selectModel.pmmlData ?
+              <Tooltip title={EN.CannotExportPmml}>
+                <button className={classnames(styles.button, styles.disabled)}>
+                  <span>{`${EN.DownloadPmml}`}</span>
+                </button>
+              </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+                <button className={styles.button}>
+                  <span>{`${EN.DownloadPmml}`}</span>
+                </button>
+              </a>)}
         </div>
         {/* <Modal title='Model Insights'
           visible={current && this.show}

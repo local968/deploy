@@ -69,11 +69,11 @@ async function query(key, offset, limit, userId) {
   const result = { count, list: [] };
   const Field = ['id', 'name', 'createTime', 'updateTime', 'description', 'fileName', 'problemType', 'train2ing'];
   const Array = [];
-  for(let r of projectIdList.splice(offset, limit)){
+  for (let r of projectIdList.splice(offset, limit)) {
     const project = await redis.hmget("project:" + r, Field);
-    if(project[0]!==null){
+    if (project[0] !== null) {
       Array.push(project);
-    }else{
+    } else {
       await projectService.remove(r);
     }
   }
@@ -1667,6 +1667,27 @@ wss.register('getOutlierData', (message, socket, progress) => {
       list: _list
     }
   })
+})
+
+wss.register('createPmml', async (message, socket) => {
+  const { id, projectId, _id, command: _command } = message
+  const { userId } = socket.session
+  await updateModel(userId, projectId, id, { getPmml: true })
+
+  const returnValue: any = await command({
+    command: _command,
+    projectId,
+    userId,
+    version: id,
+    requestId: _id
+  }, progressValue => {
+    console.log(progressValue, 'progressValue')
+    const { status } = progressValue
+    if (status < 0 || status === 100) return progressValue
+  })
+  const { status, result } = returnValue
+  if (status === 100) await updateModel(userId, projectId, id, { pmmlData: result.pmmlData })
+  return returnValue
 })
 
 wss.register('deleteIndex', (message, socket) => {

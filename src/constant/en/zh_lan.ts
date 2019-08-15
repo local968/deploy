@@ -1210,6 +1210,7 @@ const ZH_LAN = {
   SetToMaximum: '设置为该变量的最大值',
   DownloadPmml: '导出PMML',
   CannotExportPmml: '无法导出',
+  CreatePmml: '生成PMML',
   ModelProcessing: '模型训练中',
   ModelInterpretation: '模型解释',
   check: '查看',

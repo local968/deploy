@@ -311,7 +311,7 @@ function getSampleIndex() {
 router.get('/download/pmml', async (req, res) => {
   const { mid, projectId } = req.query;
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`);
-  const url = model.pmml
+  const url = model.pmmlData
   if (!url) return res.status(404).send("error")
   res.attachment(`${mid}.pmml`);
   return http.get(JSON.parse(url), response => {
