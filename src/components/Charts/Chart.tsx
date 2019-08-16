@@ -53,12 +53,6 @@ export default function Chart(props){
 				renameVariable={project.renameVariable}
 			/>;
 			break;
-		case 'correlation-matrix':
-			chart = <CorrelationMatrixs
-				value={data.value}
-				type = {data.type.map(itm=>mapHeader[itm]||itm)}
-			/>;
-			break;
 		case 'regression-numerical':
 			chart = <TSENOne
 				x_name={x_name}

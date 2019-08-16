@@ -4,15 +4,14 @@ import styles from './styles.module.css';
 import { CorrelationMatrixs } from '../../../Charts';
 import { Icon } from 'antd';
 
-interface CorrelationPlotInterface {
+interface Interface {
   onClose:any
   CorrelationMatrixData:any
 }
 @observer
-export default class CorrelationPlot extends Component<CorrelationPlotInterface> {
+export default class CorrelationPlot extends Component<Interface> {
   render() {
     const { onClose, CorrelationMatrixData } = this.props;
-    const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot}>
         <div
@@ -33,7 +32,9 @@ export default class CorrelationPlot extends Component<CorrelationPlotInterface>
             />
           </span>
         </div>
-        <CorrelationMatrixs value={value} type={type} />
+        <CorrelationMatrixs
+          message={CorrelationMatrixData}
+        />
       </div>
     );
   }

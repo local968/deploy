@@ -26,7 +26,6 @@ export default function FitBar(props:Interface){
 	}else{
 		heights = DATA;//新建变量
 	}
-	console.log(11,heights)
 
 	const x_sum = _.sum(widths);
 

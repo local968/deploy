@@ -2332,17 +2332,17 @@ class Project {
   }
 
   correlationMatrix = () => {
-    if (this.correlationMatrixData) return Promise.resolve()
-    if (this.correlationMatrixLoading) return Promise.resolve()
+    if (this.correlationMatrixData) return Promise.resolve();
+    if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
-      const featureLabel = this.dataHeader.filter(h => this.colType[h] === 'Numerical')
-      if (this.target) featureLabel.push(this.target)
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw'&&h!==this.target);
+      if (this.target) featureLabel.push(this.target);
       const command = {
         command: 'top.correlationMatrix',
         featureLabel,
         projectId: this.id,
-      }
-      this.correlationMatrixLoading = true
+      };
+      this.correlationMatrixLoading = true;
       return api.correlationMatrix(command)
         .then((returnValue: BaseResponse) => {
           const { status, result } = returnValue

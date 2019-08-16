@@ -573,7 +573,6 @@ class SimplifiedViewRow extends Component {
 class CorrelationPlot extends Component {
   render() {
     const { onClose, CorrelationMatrixData } = this.props;
-    const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot}>
         <div
@@ -592,8 +591,7 @@ class CorrelationPlot extends Component {
             />
           </span></div>
         <CorrelationMatrixs
-          value={value}
-          type={type}
+          message={CorrelationMatrixData}
         />
       </div>
     );

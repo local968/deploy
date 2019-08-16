@@ -45,29 +45,39 @@ export default class SimplifiedViews extends Component<Interface> {
 
   showCorrelationMatrix = () => {
     const { project } = this.props;
+    const {target,mapHeader,correlationMatrixData} = project;
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
     const dataHeader = toJS(project.dataHeader);
 
     const fields = Object.entries(colType)
-      .filter(itm => itm[1] === 'Numerical')
+      .filter(itm => itm[1] !== 'Raw')
       .map(itm => itm[0])
-      .filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm));
-    request
-      .post({
-        url: '/graphics/correlation-matrix',
-        data: {
-          fields,
-          id: project.etlIndex,
-        },
-      })
-      .then((CorrelationMatrixData:any) => {
-        this.showCorrelation = true;
-        let { type } = CorrelationMatrixData;
-        CorrelationMatrixData.type = type.map(itm => project.mapHeader[itm]);
-        this.CorrelationMatrixData = CorrelationMatrixData;
-      });
+      .filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm))
+      .map(itm => mapHeader[itm]);
+
+    if(!(this.CorrelationMatrixData as any).data) {
+      request
+        .post({
+          url: '/graphics/new',
+          data: {
+            url:correlationMatrixData,
+          },
+        })
+        .then((CorrelationMatrixData:any) => {
+          const { header,data } = CorrelationMatrixData;
+          this.CorrelationMatrixData = {
+            data,
+            header:header.map(itm => project.mapHeader[itm]),
+            fields,
+          };
+          this.showCorrelation = true;
+        });
+    }else{
+      (this.CorrelationMatrixData as any).fields = fields;
+      this.showCorrelation = true;
+    }
   };
 
   hideCorrelationMatrix = e => {

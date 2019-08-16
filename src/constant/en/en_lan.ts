@@ -1409,6 +1409,7 @@ const EN_LAN = {
   MultiUniqueHint3: '之间的数字',
   PredictedLabel:"Predicted label",
   ActualLabel:"Actual label",
+  DisplayTargetVariable:"Display target variable",
 };
 
 

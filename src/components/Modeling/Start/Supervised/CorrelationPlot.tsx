@@ -6,13 +6,16 @@ import { Icon } from 'antd';
 
 interface Interface {
   onClose:any
-  CorrelationMatrixData:any
+  CorrelationMatrixData:{
+    data:any
+    header:any
+    fields:Array<string>
+  }
 }
 @observer
 export default class CorrelationPlot extends Component<Interface> {
   render() {
     const { onClose, CorrelationMatrixData } = this.props;
-    const { type, value } = CorrelationMatrixData;
     return (
       <div className={styles.correlationPlot}>
         <div
@@ -32,8 +35,7 @@ export default class CorrelationPlot extends Component<Interface> {
           </span></div>
 
         <CorrelationMatrixs
-          value={value}
-          type={type}
+          message={CorrelationMatrixData}
         />
       </div>
     )

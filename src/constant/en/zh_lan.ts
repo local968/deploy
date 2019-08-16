@@ -1267,6 +1267,7 @@ const ZH_LAN = {
   MultiUniqueHint3: '之间的数字',
   PredictedLabel:"预测标签",
   ActualLabel:"实际标签",
+  DisplayTargetVariable:"显示目标变量",
 };
 
 export default ZH_LAN;

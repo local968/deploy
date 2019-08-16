@@ -1531,11 +1531,12 @@ wss.register('outlierPlot', (message, socket) => {
 });
 
 wss.register('correlationMatrix', (message, socket) => {
-  const { projectId, _id, command: _command, featureLabel } = message
-  const { userId } = socket.session
+  const { projectId, _id, command: _command, featureLabel } = message;
+  const { userId } = socket.session;
   return createOrUpdate(projectId, userId, {
     correlationMatrixLoading: true,
-  }).then(() => command({
+  }).then(() => checkEtl(projectId, userId))
+    .then(() => command({
     command: _command,
     projectId,
     requestId: _id,
