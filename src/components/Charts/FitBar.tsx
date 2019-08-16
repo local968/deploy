@@ -3,19 +3,30 @@ import React from "react";
 import echarts from 'echarts'
 import _ from 'lodash'
 import EN from "../../constant/en";
+import { toJS } from 'mobx';
 
 interface Interface {
 	message:any
 }
 
 export default function FitBar(props:Interface){
-	const {message:{data:DATA,item}} = props;
-	const widths = item.map(itm=>itm.count);
-	const x_names = item.map(itm=>itm.key);
-	const y_names = DATA.map(itm=>itm.name);
+	const {message:{
+		data:DATA,
+		item,
+		featureWidth:widths=item.map(itm=>itm.count),
+		targetUnique:x_names= item.map(itm=>itm.key),
+		featureUnique:y_names=DATA.map(itm=>itm.name),
+	}} = props;
 	const y_width = y_names.length;
 
-	const heights = _.zip(...(DATA).map(itm=>itm.value));
+	let heights;
+
+	if(DATA[0]&&DATA[0].value){
+		heights = _.zip(...(DATA).map(itm=>itm.value));
+	}else{
+		heights = DATA;//新建变量
+	}
+	console.log(11,heights)
 
 	const x_sum = _.sum(widths);
 
@@ -31,11 +42,7 @@ export default function FitBar(props:Interface){
 	let sum = 0;
 	x.map((itm,index)=>{
 		const y = ys[index];
-		// let y_name=[];
-		// if(!index){
-		// 	y_name = y_names;
-		// }
-		const y_name = _.cloneDeep(y_names);
+		const y_name = _.cloneDeep(toJS(y_names));
 		const x_name = x_names[index];
 		const _y_name = y_name.pop();
 		data.push([sum,sum+itm,y[0],0,x_name,_y_name,x_name,_y_name]);
