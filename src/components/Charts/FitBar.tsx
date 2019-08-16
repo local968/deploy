@@ -22,7 +22,12 @@ export default function FitBar(props:Interface){
 	let heights;
 
 	if(DATA[0]&&DATA[0].value){
-		heights = _.zip(...(DATA).map(itm=>itm.value));
+		heights = _.zip(...(DATA).map(itm=>{
+			if(itm.value.length){
+				return itm.value
+			}
+			return new Array(y_names.length);
+		}));
 	}else{
 		heights = DATA;//新建变量
 	}
@@ -32,9 +37,11 @@ export default function FitBar(props:Interface){
 	const x = widths.map(itm=>itm/x_sum);
 
 	const ys = heights.map((itm)=>{
-		const sum = _.sum(itm.map(it=>+it));
-		return itm.map(it=>+it/sum)
+		const sum = _.sum(itm.map(it=>+it))||1;
+		return itm.map((it=0)=>+it/sum)
 	});
+
+	console.log(ys)
 
 
 	let data = [];
@@ -62,7 +69,6 @@ export default function FitBar(props:Interface){
 		};
 	});
 
-	// const _data = data.filter(itm=>!itm.value[0]);
 	let _data = data.filter(itm=>!itm.value[0]);
 	let __data = _.cloneDeep(_data);
 	__data = __data.map(itm=>{
