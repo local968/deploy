@@ -37,7 +37,6 @@ export default class Thumbnail extends Component<Interface>{
       : hoverActive
       ? hoverIcon
       : normalIcon;
-    console.log(11,style)
     return (
       <div
         className={styles.thumbnail}

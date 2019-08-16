@@ -18,7 +18,8 @@ export default function MulitiPredictTable(props: Interface) {
     project: { targetArray, targetCounts, targetUnique },
     data: { matrix, error, error_0, error_1 },
   } = props;
-  const title = targetArray
+
+  const title = targetArray.length
     ? targetArray
     : Object.keys(targetCounts).splice(0, targetUnique);
   const columns: any = [
