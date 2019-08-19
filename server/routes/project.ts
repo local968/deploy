@@ -1301,9 +1301,27 @@ wss.register('train', async (message, socket, progress) => {
 
     console.log(`project: ${projectId} train finished, models: ${curModel}\nall command: ${_stopIds.length} ,finish: ${finishCount}, abort: ${abortCount}, error: ${errorCount}`)
 
+    userLogger.info({
+      userId,
+      pid: projectId,
+      message: `train finished, models: ${curModel}\nall command: ${_stopIds.length} ,finish: ${finishCount}, abort: ${abortCount}, error: ${errorCount}`,
+      time: moment().unix(),
+    });
+
     if (modelCounts < 1 && curModel < 1) {
       if (errorCount > 0) {
         statusData.train2Error = true;
+        commandRes.forEach((cm: any) => {
+          if (!cm.isAbort && cm.status < 0) {
+            console.error(cm.result['processError'])
+            userLogger.error({
+              userId,
+              pid: projectId,
+              message: cm.result['processError'],
+              time: moment().unix(),
+            })
+          }
+        })
       } else {
         statusData.mainStep = 3;
         statusData.curStep = 3;
@@ -1313,23 +1331,6 @@ wss.register('train', async (message, socket, progress) => {
     }
 
     return await createOrUpdate(projectId, userId, statusData);
-
-    // return
-    // const isAbort = await command({ ...data, stopId: requestId }, , true)
-    // if (isAbort === 2) return { status: 200, msg: 'ok' }
-    // const statusData = {
-    //   train2Finished: true,
-    //   train2ing: false,
-    //   train2Error: false,
-    //   trainModel: [],
-    //   selectId: '',
-    //   stopId: ''
-    // }
-    // if (!hasModel) {
-    //   console.log('failed')
-    //   statusData.train2Error = true
-    // }
-    // return await createOrUpdate(projectId, userId, statusData)
   } catch (err) {
     const statusData = {
       train2Finished: false,
@@ -1344,65 +1345,6 @@ wss.register('train', async (message, socket, progress) => {
     await createOrUpdate(projectId, userId, statusData);
     return err;
   }
-  // return checkTraningRestriction(user)
-  //   // .then(() => moveModels(message.projectId))
-  //   .then(() => createOrUpdate(projectId, userId, { ...updateData, stopId: requestId }))
-  //   .then(() => command({ ...data, stopId: requestId }, queueValue => {
-
-  //     const { status, result } = queueValue;
-  //     if (status < 0 || status === 100) return queueValue;
-  //     if (result.name === "progress") {
-  //       const { requestId: trainId } = result;
-  //       // delete result.requestId
-  //       Reflect.deleteProperty(result, 'requestId')
-  //       return createOrUpdate(projectId, userId, { trainModel: result }).then(() => progress({ ...result, trainId }))
-  //     }
-  //     if (result.score) {
-  //       hasModel = true;
-  //       return createOrUpdate(projectId, userId, { trainModel: null })
-  //         .then(() => createModel(userId, projectId, result.name, result).then(addSettingModel(userId, projectId)).then(model => progress(model)))
-  //     }
-  //     if (result.data) {
-  //       const { model: mid, action, data } = result;
-  //       let saveData = {}
-  //       if (action === "chartData") {
-  //         saveData = parseChartData(data)//原始数据
-  //       }
-  //       if (action === "pointToShow") {
-  //         saveData = { qcut: data }
-  //       }
-  //       return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
-  //     }
-  //     if (result.imageSavePath) {
-  //       const { model: mid, action, imageSavePath } = result
-  //       const saveData = { [action]: imageSavePath }
-  //       return updateModel(userId, projectId, mid, saveData).then(model => progress(model))
-  //     }
-  //   })
-  //     .then(() => {
-  //   const statusData = {
-  //     train2Finished: true,
-  //     train2ing: false,
-  //     train2Error: false,
-  //     selectId: ''
-  //   }
-  //   if (!hasModel) statusData.train2Error = true
-  //   return createOrUpdate(projectId, userId, statusData)
-  // }))
-  // .catch(err => {
-  //   const statusData = {
-  //     train2Finished: false,
-  //     train2ing: false,
-  //     train2Error: false,
-  //     selectId: '',
-  //     mainStep: 3,
-  //     curStep: 3,
-  //     lastSubStep: 1,
-  //     subStepActive: 1
-  //   }
-  //   createOrUpdate(projectId, userId, statusData)
-  //   return err
-  // })
 });
 wss.register('watchProjectList', (message, socket) => {
   const { userId } = socket.session;
