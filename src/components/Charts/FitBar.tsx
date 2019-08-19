@@ -110,7 +110,7 @@ export default function FitBar(props:Interface){
 				show: true,
 				position: 'bottom',
 				rotate:'30',
-				color:'#000',
+				// color:'#000',
 				distance:20,
 			}
 		},
@@ -127,7 +127,7 @@ export default function FitBar(props:Interface){
 			normal: {
 				show: true,
 				position: 'left',
-				color:'#000',
+				// color:'#000',
 			}
 		},
 		data:__data,
@@ -165,7 +165,10 @@ export default function FitBar(props:Interface){
       axisLabel:{
         show:false
       },
-      name:"收缩压分组（mmHg)"
+			splitLine:{
+		  	show:false
+			}
+      // name:"收缩压分组（mmHg)"
 		},{
 		  min:0,
       max:1,
@@ -173,6 +176,9 @@ export default function FitBar(props:Interface){
         show:false
       },
       name:EN.Scale,
+			splitLine:{
+		  	show:false
+			}
     }],
 		series,
 		dataZoom:{

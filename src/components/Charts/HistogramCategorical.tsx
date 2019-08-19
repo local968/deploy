@@ -94,7 +94,7 @@ export default function HistogramCategorical(props:Interface){
 
     dataZoom.orient = "vertical";
     dataZoom.start = 100;
-    dataZoom.end = 100 - 100 / data.length * 8;
+    dataZoom.end = 100 - 100 / data.length * 7;
   }
 
   const option = {
@@ -113,7 +113,7 @@ export default function HistogramCategorical(props:Interface){
       }
     },
     toolbox:{
-      show : data.length>8,
+      show : data.length>(across?7:8),
       right:30,
       itemSize:20,
       feature : {
