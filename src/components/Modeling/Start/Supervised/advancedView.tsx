@@ -357,11 +357,11 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
                   <label htmlFor={"algorithm" + k}>{v.label}</label>
                 </div>
               })}
-              <div className={styles.advancedAlgorithm} key={'solution-d'}>
+              {problemType !== 'MultiClassification' && <div className={styles.advancedAlgorithm} key={'solution-d'}>
                 {/* <input id={'R2-solution-b'} type='checkbox' defaultChecked={version.includes(2)} disabled={true} /> */}
                 <input id={'R2-solution-d'} type='checkbox' checked={version.includes(4)} onChange={this.handleSolution.bind(null, 4)} />
                 <label htmlFor={'R2-solution-d'}>DNN</label>
-              </div>
+              </div>}
             </div>
           </div>
         </div>

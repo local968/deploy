@@ -607,7 +607,7 @@ class Project {
         'random_forest',
         'sgd',
         'xgradient_boosting',
-        'r2-logistics',
+        // 'r2-logistics',
       ]
     }
     return algorithms.filter(a => !disableList.includes(a))
@@ -616,6 +616,8 @@ class Project {
   @computed
   get defaultTrain() {
     const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
+    const version = [1, 2]
+    if (this.problemType === 'Classification' || this.problemType === 'Regression') version.push(4)
 
     return {
       train2Finished: false,
@@ -636,7 +638,7 @@ class Project {
       algorithms: this.defaultAlgorithms,
       measurement,
       selectId: '',
-      version: [1, 2, 4],
+      version,
       trainHeader: [],
       customHeader: [],
       newVariable: [],
@@ -1818,7 +1820,7 @@ class Project {
           featureLabel,
           targetLabel: [target],
           projectId: id,
-          version: '1,2,3,4',
+          version: '1,2,3',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1845,7 +1847,7 @@ class Project {
             'random_forest',
             'sgd',
             'xgradient_boosting',
-            'r2-logistics',
+            // 'r2-logistics',
           ],
           featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
           esIndex: this.etlIndex,
