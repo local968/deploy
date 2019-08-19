@@ -163,3 +163,10 @@
   background: #fff;
   overflow: auto;
 }
+
+.disabled {
+  cursor: not-allowed;
+  background-color: #d3d3d3;
+  color: #aaaaaa;
+  background-image: none;
+}
