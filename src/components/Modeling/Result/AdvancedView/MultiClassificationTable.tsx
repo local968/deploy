@@ -28,24 +28,25 @@ const Headers: TableHeader[] = [
     label: 'Accuracy',
     value: 'acc',
     sort: true,
-    hint: EN.RootMeanSquareErrorRMSEmeasures
+    hint: EN.AccuracyHint
   },
   {
     label: 'Macro-P',
     value: 'macrop',
     sort: true,
-    hint: EN.RootMeanSquareErrorprediction
+    hint: EN.MacroPHint
   },
   {
     label: 'Macro-R',
     value: 'macror',
     sort: true,
+    hint: EN.MacroRHint
   },
   {
     label: 'Macro-F1',
     value: 'macrof1',
     sort: true,
-    hint: EN.RMSLEissimilarwithRMSE
+    hint: EN.MacroF1Hint
   },
   // {
   //   label: 'AP',
@@ -63,7 +64,7 @@ const Headers: TableHeader[] = [
     label: 'Kappa',
     value: 'kappa',
     sort: true,
-    hint: EN.R2isastatisticalmeasure
+    hint: EN.KappaHint
   },
   // {
   //   label: 'AUC',
@@ -81,7 +82,7 @@ const Headers: TableHeader[] = [
     label: 'Macro-AUC',
     value: 'macroauc',
     sort: true,
-    hint: EN.TheadjustedR2tells
+    hint: EN.MacroAUCHint
   },
   // {
   //   label: 'F-measure',
@@ -98,8 +99,7 @@ const Headers: TableHeader[] = [
   {
     label: 'HammingLoss',
     value: 'hammingLoss',
-    sort: true,
-    hint: EN.TheadjustedR2tells
+    sort: true
   },
   // {
   //   label: 'ZeroOneLoss',
@@ -381,7 +381,7 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
     {detail && <MultiClassificationDetailCurves
       project={project}
       model={model}
-      // mapHeader={newMapHeader}
+    // mapHeader={newMapHeader}
     />}
   </div>
 })

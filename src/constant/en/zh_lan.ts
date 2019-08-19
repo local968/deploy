@@ -1265,9 +1265,18 @@ const ZH_LAN = {
   MultiUniqueHint1: '最少支持3类，最多支持',
   MultiUniqueHint2: '类，请输入3-',
   MultiUniqueHint3: '之间的数字',
-  PredictedLabel:"预测标签",
-  ActualLabel:"实际标签",
-  DisplayTargetVariable:"显示目标变量",
+  PredictedLabel: "预测标签",
+  ActualLabel: "实际标签",
+  DisplayTargetVariable: "显示目标变量",
+  KappaHint: 'Kappa系数用于一致性检验，也可以用于衡量分类精度，基于混淆矩阵计算。',
+  MacroAUCHint: '宏平均（Macro-averaging）是指所有类别的每一个AUC的算数平均值。',
+  AccuracyHint: '准确率衡量的是正确预测的百分比; 例如，对于一个有50个class1，20个class2，30个class3的100个数据，如果模型正确预测出40个class1，10个class2和20个class3那么它的准确率是(40+10+20)/100 = 70%。',
+  MacroPHint: '宏平均（Macro-averaging）是指所有类别的每一个Precision的算数平均值。',
+  MicroPHint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的Precision。',
+  MacroRHint: '宏平均（Macro-averaging）是指所有类别的每一个Recall的算数平均值。',
+  MicroRHint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的Recall。',
+  MacroF1Hint: '宏平均（Macro-averaging）是指所有类别的每一个F1的算数平均值。',
+  MicroF1Hint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的F1。',
 };
 
 export default ZH_LAN;

@@ -1410,6 +1410,15 @@ const EN_LAN = {
   PredictedLabel: "Predicted label",
   ActualLabel: "Actual label",
   DisplayTargetVariable: "Display target variable",
+  KappaHint: 'a statistic that measures inter-annotator agreement.',
+  MacroAUCHint: '',
+  AccuracyHint: '',
+  MacroPHint: '',
+  MicroPHint: '',
+  MacroRHint: '',
+  MicroRHint: '',
+  MacroF1Hint: '',
+  MicroF1Hint: '',
 };
 
 

@@ -122,7 +122,7 @@ export default class ModelTable extends Component<Interface> {
               onClick={handleSort.bind(null, 'kappa')}
             >
               <span>
-                <Hint content={EN.RootMeanSquareErrorprediction} />
+                <Hint content={EN.KappaHint} />
                 <i style={{ width: 4 }} />
                 Kappa
                 {sort.key !== 'kappa' ? (
@@ -142,7 +142,7 @@ export default class ModelTable extends Component<Interface> {
               onClick={handleSort.bind(null, 'auc')}
             >
               <span>
-                <Hint content={EN.R2isastatisticalmeasure} />
+                <Hint content={EN.MacroAUCHint} />
                 <i style={{ width: 4 }} />Macro-AUC
                 {sort.key !== 'auc' ? (
                   <Icon type="minus" />
