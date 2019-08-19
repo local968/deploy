@@ -1537,22 +1537,22 @@ wss.register('correlationMatrix', (message, socket) => {
     correlationMatrixLoading: true,
   }).then(() => checkEtl(projectId, userId))
     .then(() => command({
-    command: _command,
-    projectId,
-    requestId: _id,
-    featureLabel,
-    userId
-  }, progressValue => {
-    const { status } = progressValue
-    if (status < 0 || status === 100) return progressValue
-  })).then(returnValue => {
-    const { status, result } = returnValue
-    if (status < 0) return returnValue
-    return createOrUpdate(projectId, userId, {
-      correlationMatrixLoading: false,
-      correlationMatrixData: result.correlationMatrixData
+      command: _command,
+      projectId,
+      requestId: _id,
+      featureLabel,
+      userId
+    }, progressValue => {
+      const { status } = progressValue
+      if (status < 0 || status === 100) return progressValue
+    })).then(returnValue => {
+      const { status, result } = returnValue
+      if (status < 0) return returnValue
+      return createOrUpdate(projectId, userId, {
+        correlationMatrixLoading: false,
+        correlationMatrixData: result.correlationMatrixData
+      })
     })
-  })
 })
 
 function queryModelList(id: any, process: any) {
@@ -1775,7 +1775,7 @@ wss.register('getAssociationData', (message, socket, progress) => {
         length: parameter.max_length
       },
     }
-    return createOrUpdate(id, userId, { associationOption, associationView })
+    return createOrUpdate(id, userId, { associationOption, associationView, associationOrigin: associationOption })
   })
 })
 
