@@ -82,7 +82,9 @@ class DataSchema extends Component<DataSchemaProps> {
       outlierFillMethod: outlierFillMethod,
       outlierFillMethodTemp: outlierFillMethod,
       nullFillMethod: nullFillMethod,
-      nullFillMethodTemp: nullFillMethod
+      nullFillMethodTemp: nullFillMethod,
+      mismatchFillMethod: {},
+      mismatchFillMethodTemp: {}
     };
 
     project.setProperty({ ...data, ...(isMulti ? { targetUnique: this.uniques } : {}) });
