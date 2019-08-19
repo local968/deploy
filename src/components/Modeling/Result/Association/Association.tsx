@@ -75,12 +75,12 @@ const Association = (props: AssociationProps) => {
             return <li className={styles.row} key={k}>
               <span>{k + 1}: {t}</span>
             </li>
-          }) : EN.AssociateNotFind}
+          }) : <div className={styles.row}><span>{EN.AssociateNotFind}</span></div>}
         </div>
         <div className={classnames(styles.views, {
           [styles.viewsHidden]: !visible
         })}>
-          <div className={styles.view}>
+          {!!texts.length && <div className={styles.view}>
             <div className={styles.options}>
               <div className={styles.tabs}>
                 <div className={classnames(styles.tab, {
@@ -101,7 +101,7 @@ const Association = (props: AssociationProps) => {
                 />
               </div>
             </div>
-          </div>
+          </div>}
         </div>
         <div className={styles.empty} />
       </div>

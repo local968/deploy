@@ -1400,16 +1400,16 @@ const EN_LAN = {
   AssociateReModel: 'Remodel',
   AssociateScatterPlot: 'Scatter plot',
   AssociateNetworkDiagram: 'Network Diagram',
-  AssociateNotFind: '',
+  AssociateNotFind: 'No output rule',
   MultiClassification: 'Multiclass Classification',
   MultiClassificationHint: 'The problem of classifying instances into one of three or more classes.',
   MultiUnique: '分类数量',
   MultiUniqueHint1: '最少支持3类，最多支持',
   MultiUniqueHint2: '类，请输入3-',
   MultiUniqueHint3: '之间的数字',
-  PredictedLabel:"Predicted label",
-  ActualLabel:"Actual label",
-  DisplayTargetVariable:"Display target variable",
+  PredictedLabel: "Predicted label",
+  ActualLabel: "Actual label",
+  DisplayTargetVariable: "Display target variable",
 };
 
 
