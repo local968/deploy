@@ -2112,7 +2112,8 @@ class Project {
       train2Error: false,
       selectId: '',
       settings: this.settings,
-      settingId: this.settingId
+      settingId: this.settingId,
+      associationOption: this.associationOption
     }, this.nextSubStep(2, 3))
     this.models = []
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
@@ -2335,7 +2336,7 @@ class Project {
     if (this.correlationMatrixData) return Promise.resolve();
     if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
-      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw'&&h!==this.target);
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target);
       if (this.target) featureLabel.push(this.target);
       const command = {
         command: 'top.correlationMatrix',
