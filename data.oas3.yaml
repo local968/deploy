@@ -38,6 +38,12 @@ paths:
             type: string
           example: 12345
           description: 请求token, 用于获取请求状态的唯一标识
+        - in: query
+          name: etlIndex
+          schema:
+            type: string
+          example: r2_etl_123321123321123321
+          description: 干净数据index, 可选参数,如果不传则为项目训练数据的干净数据index
       responses:
         200:
           description: successful response
@@ -53,7 +59,7 @@ paths:
             isEmpty:
               schema:
                 type: string
-              description: is empty 变量列表
+              description: 故意留空 变量列表
           content:
             application/json:
               schema:

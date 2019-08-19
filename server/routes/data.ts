@@ -20,10 +20,11 @@ router.get('/token/:token/delete', async (req, res) => {
   res.json({status: 200, message: 'ok'})
 })
 
-router.get('/:projectId/clean', async (req, res) => {
+const etlCleanDataApi = async (req, res) => {
   const token = req.query.token || uuid.v4()
   const scroll = req.query.scroll || '1'
   const size = req.query.size || 5000
+  let etlIndex = req.query.etlIndex
   const projectId = req.params.projectId
   if(!projectId) return res.status(400).json({error: 'need project id'})
   try {
@@ -35,14 +36,17 @@ router.get('/:projectId/clean', async (req, res) => {
       res.setHeader('scroll_id', scroll_id)
       res.setHeader('isEmpty', isEmpty)
     } else {
-      const projectResult = (await redis.hmget(`project:${projectId}`, 'originalIndex', 'etlIndex', 'missingReason')).map(JSON.parse)
-      const [_originalIndex, etlIndex, missingReason] = projectResult
+      const projectResult = (await redis.hmget(`project:${projectId}`, 'originalIndex', 'etlIndex', 'missingReason', 'dataHeader')).map(JSON.parse)
+      const [_originalIndex, _etlIndex, missingReason, dataHeader] = projectResult
       originalIndex = _originalIndex
+      if(!etlIndex)etlIndex = _etlIndex
       isEmpty = Object.keys(missingReason).map(key => missingReason[key] === 'blank' ? key : null).filter(key => key !== null).join(',')
       requestBody = {
         setting: { originalIndex, etlIndex, scroll: scroll + 'm', isEmpty },
-        size
+        size,
+        _source: dataHeader
       }
+      if(req.body) requestBody = Object.assign(requestBody, req.body)
     }
     const response = await axios.post(`${etlServicePath}/etls/api/fetch`, requestBody)
     if (response.status !== 200) return res.status(response.status).json(response.data)
@@ -58,6 +62,10 @@ router.get('/:projectId/clean', async (req, res) => {
       status: 400
     })
   }
-})
+
+}
+
+router.get('/:projectId/clean', etlCleanDataApi)
+router.post('/:projectId/clean', etlCleanDataApi)
 
 export default router

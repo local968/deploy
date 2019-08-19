@@ -200,6 +200,7 @@ wss.register('newEtl', async (message, socket, process) => {
   const deleteKeys: Set<string> = new Set()
 
   for (let key in stats) {
+
     const mismatch = project.mismatchFillMethod[key];
     const value =
       project.colType[key] === 'Numerical'
@@ -289,9 +290,7 @@ wss.register('newEtl', async (message, socket, process) => {
 
   if (project.target) {
     stats[project.target].isTarget = true;
-    if (
-      project.problemType !== 'Regression'
-    ) {
+    if (project.problemType !== 'Regression') {
       let deletedValues = [];
       if (project.targetArray && project.targetArray.length > 1) {
         if (_.includes(project.targetArray, ''))
@@ -336,6 +335,7 @@ wss.register('newEtl', async (message, socket, process) => {
           return prev;
         }, {}),
       };
+      // stats[project.target].mapValue = project.targetMap
     }
   }
 
