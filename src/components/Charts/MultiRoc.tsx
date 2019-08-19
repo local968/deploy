@@ -31,18 +31,20 @@ export default function MultiRoc(props: Interface) {
       symbolSize,
       type: 'scatter',
       name:`micro-average ROC curve(area=${roc_auc.micro.toFixed(2)})`
-
     },
   ];
+  const selected = {};
   Object.keys(fpr)
     .filter(itm => !['macro', 'micro'].includes(itm))
     .forEach(itm => {
+      const name = `ROC curve of class ${itm}(area = ${roc_auc[itm].toFixed(2)})`;
       series.push({
         data: _.zip(fpr[itm], tpr[itm]),
         symbolSize: 1,
         type: 'line',
-        name:`ROC curve of class ${itm}(area = ${roc_auc[itm].toFixed(2)})`,
+        name,
       });
+      selected[name] = false;
     });
 
   const option = {
@@ -63,6 +65,9 @@ export default function MultiRoc(props: Interface) {
       orient:"vertical",
       align:"left",
       type: 'scroll',
+      selected,
+      top:100,
+      bottom:100,
     },
     series,
     grid:{
