@@ -371,7 +371,6 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Kappa.toString())}>{formatNumber(modelScore.Kappa.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelChartData.roc_auc.macro.toString())}>{formatNumber(modelChartData.roc_auc.macro.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.HammingLoss.toString())}>{formatNumber(modelScore.HammingLoss.toString())}</span></div>
-        {/* <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.adjustR2.toString())}>{formatNumber(modelScore.adjustR2.toString())}</span></div> */}
         <div className={styles.scoreCell}>
           <div className={styles.cell}><span className={styles.text} title={formatNumber(validate.toString())}>{formatNumber(validate.toString())}</span></div>
           <div className={styles.cell}><span className={styles.text} title={formatNumber(holdout.toString())}>{formatNumber(holdout.toString())}</span></div>
@@ -381,7 +380,7 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
     {detail && <MultiClassificationDetailCurves
       project={project}
       model={model}
-    // mapHeader={newMapHeader}
     />}
   </div>
 })
+

@@ -124,6 +124,9 @@ export default class SimplifiedViewRow extends Component<
       (isRaw && `${lines}+`) ||
       (valueType === 'Numerical' && 'N/A') ||
       data.uniqueValues;
+    if(!histgramPlots[value]){
+      histgramPlot(value)
+    }
     return (
       <div className={styles.tableRow}>
         <div className={classnames(styles.tableTd, styles.tableCheck)}>
@@ -177,7 +180,7 @@ export default class SimplifiedViewRow extends Component<
                 <SimplePlot
                   isNew={isNew}
                   path={histgramPlots[value]}
-                  getPath={histgramPlot.bind(null, value)}
+                  // getPath={histgramPlot.bind(null, value)}
                 >
                   <SimplifiedViewPlot
                     type={colType[value]}

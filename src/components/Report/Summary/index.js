@@ -1,62 +1,13 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-// import * as d3 from 'd3';
 import { formatNumber } from 'util'
 import EN from '../../../constant/en';
 import {
   PIE
 } from "../../Charts"
-import classnames from "classnames";
 @observer
 class Summary extends Component {
-  componentDidMount() {
-    // this.renderD3()
-  }
-
-  backToConnect = () => {
-    const { updateProject, nextSubStep } = this.props.project
-    updateProject(nextSubStep(1, 2))
-  }
-
-  startTrain = () => {
-    const { project } = this.props
-    project.updateProject({ ...project.nextMainStep(3), runWith: project.totalLines < 10000 ? 'cross' : 'holdout' })
-  }
-
-  // renderD3 = () => {
-  //   d3.select(`.${styles.summaryChart} svg`).remove();
-  //
-  //   const outerRadius = 60;           // 外半径
-  //   const innerRadius = 0;             // 内半径
-  //   //弧生成器
-  //   const arc = d3.arc()
-  //     .innerRadius(innerRadius)
-  //     .outerRadius(outerRadius)
-  //   const { totalRawLines, deletedCount, totalFixedLines } = this.props.project
-  //   const deleteRows = deletedCount
-  //   const fixedRows = totalFixedLines - deletedCount
-  //   const cleanRows = totalRawLines - totalFixedLines
-  //   const data = [fixedRows, deleteRows, cleanRows]
-  //   const color = ['#9cebff', '#c4cbd7', '#00c855'];
-  //   const dataset = d3.pie()(data);
-  //
-  //   const svg = d3.select(`.${styles.summaryChart}`)
-  //     .append("svg")
-  //     .attr("width", 120)
-  //     .attr("height", 120)
-  //
-  //   svg.selectAll(`g`)
-  //     .data(dataset)
-  //     .enter()
-  //     .append("g")
-  //     .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
-  //     .append("path")
-  //     .attr("fill", (d, i) => color[i])
-  //     .attr("d", (d) => {
-  //       return arc(d);   //调用弧生成器，得到路径值
-  //     });
-  // }
 
   render() {
     const { project } = this.props;
@@ -202,15 +153,6 @@ class Summary extends Component {
             </div>
           </div>
         </div>
-        {/*<div className={styles.summaryBottom}>*/}
-        {/*  <div className={classnames(styles.summaryButton, styles.summaryConfirm, {*/}
-        {/*    [styles.disabled]: totalLines === 0*/}
-        {/*  })} onClick={totalLines === 0 ? null : this.startTrain}><span>{EN.Continue}</span></div>*/}
-        {/*  <div className={classnames(styles.summaryButton, {*/}
-        {/*    [styles.disabled]: !issues.dataIssue*/}
-        {/*  })} onClick={issues.dataIssue ? editFixes : null}><span>{EN.EditTheFixes}</span></div>*/}
-        {/*  <div className={styles.summaryButton} onClick={this.backToConnect}><span>{EN.LoadaBetterDataset}</span></div>*/}
-        {/*</div>*/}
       </div>
     </div>
   }

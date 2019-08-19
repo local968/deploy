@@ -87,8 +87,9 @@ export default function MulitiPredictTable(props: Interface) {
     title_title: 'Error',
     error_error: error,
   };
+  const _error_0 = _.cloneDeep(error_0);
   title.forEach(it => {
-    last_last[it] = error_0.shift();
+    last_last[it] = _error_0.shift();
   });
   data.push(last_last);
   return <section

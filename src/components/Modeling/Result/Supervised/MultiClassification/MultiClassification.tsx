@@ -46,7 +46,7 @@ export default class RegressionView extends Component<Interface> {
     const currentPerformance = current
       ? (current.chartData.roc_auc.macro > 0.8 && EN.GOOD) ||
       (current.chartData.roc_auc.macro > 0.6 && EN.OK) ||
-      EN.NotSatisfied : ''
+      EN.NotSatisfied : '';
     const newMapHeader = {
       ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}),
       ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}),

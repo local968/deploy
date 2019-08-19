@@ -45,7 +45,7 @@ export default class SimplifiedViews extends Component<Interface> {
 
   showCorrelationMatrix = () => {
     const { project } = this.props;
-    const {target,mapHeader,correlationMatrixData} = project;
+    const {mapHeader,correlationMatrixData} = project;
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);

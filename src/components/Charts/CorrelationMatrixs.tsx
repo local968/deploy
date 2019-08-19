@@ -3,6 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 import './echarts.config';
 import { Switch } from 'antd';
 import EN from "../../constant/en";
+import _ from 'lodash';
 
 interface Interface {
   height?;
@@ -21,7 +22,7 @@ export default function CorrelationMatrixs(props: Interface) {
 
 
 	useEffect(()=>{
-	  const _fields = message.fields;
+	  const _fields = _.cloneDeep(message.fields);
   	if(show){
 		  _fields.push(target);
 	  }
@@ -34,7 +35,7 @@ export default function CorrelationMatrixs(props: Interface) {
         itm.forEach((it, ind) => {
           if (_fields.includes(header[ind])) {
             _ind--;
-            __data.push([_index, _ind, it]);
+            __data.push([ _ind, _index,it]);
           }
         });
       }

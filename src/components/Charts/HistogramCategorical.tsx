@@ -146,14 +146,14 @@ export default function HistogramCategorical(props:Interface){
     },
     dataZoom,
     grid:{
-      x:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,15):`${Math.floor(+max+1)}`.length * 10 +20,
+      x:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,25):`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series,
   };
 
   return <ReactEcharts
     option={option}
-    style={{height:"100%", width:"100%"}}
+    style={{height:330, width:500}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

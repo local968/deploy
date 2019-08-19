@@ -205,8 +205,12 @@ class Report extends Component {
         {this.isShow('dataAnalysis') && <div className={styles.block}>
           {this.checkBox('dataAnalysis')}
           {
-            list[0].informativesLabel.length > 0 ? <div>   <h3 className={styles.blockTitle}>{EN.ExploratoryDataAnalysis}</h3>
-              <div className={styles.blockRow}><VariableList project={list[0]} /></div></div> : null
+            list[0].informativesLabel.length > 0 ? <div>
+              <h3 className={styles.blockTitle}>{EN.ExploratoryDataAnalysis}</h3>
+              <div className={styles.blockRow}>
+                <VariableList project={list[0]} />
+              </div>
+            </div> : null
           }
 
         </div>}

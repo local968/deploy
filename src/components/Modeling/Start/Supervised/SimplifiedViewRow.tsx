@@ -268,6 +268,11 @@ export default class SimplifiedViewRow extends Component<Interface> {
       (valueType === 'Numerical' && 'N/A') ||
       data.uniqueValues;
 
+    if(!histgramPlots[value]||!univariatePlots[value]){
+      histgramPlot(value);
+      univariatePlot(value)
+    }
+
     return (
       <div className={styles.tableRow}>
         <div className={classnames(styles.tableTd, styles.tableCheck)}>
@@ -311,7 +316,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                 <SimplePlot
                   isNew={isNew}
                   path={histgramPlots[value]}
-                  getPath={histgramPlot.bind(null, value)}
+                  // getPath={histgramPlot.bind(null, value)}
                 >
                   <SimplifiedViewPlot
                     type={colType[value]}
@@ -359,7 +364,7 @@ export default class SimplifiedViewRow extends Component<Interface> {
                 <SimplePlot
                   isNew={isNew}
                   path={univariatePlots[value]}
-                  getPath={univariatePlot.bind(null, value)}
+                  // getPath={univariatePlot.bind(null, value)}
                 >
                   <ScatterPlot
                     type={project.problemType}

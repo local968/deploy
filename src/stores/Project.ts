@@ -2843,25 +2843,17 @@ class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = async (model: any) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader, informativesLabel } = this;
-
-    console.log(informativesLabel, 'informativesLabel');
+    const { target, correlationMatrixData, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
     list.push(await this.histogram(target));
 
-    const fields = Object.entries(toJS(colType))
-      .filter(itm => itm[1] === 'Numerical')
-      .map(itm => itm[0]);
-
     list.push({
       name: 'correlation-matrix',
       data: {
-        fields,
-        id: etlIndex,
+        url:correlationMatrixData
       }
     });
-
 
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v));
