@@ -19,6 +19,11 @@ interface StartTrainInterface {
 @inject('projectStore', 'userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
+  componentDidMount() {
+    const { project } = this.props.projectStore;
+    project.correlationMatrix()
+  }
+
   @observable visible = false;
 
   fastTrain(run = true) {
@@ -49,6 +54,7 @@ export default class StartTrain extends Component<StartTrainInterface> {
     const { start_AutomaticModeling = true } = this.props.userStore.info.role;
     const { problemType } = this.props.projectStore.project;
     const isAssociation = problemType === 'Association'
+    console.log("aasss")
     if (isAssociation) return <Association project={this.props.projectStore.project} />
     return (
       <div className={styles.modelStart}>
