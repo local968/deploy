@@ -183,7 +183,7 @@ export default function FitBar(props:Interface){
     grid:{
       top:50,
       bottom:100,
-	    left:7*yNameL,
+	    left:Math.max(7*yNameL,50),
     }
 	};
 

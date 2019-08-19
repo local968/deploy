@@ -91,7 +91,7 @@ export default function HistogramCategorical(props:Interface){
         }
       }
     });
-    /////////////////////////
+
     dataZoom.orient = "vertical";
     dataZoom.start = 100;
     dataZoom.end = 100 - 100 / data.length * 8;
@@ -139,10 +139,14 @@ export default function HistogramCategorical(props:Interface){
       nameTextStyle,
       type: across?'category':"value",
       data: across?xAxisName.reverse():null,
+      axisLabel:{
+        interval:0,
+        rotate:across?30:0,
+      },
     },
     dataZoom,
     grid:{
-      x:`${Math.floor(+max+1)}`.length * 10 +20,
+      x:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,15):`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series,
   };
