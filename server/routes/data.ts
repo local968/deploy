@@ -20,7 +20,7 @@ router.get('/token/:token/delete', async (req, res) => {
   res.json({status: 200, message: 'ok'})
 })
 
-router.get('/:projectId/clean', async (req, res) => {
+const etlCleanDataApi = async (req, res) => {
   const token = req.query.token || uuid.v4()
   const scroll = req.query.scroll || '1'
   const size = req.query.size || 5000
@@ -46,6 +46,7 @@ router.get('/:projectId/clean', async (req, res) => {
         size,
         _source: dataHeader
       }
+      if(req.body) requestBody = Object.assign(requestBody, req.body)
     }
     const response = await axios.post(`${etlServicePath}/etls/api/fetch`, requestBody)
     if (response.status !== 200) return res.status(response.status).json(response.data)
@@ -61,6 +62,10 @@ router.get('/:projectId/clean', async (req, res) => {
       status: 400
     })
   }
-})
+
+}
+
+router.get('/:projectId/clean', etlCleanDataApi)
+router.post('/:projectId/clean', etlCleanDataApi)
 
 export default router
