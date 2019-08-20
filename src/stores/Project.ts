@@ -617,7 +617,9 @@ class Project {
   get defaultTrain() {
     const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
     const version = [1, 2]
+
     if (this.problemType === 'Classification' || this.problemType === 'Regression') version.push(4)
+    const min = (this.problemType === 'Classification' || this.problemType === 'MultiClassification') ? Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, this.targetUnique)) : Infinity
 
     return {
       train2Finished: false,
@@ -631,7 +633,7 @@ class Project {
       randSeed: 0,
       resampling: 'no',
       runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
-      crossCount: 5,
+      crossCount: Math.min(min - 1, 5),
       dataRange: 'all',
       customField: '',
       customRange: [],
@@ -2130,7 +2132,7 @@ class Project {
   newSetting = () => {
     const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms, informativesLabel } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
+    const min = (problemType === 'Classification' || problemType === 'MultiClassification') ? Math.min(...Object.values(targetCounts)) : Infinity
 
 
     switch (problemType) {
@@ -2851,7 +2853,7 @@ class Project {
     list.push({
       name: 'correlation-matrix',
       data: {
-        url:correlationMatrixData
+        url: correlationMatrixData
       }
     });
 
