@@ -150,12 +150,12 @@ export default function HistogramCategorical(props:Interface){
       data: across?xAxisName.reverse():null,
       axisLabel:{
         interval:0,
-        rotate:across?30:0,
+        rotate:across?45:0,
       },
     },
     dataZoom,
     grid:{
-      left:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,25):`${Math.floor(+max+1)}`.length * 10 +20,
+      left:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*6,35):`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series,
     animation:false,
@@ -163,7 +163,7 @@ export default function HistogramCategorical(props:Interface){
 
   return <ReactEcharts
     option={option}
-    style={{height:330, width:500}}
+    style={{height:330, width:550}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

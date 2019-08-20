@@ -11,7 +11,7 @@ class Summary extends Component {
 
   render() {
     const { project } = this.props;
-    const { mapHeader, target, dataHeader, totalRawLines, deletedCount, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
+    const { mapHeader, target, dataHeader,targetArray,colType,mismatchLineCounts,outlierLineCounts,nullLineCounts,colValueCounts, targetCounts,targetUnique,totalRawLines, deletedCount, targetIssuesCountsOrigin, variableIssueCount: { nullCount, mismatchCount, outlierCount }, variableIssues: { nullRow, mismatchRow, outlierRow }, totalFixedLines, problemType, issues } = project
     const deletePercent = formatNumber(deletedCount / totalRawLines * 100, 2)
     const fixedPercent = formatNumber((totalFixedLines - deletedCount) / totalRawLines * 100, 2)
     const cleanPercent = formatNumber(100 - deletePercent - fixedPercent, 2)
@@ -26,6 +26,22 @@ class Summary extends Component {
       percent.clean = 100 - percent.missing - percent.mismatch - percent.outlier
       return percent
     })
+
+
+    let targetArr = !!targetArray.length ? targetArray : Object.keys(targetCounts)
+    if (targetUnique > 0) targetArr = targetArr.slice(0, targetUnique)
+    const targetIsNum = colType[target] === 'Numerical'
+    const targetClassesCount = (!!target && !targetIsNum) ? (Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
+      return sum + (targetArr.includes(k) ? v : 0)
+    }, 0) + nullLineCounts[target]) : totalRawLines
+    const targetPercent = {
+      classesError: (totalRawLines - targetClassesCount) / totalRawLines * 100,
+      missing: nullLineCounts[target] / totalRawLines * 100,
+      mismatch: (!targetIsNum ? 0 : mismatchLineCounts[target]) / totalRawLines * 100,
+      outlier: (!targetIsNum ? 0 : outlierLineCounts[target]) / totalRawLines * 100,
+    }
+
+
     return <div className={styles.summary}>
       <div className={styles.summaryLeft}>
         <div className={styles.summaryTitle}><span>{EN.Summaryofyourdata}</span></div>
@@ -55,7 +71,7 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span>{mapHeader[target]}</span></div>
-              <div className={styles.summaryCell}><span>{formatNumber(percentList[0].clean, 2)}%</span></div>
+              <div className={styles.summaryCell}><span>{formatNumber((100 - targetPercent.classesError - targetPercent.missing - targetPercent.mismatch - targetPercent.outlier).toString(), 2)}%</span></div>
             </div>
           </div>
           <div className={styles.summaryTableRight}>
@@ -64,10 +80,11 @@ class Summary extends Component {
             </div>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryProgressBlock}>
-                <div className={styles.summaryProgress} style={{ width: percentList[0].clean + '%', backgroundColor: '#00c855' }} />
-                <div className={styles.summaryProgress} style={{ width: percentList[0].mismatch + '%', backgroundColor: '#819ffc' }} />
-                <div className={styles.summaryProgress} style={{ width: percentList[0].missing + '%', backgroundColor: '#ff97a7' }} />
-                {problemType !== 'Classification' && <div className={styles.summaryProgress} style={{ width: percentList[0].outlier + '%', backgroundColor: '#f9cf37' }} />}
+                <div className={styles.summaryProgress} style={{ width: (100 - targetPercent.classesError - targetPercent.missing - targetPercent.mismatch - targetPercent.outlier) + '%', backgroundColor: '#00c855' }} />
+                <div className={styles.summaryProgress} style={{ width: targetPercent.mismatch + '%', backgroundColor: '#819ffc' }} />
+                <div className={styles.summaryProgress} style={{ width: targetPercent.missing + '%', backgroundColor: '#ff97a7' }} />
+                <div className={styles.summaryProgress} style={{ width: targetPercent.classesError + '%', backgroundColor: '#e72424' }} />
+                <div className={styles.summaryProgress} style={{ width: targetPercent.outlier + '%', backgroundColor: '#f9cf37' }} />
               </div>
             </div>
           </div>
