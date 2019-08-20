@@ -78,6 +78,36 @@ span.text {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+.m_croSwitch div{
+  display: flex;
+  position: relative;
+  top: 30%;
+  background: #fff;
+  z-index: 2;
+}
+
+.m_croSwitch{
+  position: absolute;
+  top: 0;
+  right: 280%;
+  height: 60px;
+  flex: none;
+  align-items: center;
+  margin-right: 15px;
+}
+.m_croSwitch:after{
+  content: '';
+  border: 1px solid;
+  width: 200%;
+  display: inline-block;
+  height: 50%;
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  border-bottom: 0;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
 
 .metricSwitch {
   position: absolute;
@@ -89,7 +119,7 @@ span.text {
   align-items: center;
   margin-right: 15px;
 }
-.metricSwitch span {
+.metricSwitch span,.m_croSwitch span {
   margin: 0 10px;
   white-space: nowrap;
 }

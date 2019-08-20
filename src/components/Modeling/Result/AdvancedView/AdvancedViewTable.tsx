@@ -29,6 +29,7 @@ export interface TableHeader {
   value: string,
   sort: boolean,
   hint?: string | ReactElement
+  type?:string
 }
 
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {

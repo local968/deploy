@@ -11,7 +11,7 @@ import moment from 'moment';
 import { formatNumber } from '../../../../util'
 import MultiClassificationDetailCurves from './MultiClassificationDetailCurves';
 
-const Option = Select.Option
+const {Option} = Select;
 
 const Headers: TableHeader[] = [
   {
@@ -31,83 +31,74 @@ const Headers: TableHeader[] = [
     hint: EN.AccuracyHint
   },
   {
+    label: 'Micro-P',
+    value: 'microp',
+    sort: true,
+    hint: EN.MicroPHint,
+    type:'micro',
+  },
+
+  {
+    label: 'Micro-R',
+    value: 'micror',
+    sort: true,
+    hint: EN.MicroRHint,
+    type:'micro',
+  },
+  {
+    label: 'Micro-F1',
+    value: 'microf1',
+    sort: true,
+    hint: EN.MicroF1Hint,
+    type:'micro',
+  },
+  {
+    label: 'Micro-AUC',
+    value: 'microauc',
+    sort: true,
+    hint: EN.MicroAUCHint,
+    type:'micro',
+  },
+  {
     label: 'Macro-P',
     value: 'macrop',
     sort: true,
-    hint: EN.MacroPHint
+    hint: EN.MacroPHint,
+    type:'macro',
   },
   {
     label: 'Macro-R',
     value: 'macror',
     sort: true,
-    hint: EN.MacroRHint
+    hint: EN.MacroRHint,
+    type:'macro',
   },
   {
     label: 'Macro-F1',
     value: 'macrof1',
     sort: true,
-    hint: EN.MacroF1Hint
+    hint: EN.MacroF1Hint,
+    type:'macro',
   },
-  // {
-  //   label: 'AP',
-  //   value: 'AP',
-  //   sort: true,
-  //   hint: EN.MeanSquaredErro
-  // },
-  // {
-  //   label: 'mAP',
-  //   value: 'mAP',
-  //   sort: true,
-  //   hint: EN.MeanAbsoluteError
-  // },
+  {
+    label: 'Macro-AUC',
+    value: 'macroauc',
+    sort: true,
+    hint: EN.MacroAUCHint,
+    type:'macro',
+  },
   {
     label: 'Kappa',
     value: 'kappa',
     sort: true,
     hint: EN.KappaHint
   },
-  // {
-  //   label: 'AUC',
-  //   value: 'AUC',
-  //   sort: true,
-  //   hint: EN.TheadjustedR2tells
-  // },
-  // {
-  //   label: 'AUCPR',
-  //   value: 'AUCPR',
-  //   sort: true,
-  //   hint: EN.TheadjustedR2tells
-  // },
-  {
-    label: 'Macro-AUC',
-    value: 'macroauc',
-    sort: true,
-    hint: EN.MacroAUCHint
-  },
-  // {
-  //   label: 'F-measure',
-  //   value: 'F-measure',
-  //   sort: true,
-  //   hint: EN.TheadjustedR2tells
-  // },
-  // {
-  //   label: 'Gini',
-  //   value: 'Gini',
-  //   sort: true,
-  //   hint: EN.TheadjustedR2tells
-  // },
   {
     label: 'HammingLoss',
     value: 'hammingLoss',
     sort: true
   },
-  // {
-  //   label: 'ZeroOneLoss',
-  //   value: 'ZeroOneLoss',
-  //   sort: true,
-  //   hint: EN.TheadjustedR2tells
-  // }
-]
+];
 
 const MetricOptions = [{ key: "macro_auc", display: 'Macro AUC' }, { key: "macro_f1", display: 'Macro F1' }, { key: "micro_f1", display: 'Micro F1' }, { key: "macro_recall", display: 'Macro Recall' }, { key: "micro_recall", display: 'Micro Recall' }, { key: "macro_precision", display: 'Macro Precision' }, { key: "micro_precision", display: 'Micro Precision' }]
 
@@ -125,24 +116,30 @@ interface MultiClassificationTableProps {
 }
 
 const MultiClassificationTable = (props: MultiClassificationTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props
-  const { isHoldout } = project
-  const [detailArr, setDetail] = useState([] as string[])
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props;
+  const { isHoldout,m_cro} = project;
+  const [detailArr, setDetail] = useState([] as string[]);
 
   const sortBy = (key: string) => () => {
     handleSort(key)
-  }
+  };
 
   const handleHoldout = () => {
     project.upIsHoldout(!isHoldout);
-  }
+  };
+
+  const handleM_cro = (e) => {
+    project.upM_cro(e?'micro':'macro')
+  };
 
   const handleDetail = (s: string) => {
     if (detailArr.includes(s)) return setDetail(detailArr.filter(d => d !== s))
     return setDetail([...detailArr, s])
-  }
+  };
 
   const sortMethods = (aModel, bModel) => {
+    const {score:{holdoutScore:a_holdoutScore,validateScore:a_validateScore}} = aModel;
+    const {score:{holdoutScore:b_holdoutScore,validateScore:b_validateScore}} = bModel;
     switch (sort.key) {
       case 'macrop':
         {
@@ -150,6 +147,31 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
           const bModelData = isHoldout ? bModel.score.holdoutScore.macro_P : bModel.score.validateScore.macro_P
           return (aModelData - bModelData) * sort.value
         }
+      case 'microp':
+        {
+          const aModelData = isHoldout ? a_holdoutScore.micro_P : b_holdoutScore.micro_P;
+          const bModelData = isHoldout ? b_holdoutScore.micro_P : a_holdoutScore.micro_P;
+          return (aModelData - bModelData) * sort.value;
+        }
+
+      case 'micror':
+        {
+          const aModelData = isHoldout ? a_holdoutScore.micro_R : b_holdoutScore.micro_R;
+          const bModelData = isHoldout ? b_holdoutScore.micro_R : a_holdoutScore.micro_R;
+          return (aModelData - bModelData) * sort.value
+        }
+      case 'microf1':
+      {
+        const aModelData = isHoldout ? a_holdoutScore.micro_F1 : a_validateScore.micro_F1;
+        const bModelData = isHoldout ? b_holdoutScore.micro_F1 : b_validateScore.micro_F1;
+        return (aModelData - bModelData) * sort.value
+      }
+      case 'microauc':
+      {
+        const aModelData = isHoldout ? (aModel.holdoutChartData.roc_auc.micro) : (aModel.chartData.roc_auc.micro);
+        const bModelData = isHoldout ? (bModel.holdoutChartData.roc_auc.micro) : (bModel.chartData.roc_auc.micro);
+        return (aModelData - bModelData) * sort.value
+      }
       case 'macror':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.macro_R) : (aModel.score.validateScore.macro_R)
@@ -168,66 +190,24 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
           const bModelData = isHoldout ? (bModel.score.holdoutScore.Accuracy) : (bModel.score.validateScore.Accuracy)
           return (aModelData - bModelData) * sort.value
         }
-      // case 'ap':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.AP) : (aModel.score.validateScore.AP)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.AP) : (bModel.score.validateScore.AP)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
-      // case 'map':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.mAP) : (aModel.score.validateScore.mAP)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.mAP) : (bModel.score.validateScore.mAP)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
       case 'kappa':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.Kappa) : (aModel.score.validateScore.Kappa)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.Kappa) : (bModel.score.validateScore.Kappa)
           return (aModelData - bModelData) * sort.value
         }
-      // case 'auc':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.auc) : (aModel.score.validateScore.auc)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.auc) : (bModel.score.validateScore.auc)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
-      // case 'aucpr':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.aucpr) : (aModel.score.validateScore.aucpr)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.aucpr) : (bModel.score.validateScore.aucpr)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
       case 'macroauc':
         {
           const aModelData = isHoldout ? (aModel.holdoutChartData.roc_auc.macro) : (aModel.chartData.roc_auc.macro)
           const bModelData = isHoldout ? (bModel.holdoutChartData.roc_auc.macro) : (bModel.chartData.roc_auc.macro)
           return (aModelData - bModelData) * sort.value
         }
-      // case 'fmeasure':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.fmeasure) : (aModel.score.validateScore.fmeasure)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.fmeasure) : (bModel.score.validateScore.fmeasure)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
-      // case 'gini':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.gini) : (aModel.score.validateScore.gini)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.gini) : (bModel.score.validateScore.gini)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
       case 'hammingLoss':
         {
           const aModelData = isHoldout ? (aModel.score.holdoutScore.HammingLoss) : (aModel.score.validateScore.HammingLoss)
           const bModelData = isHoldout ? (bModel.score.holdoutScore.HammingLoss) : (bModel.score.validateScore.HammingLoss)
           return (aModelData - bModelData) * sort.value
         }
-      // case 'zeroOneLoss':
-      //   {
-      //     const aModelData = isHoldout ? (aModel.score.holdoutScore.ZeroOneLoss) : (aModel.score.validateScore.ZeroOneLoss)
-      //     const bModelData = isHoldout ? (bModel.score.holdoutScore.ZeroOneLoss) : (bModel.score.validateScore.ZeroOneLoss)
-      //     return (aModelData - bModelData) * sort.value
-      //   }
       case 'validation':
         {
           const [t, p] = metric.split("_")
@@ -247,11 +227,6 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
       case 'name':
       default:
         return (aModel.modelName > bModel.modelName ? 1 : -1) * (sort.value === 1 ? 1 : -1)
-      // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
-      // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
-      // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-      // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
     }
   };
 
@@ -266,31 +241,42 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
 
   const modelElements = useMemo(() => {
     return models.reduce((els, m) => ({ ...els, [m.id]: <MultiClassificationTableRow model={m} project={project} metric={metric} key={m.id} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
-  }, [detailArr, metric])
+  }, [detailArr, metric]);
 
   return <div className={styles.main}>
     <div className={styles.header}>
-      {Headers.map((h, i) => {
-        const hintElement = h.hint ? <Hint content={h.hint} /> : null
-        let sortElement: null | ReactElement = null
-        if (h.sort) {
-          if (h.value !== sort.key) sortElement = <Icon type='minus' />
-          else sortElement = <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />
-        }
-        return <div className={`${styles.headerCell} ${h.value === 'name' ? styles.name : ''}`} onClick={sortBy(h.value)} key={i}>
-          <span>{hintElement}</span>
-          <span className={styles.text} title={h.label}>{h.label}</span>
-          <span>{sortElement}</span>
-        </div>
-      })}
+      {Headers.filter(itm=> {
+        return !(itm.type&&itm.type!==m_cro)
+      }).map((h, i) => {
+          const hintElement = h.hint ? <Hint content={h.hint} /> : null
+          let sortElement: null | ReactElement = null
+          if (h.sort) {
+            if (h.value !== sort.key) sortElement = <Icon type='minus' />
+            else sortElement = <Icon type='up' style={sort.value === 1 ? {} : { transform: 'rotateZ(180deg)' }} />
+          }
+          return <div className={`${styles.headerCell} ${h.value === 'name' ? styles.name : ''}`} onClick={sortBy(h.value)} key={i}>
+            <span>{hintElement}</span>
+            <span className={styles.text} title={h.label}>{h.label}</span>
+            <span>{sortElement}</span>
+          </div>
+        })
+      }
       <div className={styles.toolCell}>
         <div className={styles.tools}>
+          <div className={styles.m_croSwitch}>
+            <div>
+              <span>Macro</span>
+              <Switch checked={m_cro === 'micro'} onChange={handleM_cro} style={{ backgroundColor: '#1D2B3C' }} />
+              <span>Micro</span>
+            </div>
+          </div>
+
           <div className={styles.metricSwitch}>
             <span>{EN.Validation}</span>
             <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
             <span>{EN.Holdout}</span>
           </div>
-          <div className={styles.metricBg}></div>
+          <div className={styles.metricBg}/>
           <div className={styles.metric}>
             <span className={styles.metricText} >{EN.MeasurementMetric}</span>
             <Select size="large" value={metric} onChange={handleChange} style={{ width: '140px', fontSize: '1rem' }} getPopupContainer={el => el.parentElement}>
@@ -310,10 +296,9 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
     </div>
     <div className={styles.body}>
       {filtedModels.map(m => modelElements[m.id])}
-      {/* {filtedModels.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)} */}
     </div>
   </div>
-}
+};
 
 export default observer(MultiClassificationTable)
 

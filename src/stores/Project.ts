@@ -271,7 +271,8 @@ class Project {
   @observable nullFillMethodTemp: StringObject = {};
   @observable outlierFillMethodTemp: StringObject = {};
   @observable outlierDictTemp: unknown = {};
-  @observable deleteColumns: string[] = []
+  @observable deleteColumns: string[] = [];
+  @observable m_cro:string= "macro";
 
   // train
   // 训练状态
@@ -798,6 +799,11 @@ class Project {
     }
     return obj
   };
+
+  @action
+  upM_cro(mc){
+    this.m_cro = mc;
+  }
 
   @action
   upIsHoldout(isHoldout: boolean) {
