@@ -1610,10 +1610,10 @@ class Project {
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
           validate = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
           holdout = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
-        } else if (problemType === 'Classification') {
+        } else if (problemType === 'MultiClassification') {
           const [t, p] = currentMeasurement.split("_")
-          validate = currentMeasurement === 'measurement' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
-          holdout = currentMeasurement === 'measurement' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          validate = currentMeasurement === 'macro_auc' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          holdout = currentMeasurement === 'macro_auc' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
