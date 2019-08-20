@@ -4,16 +4,20 @@
   flex-direction: column;
   composes: content from 'style';
 }
+
 .tabs {
   display: flex;
   margin-top: 0.3em;
   position: relative;
   z-index: 0;
 }
+
 .tab {
   display: flex;
+  flex: auto;
   align-items: center;
-  width: 3.06em;
+  max-width: 3.06em;
+  padding: 0.1em;
   justify-content: center;
   height: 0.6em;
   border-top: 5px solid white;
@@ -25,36 +29,43 @@
   position: relative;
   cursor: pointer;
 }
+
 .tab:last-child {
   margin-right: 0;
 }
+
 .tab.active {
   border-color: #1d2b3c;
   background: white;
 }
-.deployment {
-}
-.operation {
-}
-.performance {
-}
+
+.deployment {}
+
+.operation {}
+
+.performance {}
+
 .icon {
   margin-right: 0.12em;
 }
+
 .text {
   font-size: 1.25rem;
+  white-space: nowrap;
 }
+
 .content {
   width: 100%;
   background: white;
   position: relative;
   z-index: 1;
   box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
   border-top-left-radius: 0;
   display: flex;
   /*flex-direction: column;*/
   flex: 1 1 0;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .enable {
