@@ -138,7 +138,7 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
   };
 
   const handleM_cro = (e) => {
-    project.upM_cro(e?'micro':'macro')
+    project.upM_cro(e)
   };
 
   const handleDetail = (s: string) => {
