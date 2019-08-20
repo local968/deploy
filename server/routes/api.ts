@@ -5,7 +5,7 @@ import uuid from 'uuid';
 import crypto from 'crypto';
 import command from '../command';
 import api from '../scheduleApi';
-const {restriction} = require("../apis/service/planService");
+const { restriction } = require("../apis/service/planService");
 import wss from '../webSocket';
 import Papa from 'papaparse';
 import config from '../../config';
@@ -139,12 +139,12 @@ router.post('/deploy', async (req, res) => {
     target = mapHeader[Object.keys(stats).find(key => stats[key].isTarget)]
     delete stats[targetIndex]
     const mappingResponse = await
-    axios.get(`${esServicePath}/etls/${index}/header`)
+      axios.get(`${esServicePath}/etls/${index}/header`)
     const dataHeader = mappingResponse.data.split(',')
     const headerArray = dataHeader.filter(h => h !== '__no')
     const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
       === -1)
-    if(lackHeaders.length > 0) return errorRes(10018)
+    if (lackHeaders.length > 0) return errorRes(10018)
     etlIndex = await etl(index, stats);
   } catch (e) {
     console.error(e);
@@ -160,7 +160,7 @@ router.post('/deploy', async (req, res) => {
   const duration = moment.duration(moment().unix() - createdTime);
   const restrictQuery = `user:${userId}:duration:${duration.years()}-${duration.months()}:deploy`;
   const count = await redis.get(restrictQuery);
-  const {userDeployRestriction} = await restriction();
+  const { userDeployRestriction } = await restriction();
   const left = userDeployRestriction[level] - parseInt(count);
   if (_.parseInt(_.toString(lineCount)) >= left)
     return errorRes(
@@ -175,6 +175,7 @@ router.post('/deploy', async (req, res) => {
     Outlier: 'outlier.deploy',
     Classification: 'clfreg.deploy',
     Regression: 'clfreg.deploy',
+    MultiClassification: 'multi.deploy'
   };
   const request = {
     requestId: name,
