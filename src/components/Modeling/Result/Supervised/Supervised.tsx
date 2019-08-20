@@ -181,7 +181,7 @@ export default class ModelResult extends Component<ModelResultProps> {
                 <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
             </a>)}
-          {(problemType !== 'MultiClassification' && this.view === 'advanced') && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
+          {this.view === 'advanced' && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
             <span>{`${EN.CreatePmml}`}</span>
           </button> : !selectModel.pmmlData ?
               <Tooltip title={EN.CannotExportPmml}>

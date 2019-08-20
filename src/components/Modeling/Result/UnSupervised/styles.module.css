@@ -671,7 +671,7 @@ button.disable {
   width: 100%;
 }
 
-span.ccellHeaderSpan{
+span.ccellHeaderSpan {
   max-width: 60%;
 }
 
@@ -681,8 +681,8 @@ span.ccellHeaderSpan{
   justify-content: space-around;
 }
 
-.dfn{
-  font-style:normal;
+.dfn {
+  font-style: normal;
   font-size: 14px;
   width: 100%;
   display: flex;

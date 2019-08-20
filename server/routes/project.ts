@@ -1657,6 +1657,27 @@ wss.register('createPmml', async (message, socket) => {
   return returnValue
 })
 
+wss.register('createContainer', async (message, socket) => {
+  const { id, projectId, _id, command: _command } = message
+  const { userId } = socket.session
+  await updateModel(userId, projectId, id, { getContainer: true })
+
+  const returnValue: any = await command({
+    command: _command,
+    projectId,
+    userId,
+    version: id,
+    requestId: _id
+  }, progressValue => {
+    console.log(progressValue, 'progressValue')
+    const { status } = progressValue
+    if (status < 0 || status === 100) return progressValue
+  })
+  const { status, result } = returnValue
+  if (status === 100) await updateModel(userId, projectId, id, { containerData: result.containerData })
+  return returnValue
+})
+
 wss.register('deleteIndex', (message, socket) => {
   const { index, projectId } = message
   const { userId } = socket.session;
@@ -1720,47 +1741,5 @@ wss.register('getAssociationData', (message, socket, progress) => {
     return createOrUpdate(id, userId, { associationOption, associationView, associationOrigin: associationOption })
   })
 })
-
-router.get('/export', (req, res) => {
-  const { id, sign } = req.query
-
-  if (sign !== config.EXPORT_SECRET) return res.status(400).json({
-    status: 400,
-    message: 'auth error'
-  })
-
-  return redis.hgetall('project:' + id).then(p => {
-    const project = {
-      colType: JSON.parse(p.colType || '""'),
-      colMap: JSON.parse(p.colMap || '""'),
-      rawDataView: JSON.parse(p.rawDataView || '""'),
-      nullFillMethod: JSON.parse(p.nullFillMethod || '""'),
-      mismatchFillMethod: JSON.parse(p.mismatchFillMethod || '""'),
-      outlierFillMethod: JSON.parse(p.outlierFillMethod || '""'),
-      featureLabel: JSON.parse(p.dataHeader || '""'),
-      targetLabel: [JSON.parse(p.target || '""')],
-      problemType: JSON.parse(p.problemType || '""'),
-      mapHeader: JSON.parse(p.mapHeader || '""'),
-      cutoff: {}
-    }
-    let promise = Promise.resolve()
-    if (project.problemType === 'Classification') promise = queryModelList(id, result => {
-      const { status, model } = result
-      if (status !== 200) return
-      const { chartData, fitIndex, id } = model
-      const { roc: { Threshold } } = chartData
-      project.cutoff[id] = Threshold[fitIndex]
-    });
-
-    return promise.then(() => {
-      return res.json({
-        status: 100,
-        message: 'ok',
-        data: project
-      })
-    })
-  })
-})
-
 
 export default router

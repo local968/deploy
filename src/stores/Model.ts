@@ -153,6 +153,8 @@ class Model {
   @observable accuracyData: NumberObject = {}
   @observable getPmml: boolean = false
   @observable pmmlData: string = ''
+  @observable getContainer: boolean = false
+  @observable containerData: string = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
@@ -454,8 +456,17 @@ class Model {
 
   createPmml = () => {
     this.getPmml = true
+    const prev = ((this.problemType === 'Classification' || this.problemType === 'Regression') && 'clfreg') || (this.problemType === 'Clustering' && 'clustering') || (this.problemType === 'Outlier' && 'outlier') || (this.problemType === 'MultiClassification' && 'multi') || ''
+    if (!prev) return Promise.resolve()
     return socketStore.ready().then(api => {
-      return api.createPmml({ command: 'clfreg.pmml', id: this.id, projectId: this.projectId })
+      return api.createPmml({ command: `${prev}.pmml`, id: this.id, projectId: this.projectId })
+    })
+  }
+
+  createContainer = () => {
+    this.getContainer = true
+    return socketStore.ready().then(api => {
+      return api.createContainer({ command: 'top.dockerRuntime', id: this.id, projectId: this.projectId })
     })
   }
   // outlierPlot = (featureList) => {
