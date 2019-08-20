@@ -37,7 +37,6 @@ const Headers: TableHeader[] = [
     hint: EN.MicroPHint,
     type:'micro',
   },
-
   {
     label: 'Micro-R',
     value: 'micror',
@@ -88,10 +87,20 @@ const Headers: TableHeader[] = [
     type:'macro',
   },
   {
+    label: 'MCC',
+    value: 'mcc',
+    sort: true
+  },
+  {
     label: 'Kappa',
     value: 'kappa',
     sort: true,
     hint: EN.KappaHint
+  },
+  {
+    label:"Jaccard",
+    value:"Jaccard",
+    sort: true,
   },
   {
     label: 'HammingLoss',
@@ -196,6 +205,18 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
           const bModelData = isHoldout ? (bModel.score.holdoutScore.Kappa) : (bModel.score.validateScore.Kappa)
           return (aModelData - bModelData) * sort.value
         }
+      case 'mcc':
+      {
+        const aModelData = isHoldout ? (aModel.score.holdoutScore.MCC) : (aModel.score.validateScore.MCC);
+        const bModelData = isHoldout ? (bModel.score.holdoutScore.MCC) : (bModel.score.validateScore.MCC);
+        return (aModelData - bModelData) * sort.value
+      }
+      case 'Jaccard':
+      {
+        const aModelData = isHoldout ? (aModel.score.holdoutScore.Jaccard) : (aModel.score.validateScore.Jaccard);
+        const bModelData = isHoldout ? (bModel.score.holdoutScore.Jaccard) : (bModel.score.validateScore.Jaccard);
+        return (aModelData - bModelData) * sort.value
+      }
       case 'macroauc':
         {
           const aModelData = isHoldout ? (aModel.holdoutChartData.roc_auc.macro) : (aModel.chartData.roc_auc.macro)
@@ -265,9 +286,15 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
         <div className={styles.tools}>
           <div className={styles.m_croSwitch}>
             <div>
-              <span>Macro</span>
-              <Switch checked={m_cro === 'micro'} onChange={handleM_cro} style={{ backgroundColor: '#1D2B3C' }} />
-              <span>Micro</span>
+              <Select
+                size="large"
+                value={m_cro}
+                      onChange={handleM_cro}
+                      style={{ width: '140px', fontSize: '1rem' }}
+                      getPopupContainer={el => el.parentElement}
+              >
+                {['macro','micro'].map(mo => <Option value={mo} key={mo} >{mo}</Option>)}
+              </Select>
             </div>
           </div>
 
@@ -354,7 +381,9 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore[m_cro+'_R'].toString())}>{formatNumber(modelScore[m_cro+'_R'].toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore[m_cro+'_F1'].toString())}>{formatNumber(modelScore[m_cro+'_F1'].toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelChartData.roc_auc[m_cro].toString())}>{formatNumber(modelChartData.roc_auc[m_cro].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.MCC.toString())}>{formatNumber(modelScore.MCC.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Kappa.toString())}>{formatNumber(modelScore.Kappa.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Jaccard.toString())}>{formatNumber(modelScore.Jaccard.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.HammingLoss.toString())}>{formatNumber(modelScore.HammingLoss.toString())}</span></div>
         <div className={styles.scoreCell}>
           <div className={styles.cell}><span className={styles.text} title={formatNumber(validate.toString())}>{formatNumber(validate.toString())}</span></div>

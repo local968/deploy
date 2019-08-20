@@ -35,7 +35,7 @@ span.text {
 .toolCell {
   display: flex;
   width: 0;
-  flex: 2 2;
+  flex: 3 2;
   align-items: center;
   position: relative;
   background: #f0f2f6;
@@ -78,18 +78,19 @@ span.text {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
-.m_croSwitch div{
+.m_croSwitch >div{
   display: flex;
   position: relative;
-  top: 30%;
+  top: 20%;
   background: #fff;
   z-index: 2;
+  left:12%;
 }
 
 .m_croSwitch{
   position: absolute;
   top: 0;
-  right: 280%;
+  right: 300%;
   height: 60px;
   flex: none;
   align-items: center;
@@ -98,7 +99,7 @@ span.text {
 .m_croSwitch:after{
   content: '';
   border: 1px solid;
-  width: 200%;
+  width: 225%;
   display: inline-block;
   height: 50%;
   position: absolute;
@@ -119,7 +120,7 @@ span.text {
   align-items: center;
   margin-right: 15px;
 }
-.metricSwitch span,.m_croSwitch span {
+.metricSwitch span{
   margin: 0 10px;
   white-space: nowrap;
 }
@@ -165,7 +166,7 @@ span.text {
 .scoreCell {
   display: flex;
   width: 0;
-  flex: 2 2;
+  flex: 3 2;
   align-items: center;
   position: relative;
 }
