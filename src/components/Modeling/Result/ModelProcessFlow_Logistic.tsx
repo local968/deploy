@@ -94,7 +94,8 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.OutlierDetection}(${target})`,outlierLineCounts[target],true);
 
-		const dqft = problemType==='Classification'&&this.DQFT();
+		const dqft = ['MultiClassification','Classification'].includes(problemType)&&this.DQFT();
+
 
 		if(!mv&&!mi&&!out&&!dqft){
 			return <dl>
