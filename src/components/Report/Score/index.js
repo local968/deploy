@@ -298,6 +298,7 @@ const questMarks = {
   Recall: EN.Itrepresentsthecompleteness,
   'Cutoff Threshold': EN.Manyclassifiersareabletoproduce,
   'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
+  'Fbeta': <p>{EN.TheFbetascoreistheharmonicmean}<br /><br />{EN.PrecisionRecallbeta}</p>,
   Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
   KS: EN.Efficientwaytodetermine,
   'Normalized RMSE': EN.RootMeanSquareError,
@@ -324,18 +325,15 @@ class AdvancedModelTable extends Component {
     const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, target, mapHeader }, sort, handleSort, metric, project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
-    // const texts = problemType === 'Classification' ?
-    //   [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
-    //   [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
     
     let texts;
     
     switch (problemType) {
       case 'Classification':
-        texts = [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout];
+        texts = [EN.ModelName, EN.Time, 'Fbeta', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout];
         break;
       case 'MultiClassification':
-        texts = [EN.ModelName, 'Kappa', 'Macro-AUC', EN.ExecutionSpeed, EN.Time];
+        texts = [EN.ModelName, EN.Time, 'Accuracy', "Macro-P", "Macro-R","Macro-F1","Macro-AUC","Kappa","HammingLoss",EN.Validation, EN.Holdout];
         break;
       default:
         texts = [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
@@ -652,7 +650,6 @@ class ClassificationModelRow extends Component {
   };
   render() {
     const { model, texts, metric, checked, yes, no, project } = this.props;
-    console.log(this.props)
     if (!model.chartData) return null;
     const { modelName, fitIndex, chartData: { roc }, score } = model;
     return (
@@ -670,7 +667,7 @@ class ClassificationModelRow extends Component {
                   </div>}
                   />
                 );
-              case 'F1-Score':
+              case 'Fbeta':
                 return <RowCell key={2} data={model.f1Validation} />;
               case 'Precision':
                 return <RowCell key={3} data={model.precisionValidation} />;

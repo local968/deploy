@@ -149,15 +149,15 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
         }
       case 'microp':
         {
-          const aModelData = isHoldout ? a_holdoutScore.micro_P : b_holdoutScore.micro_P;
-          const bModelData = isHoldout ? b_holdoutScore.micro_P : a_holdoutScore.micro_P;
+          const aModelData = isHoldout ? a_holdoutScore.micro_P : a_validateScore.micro_P;
+          const bModelData = isHoldout ? b_holdoutScore.micro_P : b_validateScore.micro_P;
           return (aModelData - bModelData) * sort.value;
         }
 
       case 'micror':
         {
-          const aModelData = isHoldout ? a_holdoutScore.micro_R : b_holdoutScore.micro_R;
-          const bModelData = isHoldout ? b_holdoutScore.micro_R : a_holdoutScore.micro_R;
+          const aModelData = isHoldout ? a_holdoutScore.micro_R : a_validateScore.micro_R;
+          const bModelData = isHoldout ? b_holdoutScore.micro_R : b_validateScore.micro_R;
           return (aModelData - bModelData) * sort.value
         }
       case 'microf1':
@@ -312,7 +312,7 @@ interface MultiClassificationTableRowProps {
 
 const MultiClassificationTableRow = observer((props: MultiClassificationTableRowProps) => {
   const { model, project, metric, detail, handleDetail } = props
-  const { isHoldout, mapHeader, newVariable, selectModel, recommendModel } = project
+  const { isHoldout, mapHeader, newVariable, selectModel, recommendModel,m_cro } = project
   const { score, holdoutChartData, chartData } = model
   const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
   const [t, p] = metric.split("_")
@@ -350,11 +350,11 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
         </div>
         <div className={styles.cell}><span className={styles.text} title={moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}>{moment.unix(model.createTime).format('YYYY/MM/DD HH:mm')}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Accuracy.toString())}>{formatNumber(modelScore.Accuracy.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_P.toString())}>{formatNumber(modelScore.macro_P.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_R.toString())}>{formatNumber(modelScore.macro_R.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.macro_F1.toString())}>{formatNumber(modelScore.macro_F1.toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore[m_cro+'_P'].toString())}>{formatNumber(modelScore[m_cro+'_P'].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore[m_cro+'_R'].toString())}>{formatNumber(modelScore[m_cro+'_R'].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore[m_cro+'_F1'].toString())}>{formatNumber(modelScore[m_cro+'_F1'].toString())}</span></div>
+        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelChartData.roc_auc[m_cro].toString())}>{formatNumber(modelChartData.roc_auc[m_cro].toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.Kappa.toString())}>{formatNumber(modelScore.Kappa.toString())}</span></div>
-        <div className={styles.cell}><span className={styles.text} title={formatNumber(modelChartData.roc_auc.macro.toString())}>{formatNumber(modelChartData.roc_auc.macro.toString())}</span></div>
         <div className={styles.cell}><span className={styles.text} title={formatNumber(modelScore.HammingLoss.toString())}>{formatNumber(modelScore.HammingLoss.toString())}</span></div>
         <div className={styles.scoreCell}>
           <div className={styles.cell}><span className={styles.text} title={formatNumber(validate.toString())}>{formatNumber(validate.toString())}</span></div>
