@@ -52,13 +52,13 @@ export default function HistogramCategorical(props:Interface){
     itemStyle:{},
     barGap:'-100%',
   }];
-  const dataZoom = {
+  const dataZoom:any = [{
     type: 'inside',
     zoomLock:true,
     start: 0,
     end: 100 / data.length * 8,
     orient:"horizontal",
-  };
+  }];
 
   if(across){
     _data.reverse();
@@ -92,9 +92,18 @@ export default function HistogramCategorical(props:Interface){
       }
     });
 
-    dataZoom.orient = "vertical";
-    dataZoom.start = 100;
-    dataZoom.end = 100 - 100 / data.length * 7;
+    dataZoom[0].orient = "vertical";
+    dataZoom[0].start = 100;
+    dataZoom[0].end = 100 - 100 / data.length * 7;
+    if(data.length>7){
+      dataZoom.push({
+        type:"slider",
+        filterMode: 'none',
+        rangeMode: ['percent', 'percent'],
+        // zoomLock:true,
+        orient:"vertical",
+      })
+    }
   }
 
   const option = {
@@ -146,9 +155,10 @@ export default function HistogramCategorical(props:Interface){
     },
     dataZoom,
     grid:{
-      x:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,25):`${Math.floor(+max+1)}`.length * 10 +20,
+      left:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*5,25):`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series,
+    animation:false,
   };
 
   return <ReactEcharts

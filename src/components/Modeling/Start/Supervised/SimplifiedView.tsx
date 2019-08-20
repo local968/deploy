@@ -67,7 +67,7 @@ export default class SimplifiedView extends Component<Interface> {
             data: {
               field: target,
               id: etlIndex,
-              size: uniqueValues > 8 ? 8 : uniqueValues,
+              size: uniqueValues,
             },
           })
           .then((result: any) => this.showback(target, result.data));

@@ -324,10 +324,25 @@ class AdvancedModelTable extends Component {
     const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, target, mapHeader }, sort, handleSort, metric, project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
-    const texts = problemType === 'Classification' ?
-      [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
-      [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
-    const arr = []
+    // const texts = problemType === 'Classification' ?
+    //   [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout] :
+    //   [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
+    
+    let texts;
+    
+    switch (problemType) {
+      case 'Classification':
+        texts = [EN.ModelName, EN.Time, 'F1-Score', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout];
+        break;
+      case 'MultiClassification':
+        texts = [EN.ModelName, 'Kappa', 'Macro-AUC', EN.ExecutionSpeed, EN.Time];
+        break;
+      default:
+        texts = [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
+    }
+    
+    
+    const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
     const headerData = texts.reduce((prev, curr) => {
@@ -343,7 +358,9 @@ class AdvancedModelTable extends Component {
       }
       return prev
     }, {});
-    const header = <div className={styles.tableHeader}><Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row></div>;
+    const header = <div className={styles.tableHeader}>
+      <Row>{texts.map(t => <RowCell data={headerData[t]} key={t} />)}</Row>
+    </div>;
     const dataSource = models.map(m => {
       switch (problemType) {
         case "Classification":
@@ -576,9 +593,9 @@ class MultiClassificationModelRow extends Component{
     this.setState({ detail: !this.state.detail });
   };
   render() {
-    const { model, texts, metric, checked, yes, no, project } = this.props;
+    const { model, texts, checked, yes, no, project } = this.props;
     if (!model.chartData) return null;
-    const { modelName, fitIndex, chartData: { roc }, score } = model;
+    const { modelName, chartData: { roc_auc }, score,executeSpeed,createTime } = model;
     return (
       <div >
         <Row onClick={this.handleResult} >
@@ -594,26 +611,18 @@ class MultiClassificationModelRow extends Component{
                   </div>}
                   />
                 );
-              case 'F1-Score':
-                return <RowCell key={2} data={model.f1Validation} />;
-              case 'Precision':
-                return <RowCell key={3} data={model.precisionValidation} />;
-              case 'Recall':
-                return <RowCell key={4} data={model.recallValidation} />;
-              case 'LogLoss':
-                return <RowCell key={5} data={roc.LOGLOSS[fitIndex]} />;
-              case 'Cutoff Threshold':
-                return <RowCell key={6} data={roc.Threshold[fitIndex]} />;
-              case 'KS':
-                return <RowCell key={7} data={roc.KS[fitIndex]} />;
-              case EN.Validation:
-                return <RowCell key={8} data={metric === 'auc' ? score.validateScore[metric] : model[metric + 'Validation']} />;
-              case EN.Holdout:
-                return <RowCell key={9} data={metric === 'auc' ? score.holdoutScore[metric] : model[metric + 'Holdout']} />;
+              case 'Kappa':
+                return <RowCell key={2} data={formatNumber(score.validateScore.Kappa.toString())} />;
+              case 'Macro-AUC':
+                return <RowCell key={3} data={formatNumber(roc_auc.macro.toString())} />;
+              case EN.ExecutionSpeed:
+                return <RowCell key={4} data={formatNumber(executeSpeed.toString()) + EN.Rowss} />;
               case EN.Time:
-                return <RowCell key={10} data={model.createTime ? moment.unix(model.createTime).format('YYYY/MM/DD HH:mm') : ''} notFormat={true} />;
+                return <RowCell key={5} data={createTime
+                  ? moment.unix(createTime).format('YYYY/MM/DD HH:mm')
+                  : ''} />;
               default:
-                return null
+                return null;
             }
           })}
         </Row>
@@ -853,7 +862,8 @@ class PredictTable extends Component {
 
     // set default value
 
-
+  
+    console.log(12312)
 
     const { project = {}, model, yes, no } = this.props;
     const { fitIndex, chartData } = model;
