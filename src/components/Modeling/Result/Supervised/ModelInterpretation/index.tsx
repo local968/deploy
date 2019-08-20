@@ -47,8 +47,24 @@ export default function ModelInterpretation(props){
   if(linearData){
     return <div ref={dom} className={styles.ModelInterpretation}/>
   }
+
+  const [downloadUrl,upDownloadUrl] = useState('');
+
+  useEffect(()=>{
+    if(url){
+      const arr = url.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length, u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      upDownloadUrl(URL.createObjectURL(new Blob([u8arr], { type: mime })))
+    }
+  },[url]);
+
   return <section className={styles.treeData}>
-    <a href={url} download={modelName+'.png'}><i/>{EN.PictureDownload}</a>
+    {downloadUrl&&<a href={downloadUrl} download={modelName+'.png'}><i/>{EN.PictureDownload}</a>}
     <img src={url} alt=""/>
   </section>
 }
