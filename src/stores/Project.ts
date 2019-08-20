@@ -1093,7 +1093,7 @@ class Project {
     if (isMulti) data.targetUnique = this.targetUnique
     if (this.noComputeTemp || isAssociation) {
       if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
-        const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 1000), 3) : 3
+        const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 100), 3) : 3
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, this.targetUnique))
         if (min < defaultCount) {
           console.error("数量太小");
@@ -1185,7 +1185,7 @@ class Project {
     }
 
     if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
-      const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 1000), 3) : 3
+      const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 100), 3) : 3
       const min = Math.min(...Object.values(this.targetCounts))
       if (min < defaultCount) {
         console.error("数量太小");

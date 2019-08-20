@@ -411,7 +411,8 @@ class DataSchema extends Component<DataSchemaProps> {
         } else {
           if (this.dataType[h] === 'Categorical') {
             if (isMulti) {
-              if (rawDataView[h].uniqueValues > 2) prev[h] = mapHeader[h];
+              const counts = (this.target ? rawDataView[this.target].uniqueValues : 0) + +(!!project.nullLineCounts[h])
+              if (counts > 2) prev[h] = mapHeader[h];
             } else {
               prev[h] = mapHeader[h];
             }
