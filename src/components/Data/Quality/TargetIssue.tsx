@@ -141,7 +141,7 @@ class TargetIssue extends Component<TargetIssueProps> {
       if (curUnique < targetUniques && !hasNull)
         warnings.push(`${EN.YourtargetvariableHas}${EN.Less}${targetUniques}${EN.ge}`);
       if (curUnique === targetUniques && !hasNull) {
-        const defaultCount = problemType === 'MultiClassification' ? Math.max(Math.ceil(totalLines / 200), 3) : 3
+        const defaultCount = problemType === 'MultiClassification' ? Math.max(Math.ceil(totalLines / 1000), 3) : 3
         const min = Math.min(...Object.values(targetCounts));
         if (min < defaultCount) warnings.push(EN.Itisrecommendedthatyou);
       }
