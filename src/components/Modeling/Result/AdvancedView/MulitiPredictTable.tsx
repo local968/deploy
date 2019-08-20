@@ -105,6 +105,7 @@ export default function MulitiPredictTable(props: Interface) {
       bordered={true}
       size={'small'}
       dataSource={data}
+      style={{maxWidth:800}}
       scroll={{ x: 'max-content', y: 300 }} />
   </section>
 }

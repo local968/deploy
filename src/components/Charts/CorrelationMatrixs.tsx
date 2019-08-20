@@ -125,12 +125,12 @@ export default function CorrelationMatrixs(props: Interface) {
     dataZoom: [
       {
         type: 'slider',
-        filterMode: 'none',
+        // filterMode: 'none',
         rangeMode: ['percent', 'percent'],
       },
       {
         type: 'slider',
-        filterMode: 'none',
+        // filterMode: 'none',
         rangeMode: ['percent', 'percent'],
         orient: 'vertical',
         right:0,

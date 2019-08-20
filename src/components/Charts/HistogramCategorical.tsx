@@ -95,12 +95,14 @@ export default function HistogramCategorical(props:Interface){
     dataZoom[0].orient = "vertical";
     dataZoom[0].start = 100;
     dataZoom[0].end = 100 - 100 / data.length * 7;
+    dataZoom[0].maxValueSpan = 15;
     if(data.length>7){
       dataZoom.push({
         type:"slider",
         filterMode: 'none',
         rangeMode: ['percent', 'percent'],
         // zoomLock:true,
+        // maxSpan:50,
         orient:"vertical",
       })
     }
