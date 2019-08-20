@@ -90,7 +90,8 @@ class TargetIssue extends Component<TargetIssueProps> {
       rawDataView,
       targetIssuesCountsOrigin,
       targetArrayTemp,
-      targetUnique
+      targetUnique,
+      problemType
     } = project;
     const targetUniques = targetUnique || NaN
     const targetIndex = rawHeader.findIndex(h => h === target);
@@ -140,8 +141,9 @@ class TargetIssue extends Component<TargetIssueProps> {
       if (curUnique < targetUniques && !hasNull)
         warnings.push(`${EN.YourtargetvariableHas}${EN.Less}${targetUniques}${EN.ge}`);
       if (curUnique === targetUniques && !hasNull) {
+        const defaultCount = problemType === 'MultiClassification' ? Math.max(Math.ceil(totalLines / 1000), 3) : 3
         const min = Math.min(...Object.values(targetCounts));
-        if (min < 3) warnings.push(EN.Itisrecommendedthatyou);
+        if (min < defaultCount) warnings.push(EN.Itisrecommendedthatyou);
       }
     }
     if ((nullLineCounts[target] ? nullLineCounts[target] : 0) === totalRawLines)
