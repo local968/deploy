@@ -98,8 +98,7 @@ const Association = (props: AssociationProps) => {
     </div>
     <div className={styles.views}>
       <HistogramCategorical
-        title={EN.AssociationViewTitle}
-        x_name={EN.NumberofClusters}
+        title=' '
         data={chartData}
       />
       <div className={styles.summary}>

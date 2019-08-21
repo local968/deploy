@@ -19,6 +19,7 @@ import Chart from "../../Charts/Chart";
 import config from 'config'
 import DetailCurves from '../../Modeling/Result/AdvancedView/DetailCurves';
 import MultiClassificationDetailCurves from '../../Modeling/Result/AdvancedView/MultiClassificationDetailCurves';
+import AdvancedViewTable from '../../Modeling/Result/AdvancedView/AdvancedViewTable';
 const isEN = config.isEN;
 const varImpactNormal = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjMxcHgiIGhlaWdodD0iMzFweCIgdmlld0JveD0iMCAwIDMxIDMxIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTQgKDc2NDgwKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4NCiAgICA8dGl0bGU+aWNvblZhcmlhYmxlSW1wYWN0TVItTm9ybWFsPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZyBpZD0iUGFnZS0yIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPGcgaWQ9IjUtNC00LU1vZGVsLVNlbGVjdGlvbl9BZHZhbmNlZC1WaWV3X01vZGVsLUV4cGFuZF9ST0MtQ3VyZS1Db3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNzcuMDAwMDAwLCAtNDU1LjAwMDAwMCkiPg0KICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwLTE3IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzcuMDAwMDAwLCAzMTMuMDAwMDAwKSI+DQogICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdE1SLU5vcm1hbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDE0Mi4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICAgICAgPGc+DQogICAgICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTM1IiBzdHJva2U9IiMxRDJCM0MiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSIjRkZGRkZGIiB4PSIwLjYiIHk9IjAuNiIgd2lkdGg9IjI4Ljk5MzU0ODQiIGhlaWdodD0iMjguOTkzNTQ4NCIgcng9IjEuMiI+PC9yZWN0Pg0KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuMDk2Nzc0LCAxNS43MTEyMzApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTE1LjA5Njc3NCwgLTE1LjcxMTIzMCkgdHJhbnNsYXRlKDQuMzU0ODM5LCA0LjY3ODk3MikiPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik05LjI5MDMyMjU4LDkuODcwOTY3NzQgTDI4Ljc0MTkzNTUsOS44NzA5Njc3NCBDMjkuNTQzNjM5Miw5Ljg3MDk2Nzc0IDMwLjE5MzU0ODQsMTAuNTIwODc3IDMwLjE5MzU0ODQsMTEuMzIyNTgwNiBMMzAuMTkzNTQ4NCwxMS4zMjI1ODA2IEMzMC4xOTM1NDg0LDEyLjEyNDI4NDMgMjkuNTQzNjM5MiwxMi43NzQxOTM1IDI4Ljc0MTkzNTUsMTIuNzc0MTkzNSBMOS4yOTAzMjI1OCwxMi43NzQxOTM1IEw5LjI5MDMyMjU4LDkuODcwOTY3NzQgWiIgaWQ9IlJlY3RhbmdsZS0xMSIgZmlsbD0iIzFEMkIzQyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTkuNzQxOTM1LCAxMS4zMjI1ODEpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTkuNzQxOTM1LCAtMTEuMzIyNTgxKSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNi4zODcwOTY3Nyw4LjEyOTAzMjI2IEwyMi4zNTQ4Mzg3LDguMTI5MDMyMjYgQzIzLjE1NjU0MjQsOC4xMjkwMzIyNiAyMy44MDY0NTE2LDguNzc4OTQxNDkgMjMuODA2NDUxNiw5LjU4MDY0NTE2IEwyMy44MDY0NTE2LDkuNTgwNjQ1MTYgQzIzLjgwNjQ1MTYsMTAuMzgyMzQ4OCAyMy4xNTY1NDI0LDExLjAzMjI1ODEgMjIuMzU0ODM4NywxMS4wMzIyNTgxIEw2LjM4NzA5Njc3LDExLjAzMjI1ODEgTDYuMzg3MDk2NzcsOC4xMjkwMzIyNiBaIiBpZD0iUmVjdGFuZ2xlLTExLUNvcHkiIGZpbGw9IiMxRDJCM0MiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1LjA5Njc3NCwgOS41ODA2NDUpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTUuMDk2Nzc0LCAtOS41ODA2NDUpICI+PC9wYXRoPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik01LjgwNjQ1MTYxLDQuMDY0NTE2MTMgTDEzLjY0NTE2MTMsNC4wNjQ1MTYxMyBDMTQuNDQ2ODY1LDQuMDY0NTE2MTMgMTUuMDk2Nzc0Miw0LjcxNDQyNTM2IDE1LjA5Njc3NDIsNS41MTYxMjkwMyBMMTUuMDk2Nzc0Miw1LjUxNjEyOTAzIEMxNS4wOTY3NzQyLDYuMzE3ODMyNyAxNC40NDY4NjUsNi45Njc3NDE5NCAxMy42NDUxNjEzLDYuOTY3NzQxOTQgTDUuODA2NDUxNjEsNi45Njc3NDE5NCBMNS44MDY0NTE2MSw0LjA2NDUxNjEzIFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0yIiBmaWxsPSIjMUQyQjNDIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMC40NTE2MTMsIDUuNTE2MTI5KSByb3RhdGUoOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTEwLjQ1MTYxMywgLTUuNTE2MTI5KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IEw5LDMuNDgzODcwOTcgQzkuODAxNzAzNjcsMy40ODM4NzA5NyAxMC40NTE2MTI5LDQuMTMzNzgwMiAxMC40NTE2MTI5LDQuOTM1NDgzODcgTDEwLjQ1MTYxMjksNC45MzU0ODM4NyBDMTAuNDUxNjEyOSw1LjczNzE4NzU0IDkuODAxNzAzNjcsNi4zODcwOTY3NyA5LDYuMzg3MDk2NzcgTDEuNzQxOTM1NDgsNi4zODcwOTY3NyBMMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0zIiBmaWxsPSIjMUQyQjNDIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2LjA5Njc3NCwgNC45MzU0ODQpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtNi4wOTY3NzQsIC00LjkzNTQ4NCkgIj48L3BhdGg+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTS0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgTDMuMTkzNTQ4MzksMi4zMjI1ODA2NSBDMy45OTUyNTIwNiwyLjMyMjU4MDY1IDQuNjQ1MTYxMjksMi45NzI0ODk4OCA0LjY0NTE2MTI5LDMuNzc0MTkzNTUgTDQuNjQ1MTYxMjksMy43NzQxOTM1NSBDNC42NDUxNjEyOSw0LjU3NTg5NzIyIDMuOTk1MjUyMDYsNS4yMjU4MDY0NSAzLjE5MzU0ODM5LDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgWiIgaWQ9IlJlY3RhbmdsZS0xMS1Db3B5LTQiIGZpbGw9IiMxRDJCM0MiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuNzQxOTM1LCAzLjc3NDE5NCkgcm90YXRlKDkwLjAwMDAwMCkgdHJhbnNsYXRlKC0xLjc0MTkzNSwgLTMuNzc0MTk0KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuMDAwMDAwKSIgc3Ryb2tlPSIjMUQyQjNDIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2Utd2lkdGg9IjEuMiI+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLjE0NzM3NDkyLDEuMTQxMjc5OTkgTDIxLjA1MDYwMDcsMS4xNDEyNzk5OSIgaWQ9IkxpbmUiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgIDwvZz4NCiAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICA8L2c+DQogICAgICAgIDwvZz4NCiAgICA8L2c+DQo8L3N2Zz4NCg=='
 const varImpactHover = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHZpZXdCb3g9IjAgMCA1MiA1MiI+DQogICAgPGRlZnM+DQogICAgICAgIDxyZWN0IGlkPSJhIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHJ4PSIyIi8+DQogICAgPC9kZWZzPg0KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+DQogICAgICAgIDxnPg0KICAgICAgICAgICAgPHVzZSBmaWxsPSIjRTZGMUZGIiB4bGluazpocmVmPSIjYSIvPg0KICAgICAgICAgICAgPHJlY3Qgd2lkdGg9IjUxIiBoZWlnaHQ9IjUxIiB4PSIuNSIgeT0iLjUiIHN0cm9rZT0iIzQ0OEVFRCIgcng9IjIiLz4NCiAgICAgICAgPC9nPg0KICAgICAgICA8cGF0aCBzdHJva2U9IiM0NDhFRUQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIGQ9Ik0yNC45NjYgNDUuMzA0di0zNiIvPg0KICAgICAgICA8cGF0aCBmaWxsPSIjNDQ4RUVEIiBkPSJNMjUuNSA5LjA1OEgzOWEyLjUgMi41IDAgMSAxIDAgNUgyNS41di01ek0yNS41IDE2LjA1OEgzNWEyLjUgMi41IDAgMSAxIDAgNWgtOS41di01ek0yNC41IDIzLjA1OEgzMGEyLjUgMi41IDAgMSAxIDAgNWgtNS41di01ek0xMi41IDQ1LjU1OEgyNXYtNUgxMi41YTIuNSAyLjUgMCAwIDAgMCA1ek0xOCAzOS4wNThoNy41di01SDE4YTIuNSAyLjUgMCAwIDAgMCA1eiIvPg0KICAgIDwvZz4NCjwvc3ZnPg0K'
@@ -593,7 +594,10 @@ class MultiClassificationModelRow extends Component{
   render() {
     const { model, texts, checked, yes, no, project } = this.props;
     if (!model.chartData) return null;
-    const { modelName, chartData: { roc_auc }, score,executeSpeed,createTime } = model;
+    const { modelName, chartData: { roc_auc }, score:{holdoutScore,validateScore},executeSpeed,createTime } = model;
+  
+    const modelScore = project.isHoldout ? holdoutScore : validateScore;
+  
     return (
       <div >
         <Row onClick={this.handleResult} >
@@ -609,16 +613,17 @@ class MultiClassificationModelRow extends Component{
                   </div>}
                   />
                 );
-              case 'Kappa':
-                return <RowCell key={2} data={formatNumber(score.validateScore.Kappa.toString())} />;
+              case EN.Time:
+                return <RowCell key={2} data={createTime
+                  ? moment.unix(createTime).format('YYYY/MM/DD HH:mm')
+                  : ''} />;
+              case 'Accuracy':
+                return <RowCell key={3} data={formatNumber(modelScore.Accuracy.toString())} />;
               case 'Macro-AUC':
                 return <RowCell key={3} data={formatNumber(roc_auc.macro.toString())} />;
               case EN.ExecutionSpeed:
                 return <RowCell key={4} data={formatNumber(executeSpeed.toString()) + EN.Rowss} />;
-              case EN.Time:
-                return <RowCell key={5} data={createTime
-                  ? moment.unix(createTime).format('YYYY/MM/DD HH:mm')
-                  : ''} />;
+              
               default:
                 return null;
             }
@@ -629,12 +634,12 @@ class MultiClassificationModelRow extends Component{
           <Switch checked={project.isHoldout} onChange={() => project.isHoldout = !project.isHoldout} style={{ backgroundColor: '#1D2B3C' }} />
           <span>{EN.Holdout}</span>
         </div>
-        {<MultiClassificationDetailCurves
+        <MultiClassificationDetailCurves
           project={project}
           model={model}
           yes={yes}
           no={no}
-        />}
+        />
       </div>
     )
   }

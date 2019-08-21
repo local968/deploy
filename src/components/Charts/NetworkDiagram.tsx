@@ -7,16 +7,19 @@ interface Interface {
 
 export default function NetworkDiagram(props:Interface) {
 	const {data:_data} = props;
-	const data = Object.keys(_data).map(name=>({
-		name,
-		symbol:'circle',
-		itemStyle:{
-			color:'#31C4E9',
-		},
-		label:{
-			color:'#8A8A8A',
+	const data = Object.keys(_data).map(name=>{
+		const color = name.match(/^R\d+$/)?'yellow':'#31C4E9';
+		return {
+			name,
+			symbol:'circle',
+			itemStyle:{
+				color,
+			},
+			label:{
+				color:'#8A8A8A',
+			}
 		}
-	}));
+	});
 	const links = [];
 
 	let edgeSymbolSize = 10;
@@ -57,7 +60,7 @@ export default function NetworkDiagram(props:Interface) {
 						show: true
 					}
 				},
-				edgeSymbol: ['circle', 'arrow'],
+				edgeSymbol: ['', 'arrow'],
 				edgeSymbolSize,
 				circular: {
 					rotateLabel: true
