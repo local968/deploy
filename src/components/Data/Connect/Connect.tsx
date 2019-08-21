@@ -5,7 +5,7 @@ import sampleIcon from './sample.svg';
 import localFileIcon from './local-file.svg';
 import sqlIcon from './sql.svg';
 import { message } from 'antd';
-import { Uploader, ProgressBar, Confirm,Show } from 'components/Common';
+import { Uploader, ProgressBar, Confirm, Show } from 'components/Common';
 import DatabaseConfig from 'components/Common/DatabaseConfig';
 import r2LoadGif from './R2Loading.gif';
 import EN from '../../../constant/en';
@@ -17,7 +17,7 @@ import { UserStore } from 'stores/UserStore';
 import { SocketStore } from 'stores/SocketStore';
 import { UploadProps } from 'stores/Project';
 
-const {Option} = Select;
+const { Option } = Select;
 
 interface DataConnectProps {
   projectStore: ProjectStore,
@@ -35,6 +35,7 @@ export default class DataConnect extends Component<DataConnectProps> {
   uploadRef: React.RefObject<Uploader>;
   pause: () => void;
   resume: () => void;
+  abort: () => void
   @observable sample: boolean = false;
   @observable sql: boolean = false;
   @observable file: File | null = null;
@@ -58,11 +59,12 @@ export default class DataConnect extends Component<DataConnectProps> {
       return `${EN.DownloadedData} ${this.sqlProgress}${EN.Rows}`;
   }
 
-  onUpload = ({ pause, resume }: { pause: () => void; resume: () => void }) => {
+  onUpload = ({ pause, resume, abort }: { pause: () => void; resume: () => void, abort: () => void }) => {
     this.uploading = true;
     this.isPause = false;
     this.pause = pause;
     this.resume = resume;
+    this.abort = abort
   };
 
   upload = action((data: UploadProps) => {
@@ -90,7 +92,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     const [loaded, size] = progress.split('/');
     try {
       this.process = (parseFloat(loaded) / parseFloat(size)) * 50;
-    } catch (e) {}
+    } catch (e) { }
   });
 
   onChecks = action((file: File) => {
@@ -170,7 +172,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.sql = false;
   };
 
-  onClick = (key:any) => {
+  onClick = (key: any) => {
     const { project } = this.props.projectStore;
     if (this.uploading || project.etling) return;
     this.key = key;
@@ -203,8 +205,8 @@ export default class DataConnect extends Component<DataConnectProps> {
     return (
       <div
         className={styles.uploadBlock}
-        onClick={()=>{
-          if(this.props.userStore.info.role[name]!==false){
+        onClick={() => {
+          if (this.props.userStore.info.role[name] !== false) {
             this.onClick(key)
           }
         }}
@@ -242,11 +244,16 @@ export default class DataConnect extends Component<DataConnectProps> {
   };
 
   closeUpload = () => {
-    this.pause && this.pause();
+    this.abort && this.abort();
     this.uploading = false;
     this.process = 0;
     this.file = null;
   };
+
+  afterClose = (index: string) => {
+    console.log("delete", index)
+    this.props.projectStore.project.deleteIndex(index)
+  }
 
   render() {
     const {
@@ -295,6 +302,7 @@ export default class DataConnect extends Component<DataConnectProps> {
             file={this.file}
             ref={this.uploadRef}
             charset={charset}
+            afterClose={this.afterClose}
           />
         </div>
         {
@@ -311,11 +319,9 @@ export default class DataConnect extends Component<DataConnectProps> {
             <div className={styles.progressBlock}>
               <div className={styles.progressTitle}>
                 <span>{EN.DataImport}</span>
-                {
-                  <div className={styles.close} onClick={this.closeUpload}>
-                    <span>X</span>
-                  </div>
-                }
+                {<div className={styles.close} onClick={this.closeUpload}>
+                  <span>X</span>
+                </div>}
               </div>
               <div className={styles.progressContent}>
                 <div className={styles.progressLoad}>
@@ -331,8 +337,8 @@ export default class DataConnect extends Component<DataConnectProps> {
                       {!this.isPause ? (
                         <span onClick={this.handleParse}>{EN.Paused}</span>
                       ) : (
-                        <span onClick={this.handleResume}>{EN.Resume}</span>
-                      )}
+                          <span onClick={this.handleResume}>{EN.Resume}</span>
+                        )}
                     </div>
                   )}
                 </div>

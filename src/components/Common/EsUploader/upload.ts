@@ -40,7 +40,7 @@ export default function EsUploader(file, option: any = {}) {
   let currentCursor = 0
   let no = 0
 
-  const { onProgress = () => { }, onError = () => { }, onFinished = () => { },
+  const { onProgress = () => { }, onError = () => { }, onFinished = () => { }, afterClose = (index) => { },
     charset = 'utf-8' } =
     option
 
@@ -112,10 +112,10 @@ export default function EsUploader(file, option: any = {}) {
     while (processors.length > 0) {
       await handleChunkDOne()
     }
-    const rawHeader = option.mapHeader || header.filter(h => h !==  '__no')
-    if(option.mapHeader) {
+    const rawHeader = option.mapHeader || header.filter(h => h !== '__no')
+    if (option.mapHeader) {
       header.filter(h => h !== '__no').forEach(h => {
-        if(option.mapHeader.indexOf(h) === -1) rawHeader.push(h)
+        if (option.mapHeader.indexOf(h) === -1) rawHeader.push(h)
       })
     }
     if (!isPause)
@@ -155,11 +155,11 @@ export default function EsUploader(file, option: any = {}) {
   const getNextChunk = async () => {
     let plus = 0
     const _header = autoFixHeader(header.filter(key => key !== '__no')).map((k, i) => {
-      if(option.mapHeader) {
+      if (option.mapHeader) {
         const index = option.mapHeader.indexOf(k)
-        if(index === -1) return option.mapHeader.length + plus++
+        if (index === -1) return option.mapHeader.length + plus++
         return index
-      }else return i
+      } else return i
     })
     _header.unshift('__no')
     chunk.unshift(_header)
@@ -174,6 +174,11 @@ export default function EsUploader(file, option: any = {}) {
     return csvChunk
   }
 
+  const deleteIndex = () => {
+    if (!index) setTimeout(() => deleteIndex(), 3000)
+    else afterClose(index)
+  }
+
   const resume = async () => {
     isPause = false
     continuedUpload()
@@ -185,6 +190,7 @@ export default function EsUploader(file, option: any = {}) {
 
   const abort = async () => {
     isPause = true
+    deleteIndex()
   }
 
   start()
