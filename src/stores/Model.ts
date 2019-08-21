@@ -155,6 +155,7 @@ class Model {
   @observable pmmlData: string = ''
   @observable getContainer: boolean = false
   @observable containerData: string = ''
+  @observable runTimeData: string = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {

@@ -155,6 +155,12 @@ function ModelResult(props) {
     })
   }
 
+  const createContainer = () => {
+    selectModel.createContainer().then(result => {
+      if (result.status < 0) message.error(result['processError'])
+    })
+  }
+
   return (
     <div className={classes.root}>
       {problemType === 'Outlier' && (
@@ -387,6 +393,18 @@ function ModelResult(props) {
             </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
               <button className={classes.button}>
                 <span>{`${EN.DownloadPmml}`}</span>
+              </button>
+            </a>)}
+        {view === 'advanced' && (!selectModel.getContainer ? <button className={classes.button} onClick={createContainer}>
+          <span>{`${EN.CreateContainer}`}</span>
+        </button> : !selectModel.containerData ?
+            <Tooltip title={EN.CannotExportContainer}>
+              <button className={`${classes.button} ${classes.disabled}`}>
+                <span>{`${EN.DownloadContainer}`}</span>
+              </button>
+            </Tooltip> : <a href={`/upload/download/container?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+              <button className={classes.button}>
+                <span>{`${EN.DownloadContainer}`}</span>
               </button>
             </a>)}
       </div>

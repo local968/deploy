@@ -1277,7 +1277,10 @@ const ZH_LAN = {
   MicroRHint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的Recall。',
   MacroF1Hint: '宏平均（Macro-averaging）是指所有类别的每一个F1的算数平均值。',
   MicroF1Hint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的F1。',
-  MicroAUCHint:"微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的AUC。",
+  MicroAUCHint: "微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的AUC。",
+  CreateContainer: '生成容器',
+  CannotExportContainer: '无法导出容器',
+  DownloadContainer: '导出容器',
 };
 
 export default ZH_LAN;

@@ -116,6 +116,12 @@ export default class ModelResult extends Component<ModelResultProps> {
     })
   }
 
+  createContainer = () => {
+    this.props.projectStore.project.selectModel.createContainer().then(result => {
+      if (result.status < 0) message.error(result['processError'])
+    })
+  }
+
   render() {
     const { project } = this.props.projectStore;
     const { models, isHoldout, problemType } = project;
@@ -191,6 +197,18 @@ export default class ModelResult extends Component<ModelResultProps> {
               </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
                 <button className={styles.button}>
                   <span>{`${EN.DownloadPmml}`}</span>
+                </button>
+              </a>)}
+          {this.view === 'advanced' && (!selectModel.getContainer ? <button className={styles.button} onClick={this.createContainer}>
+            <span>{`${EN.CreateContainer}`}</span>
+          </button> : !selectModel.containerData ?
+              <Tooltip title={EN.CannotExportContainer}>
+                <button className={classnames(styles.button, styles.disabled)}>
+                  <span>{`${EN.DownloadContainer}`}</span>
+                </button>
+              </Tooltip> : <a href={`/upload/download/container?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+                <button className={styles.button}>
+                  <span>{`${EN.DownloadContainer}`}</span>
                 </button>
               </a>)}
         </div>

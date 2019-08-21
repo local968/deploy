@@ -1648,7 +1648,6 @@ wss.register('createPmml', async (message, socket) => {
     version: id,
     requestId: _id
   }, progressValue => {
-    console.log(progressValue, 'progressValue')
     const { status } = progressValue
     if (status < 0 || status === 100) return progressValue
   })
@@ -1669,12 +1668,11 @@ wss.register('createContainer', async (message, socket) => {
     version: id,
     requestId: _id
   }, progressValue => {
-    console.log(progressValue, 'progressValue')
     const { status } = progressValue
     if (status < 0 || status === 100) return progressValue
   })
   const { status, result } = returnValue
-  if (status === 100) await updateModel(userId, projectId, id, { containerData: result.containerData })
+  if (status === 100) await updateModel(userId, projectId, id, { containerData: result.modelImageData, runTimeData: result.modelRuntimeData })
   return returnValue
 })
 

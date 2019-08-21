@@ -1419,7 +1419,10 @@ const EN_LAN = {
   MicroRHint: '',
   MacroF1Hint: '',
   MicroF1Hint: '',
-  MicroAUCHint:"微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的AUC。",
+  MicroAUCHint: "微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的AUC。",
+  CreateContainer: 'Create Container',
+  CannotExportContainer: 'Cannot be Exported',
+  DownloadContainer: 'Export Container',
 };
 
 
