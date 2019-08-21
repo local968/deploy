@@ -1031,45 +1031,45 @@ wss.register('abortTrain', (message, socket) => {
     //       { ...message, userId, requestId, stopId },
     //     ])}`,
     //   )
-    return command({ ...message, userId, requestId, stopId }, (progressValue) => {
-      const { status } = progressValue
-      if (status < 0 || status === 100) return progressValue
-    })
-      .then(async () => {
-        command.clearListener(stopId);
-        userLogger.warn({
-          userId,
-          pid: projectId,
-          params: JSON.stringify({ stopId }),
-          message: `abort train: ${stopId}`,
-          time: moment().unix(),
-        });
-        const trainModel = await getProjectField(projectId, 'trainModel');
-        Reflect.deleteProperty(trainModel, stopId);
-        const curStopIds = stopIds.filter(si => si !== stopId);
-        const statusData: StatusData = {
-          trainModel,
-          stopIds: curStopIds,
-        };
-        // const modelCounts = await getModelCount(projectId);
-        if (!curStopIds.length) {
-          statusData.trainModel = {};
-          statusData.stopIds = [];
-          statusData.train2Finished = true
-          statusData.train2ing = false
-          // if (isModeling && !modelCounts) {
-          //   statusData.mainStep = 3;
-          //   statusData.curStep = 3;
-          //   statusData.lastSubStep = 1;
-          //   statusData.subStepActive = 1;
-          // }
-        }
-        return createOrUpdate(projectId, userId, statusData);
-      });
-    // return command(, () => {
+    command({ ...message, userId, requestId, stopId })
+    // .then(async () => {
+    command.clearListener(stopId);
+    userLogger.warn({
+      userId,
+      pid: projectId,
+      params: JSON.stringify({ stopId }),
+      message: `abort train: ${stopId}`,
+      time: moment().unix(),
+    });
+    return getProjectField(projectId, 'trainModel').then(trainModel => {
+      Reflect.deleteProperty(trainModel, stopId);
+      const curStopIds = stopIds.filter(si => si !== stopId);
+      const statusData: StatusData = {
+        trainModel,
+        stopIds: curStopIds,
+      };
+      // const modelCounts = await getModelCount(projectId);
+      if (!curStopIds.length) {
+        statusData.trainModel = {};
+        statusData.stopIds = [];
+        statusData.train2Finished = true
+        statusData.train2ing = false
+        // if (isModeling && !modelCounts) {
+        //   statusData.mainStep = 3;
+        //   statusData.curStep = 3;
+        //   statusData.lastSubStep = 1;
+        //   statusData.subStepActive = 1;
+        // }
+      }
+      return createOrUpdate(projectId, userId, statusData);
+    });
+  })
+  // const trainModel = await getProjectField(projectId, 'trainModel');
 
-    // }, true)
-  });
+  // return command(, () => {
+
+  // }, true)
+  // });
 });
 
 wss.register('train', async (message, socket, progress) => {
