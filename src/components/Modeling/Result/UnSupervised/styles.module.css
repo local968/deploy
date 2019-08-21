@@ -286,6 +286,7 @@
 .tabs {
   border-bottom: 1px #1D2B3C solid;
   display: flex;
+  flex: none;
   /* justify-content: flex-end; */
   margin-bottom: 40px
 }
