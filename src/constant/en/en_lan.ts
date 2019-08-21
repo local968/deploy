@@ -1270,6 +1270,8 @@ const EN_LAN = {
   Minimum: 'Lower bound of effective value',
   Maximum: 'Upper bound of effective value',
   TargetMore2Unique: 'Target has more than 2 unique values',
+  TargetMoreUnique: 'Target has more than ',
+  GE: ' unique values',
   Areyousuretodeletethismodeldeployment: 'Are you sure to delete this model deployment? This action cannot be recovered.',
   DropTheRows: 'Drop the rows',
   Mapping: 'Mapping',
