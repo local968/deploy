@@ -27,6 +27,8 @@ export default function HistogramCategorical(props:Interface){
     xAxisName = data.map((itm)=>itm.name),
     title = `Feature:${x_name}`,
     across,
+    height = '100%',
+    width = '100%'
   } = props;
 
   const dt = data.map(itm=>itm.value);
@@ -165,7 +167,7 @@ export default function HistogramCategorical(props:Interface){
 
   return <ReactEcharts
     option={option}
-    style={{height:330, width:550}}
+    style={{height, width}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

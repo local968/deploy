@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import { Button, Icon, Modal, Radio, Table, Tabs, Tooltip, Switch } from 'antd';
+import { Button, Icon, Modal, Radio, Table, Tabs, Tooltip, Switch, Select } from 'antd';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
-import { NumberInput } from 'components/Common';
+import { NumberInput,Hint } from 'components/Common';
 import { formatNumber } from 'util'
 import { observable, computed, action, toJS } from 'mobx';
 import EN from '../../../constant/en';
@@ -12,15 +12,12 @@ import VariableImpact from "../../Modeling/Result/VariableImpact";
 import FitPlot from "../../Charts/FitPlot";
 import ResidualPlot from "../../Charts/ResidualPlot";
 import SpeedvsAccuracys from "../../Charts/SpeedvsAccuracys";
-import LiftChart from "../../Charts/LiftChart";
-import RocChart from "../../Charts/RocChart";
-import { Hint } from 'components/Common';
+import {LiftChart,RocChart} from "../../Charts";
 import Chart from "../../Charts/Chart";
 import config from 'config'
 import DetailCurves from '../../Modeling/Result/AdvancedView/DetailCurves';
 import MultiClassificationDetailCurves from '../../Modeling/Result/AdvancedView/MultiClassificationDetailCurves';
-import AdvancedViewTable from '../../Modeling/Result/AdvancedView/AdvancedViewTable';
-const isEN = config.isEN;
+const {isEN} = config;
 const varImpactNormal = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjMxcHgiIGhlaWdodD0iMzFweCIgdmlld0JveD0iMCAwIDMxIDMxIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTQgKDc2NDgwKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4NCiAgICA8dGl0bGU+aWNvblZhcmlhYmxlSW1wYWN0TVItTm9ybWFsPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZyBpZD0iUGFnZS0yIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPGcgaWQ9IjUtNC00LU1vZGVsLVNlbGVjdGlvbl9BZHZhbmNlZC1WaWV3X01vZGVsLUV4cGFuZF9ST0MtQ3VyZS1Db3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNzcuMDAwMDAwLCAtNDU1LjAwMDAwMCkiPg0KICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwLTE3IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzcuMDAwMDAwLCAzMTMuMDAwMDAwKSI+DQogICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdE1SLU5vcm1hbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDE0Mi4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICAgICAgPGc+DQogICAgICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTM1IiBzdHJva2U9IiMxRDJCM0MiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSIjRkZGRkZGIiB4PSIwLjYiIHk9IjAuNiIgd2lkdGg9IjI4Ljk5MzU0ODQiIGhlaWdodD0iMjguOTkzNTQ4NCIgcng9IjEuMiI+PC9yZWN0Pg0KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuMDk2Nzc0LCAxNS43MTEyMzApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTE1LjA5Njc3NCwgLTE1LjcxMTIzMCkgdHJhbnNsYXRlKDQuMzU0ODM5LCA0LjY3ODk3MikiPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik05LjI5MDMyMjU4LDkuODcwOTY3NzQgTDI4Ljc0MTkzNTUsOS44NzA5Njc3NCBDMjkuNTQzNjM5Miw5Ljg3MDk2Nzc0IDMwLjE5MzU0ODQsMTAuNTIwODc3IDMwLjE5MzU0ODQsMTEuMzIyNTgwNiBMMzAuMTkzNTQ4NCwxMS4zMjI1ODA2IEMzMC4xOTM1NDg0LDEyLjEyNDI4NDMgMjkuNTQzNjM5MiwxMi43NzQxOTM1IDI4Ljc0MTkzNTUsMTIuNzc0MTkzNSBMOS4yOTAzMjI1OCwxMi43NzQxOTM1IEw5LjI5MDMyMjU4LDkuODcwOTY3NzQgWiIgaWQ9IlJlY3RhbmdsZS0xMSIgZmlsbD0iIzFEMkIzQyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTkuNzQxOTM1LCAxMS4zMjI1ODEpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTkuNzQxOTM1LCAtMTEuMzIyNTgxKSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNi4zODcwOTY3Nyw4LjEyOTAzMjI2IEwyMi4zNTQ4Mzg3LDguMTI5MDMyMjYgQzIzLjE1NjU0MjQsOC4xMjkwMzIyNiAyMy44MDY0NTE2LDguNzc4OTQxNDkgMjMuODA2NDUxNiw5LjU4MDY0NTE2IEwyMy44MDY0NTE2LDkuNTgwNjQ1MTYgQzIzLjgwNjQ1MTYsMTAuMzgyMzQ4OCAyMy4xNTY1NDI0LDExLjAzMjI1ODEgMjIuMzU0ODM4NywxMS4wMzIyNTgxIEw2LjM4NzA5Njc3LDExLjAzMjI1ODEgTDYuMzg3MDk2NzcsOC4xMjkwMzIyNiBaIiBpZD0iUmVjdGFuZ2xlLTExLUNvcHkiIGZpbGw9IiMxRDJCM0MiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1LjA5Njc3NCwgOS41ODA2NDUpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTUuMDk2Nzc0LCAtOS41ODA2NDUpICI+PC9wYXRoPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik01LjgwNjQ1MTYxLDQuMDY0NTE2MTMgTDEzLjY0NTE2MTMsNC4wNjQ1MTYxMyBDMTQuNDQ2ODY1LDQuMDY0NTE2MTMgMTUuMDk2Nzc0Miw0LjcxNDQyNTM2IDE1LjA5Njc3NDIsNS41MTYxMjkwMyBMMTUuMDk2Nzc0Miw1LjUxNjEyOTAzIEMxNS4wOTY3NzQyLDYuMzE3ODMyNyAxNC40NDY4NjUsNi45Njc3NDE5NCAxMy42NDUxNjEzLDYuOTY3NzQxOTQgTDUuODA2NDUxNjEsNi45Njc3NDE5NCBMNS44MDY0NTE2MSw0LjA2NDUxNjEzIFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0yIiBmaWxsPSIjMUQyQjNDIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMC40NTE2MTMsIDUuNTE2MTI5KSByb3RhdGUoOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTEwLjQ1MTYxMywgLTUuNTE2MTI5KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IEw5LDMuNDgzODcwOTcgQzkuODAxNzAzNjcsMy40ODM4NzA5NyAxMC40NTE2MTI5LDQuMTMzNzgwMiAxMC40NTE2MTI5LDQuOTM1NDgzODcgTDEwLjQ1MTYxMjksNC45MzU0ODM4NyBDMTAuNDUxNjEyOSw1LjczNzE4NzU0IDkuODAxNzAzNjcsNi4zODcwOTY3NyA5LDYuMzg3MDk2NzcgTDEuNzQxOTM1NDgsNi4zODcwOTY3NyBMMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0zIiBmaWxsPSIjMUQyQjNDIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2LjA5Njc3NCwgNC45MzU0ODQpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtNi4wOTY3NzQsIC00LjkzNTQ4NCkgIj48L3BhdGg+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTS0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgTDMuMTkzNTQ4MzksMi4zMjI1ODA2NSBDMy45OTUyNTIwNiwyLjMyMjU4MDY1IDQuNjQ1MTYxMjksMi45NzI0ODk4OCA0LjY0NTE2MTI5LDMuNzc0MTkzNTUgTDQuNjQ1MTYxMjksMy43NzQxOTM1NSBDNC42NDUxNjEyOSw0LjU3NTg5NzIyIDMuOTk1MjUyMDYsNS4yMjU4MDY0NSAzLjE5MzU0ODM5LDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgWiIgaWQ9IlJlY3RhbmdsZS0xMS1Db3B5LTQiIGZpbGw9IiMxRDJCM0MiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuNzQxOTM1LCAzLjc3NDE5NCkgcm90YXRlKDkwLjAwMDAwMCkgdHJhbnNsYXRlKC0xLjc0MTkzNSwgLTMuNzc0MTk0KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuMDAwMDAwKSIgc3Ryb2tlPSIjMUQyQjNDIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2Utd2lkdGg9IjEuMiI+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLjE0NzM3NDkyLDEuMTQxMjc5OTkgTDIxLjA1MDYwMDcsMS4xNDEyNzk5OSIgaWQ9IkxpbmUiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgIDwvZz4NCiAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICA8L2c+DQogICAgICAgIDwvZz4NCiAgICA8L2c+DQo8L3N2Zz4NCg=='
 const varImpactHover = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHZpZXdCb3g9IjAgMCA1MiA1MiI+DQogICAgPGRlZnM+DQogICAgICAgIDxyZWN0IGlkPSJhIiB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHJ4PSIyIi8+DQogICAgPC9kZWZzPg0KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+DQogICAgICAgIDxnPg0KICAgICAgICAgICAgPHVzZSBmaWxsPSIjRTZGMUZGIiB4bGluazpocmVmPSIjYSIvPg0KICAgICAgICAgICAgPHJlY3Qgd2lkdGg9IjUxIiBoZWlnaHQ9IjUxIiB4PSIuNSIgeT0iLjUiIHN0cm9rZT0iIzQ0OEVFRCIgcng9IjIiLz4NCiAgICAgICAgPC9nPg0KICAgICAgICA8cGF0aCBzdHJva2U9IiM0NDhFRUQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIGQ9Ik0yNC45NjYgNDUuMzA0di0zNiIvPg0KICAgICAgICA8cGF0aCBmaWxsPSIjNDQ4RUVEIiBkPSJNMjUuNSA5LjA1OEgzOWEyLjUgMi41IDAgMSAxIDAgNUgyNS41di01ek0yNS41IDE2LjA1OEgzNWEyLjUgMi41IDAgMSAxIDAgNWgtOS41di01ek0yNC41IDIzLjA1OEgzMGEyLjUgMi41IDAgMSAxIDAgNWgtNS41di01ek0xMi41IDQ1LjU1OEgyNXYtNUgxMi41YTIuNSAyLjUgMCAwIDAgMCA1ek0xOCAzOS4wNThoNy41di01SDE4YTIuNSAyLjUgMCAwIDAgMCA1eiIvPg0KICAgIDwvZz4NCjwvc3ZnPg0K'
 const varImpactSelected = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgd2lkdGg9IjMxcHgiIGhlaWdodD0iMzFweCIgdmlld0JveD0iMCAwIDMxIDMxIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggNTQgKDc2NDgwKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4NCiAgICA8dGl0bGU+aWNvblZhcmlhYmxlSW1wYWN0TVItTm9ybWFsPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZyBpZD0iUGFnZS0yIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPGcgaWQ9IjUtNC00LU1vZGVsLVNlbGVjdGlvbl9BZHZhbmNlZC1WaWV3X01vZGVsLUV4cGFuZF9ST0MtQ3VyZS1Db3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNzcuMDAwMDAwLCAtNDU1LjAwMDAwMCkiPg0KICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwLTE3IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzcuMDAwMDAwLCAzMTMuMDAwMDAwKSI+DQogICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdE1SLU5vcm1hbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDE0Mi4wMDAwMDApIj4NCiAgICAgICAgICAgICAgICAgICAgPGc+DQogICAgICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTM1IiBzdHJva2U9IiMxRDJCM0MiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSIjMUQyQjNDIiB4PSIwLjYiIHk9IjAuNiIgd2lkdGg9IjI4Ljk5MzU0ODQiIGhlaWdodD0iMjguOTkzNTQ4NCIgcng9IjEuMiI+PC9yZWN0Pg0KICAgICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Imljb25WYXJpYWJsZUltcGFjdCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUuMDk2Nzc0LCAxNS43MTEyMzApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTE1LjA5Njc3NCwgLTE1LjcxMTIzMCkgdHJhbnNsYXRlKDQuMzU0ODM5LCA0LjY3ODk3MikiPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik05LjI5MDMyMjU4LDkuODcwOTY3NzQgTDI4Ljc0MTkzNTUsOS44NzA5Njc3NCBDMjkuNTQzNjM5Miw5Ljg3MDk2Nzc0IDMwLjE5MzU0ODQsMTAuNTIwODc3IDMwLjE5MzU0ODQsMTEuMzIyNTgwNiBMMzAuMTkzNTQ4NCwxMS4zMjI1ODA2IEMzMC4xOTM1NDg0LDEyLjEyNDI4NDMgMjkuNTQzNjM5MiwxMi43NzQxOTM1IDI4Ljc0MTkzNTUsMTIuNzc0MTkzNSBMOS4yOTAzMjI1OCwxMi43NzQxOTM1IEw5LjI5MDMyMjU4LDkuODcwOTY3NzQgWiIgaWQ9IlJlY3RhbmdsZS0xMSIgZmlsbD0iI2ZmZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTkuNzQxOTM1LCAxMS4zMjI1ODEpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTkuNzQxOTM1LCAtMTEuMzIyNTgxKSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNi4zODcwOTY3Nyw4LjEyOTAzMjI2IEwyMi4zNTQ4Mzg3LDguMTI5MDMyMjYgQzIzLjE1NjU0MjQsOC4xMjkwMzIyNiAyMy44MDY0NTE2LDguNzc4OTQxNDkgMjMuODA2NDUxNiw5LjU4MDY0NTE2IEwyMy44MDY0NTE2LDkuNTgwNjQ1MTYgQzIzLjgwNjQ1MTYsMTAuMzgyMzQ4OCAyMy4xNTY1NDI0LDExLjAzMjI1ODEgMjIuMzU0ODM4NywxMS4wMzIyNTgxIEw2LjM4NzA5Njc3LDExLjAzMjI1ODEgTDYuMzg3MDk2NzcsOC4xMjkwMzIyNiBaIiBpZD0iUmVjdGFuZ2xlLTExLUNvcHkiIGZpbGw9IiNmZmYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1LjA5Njc3NCwgOS41ODA2NDUpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTUuMDk2Nzc0LCAtOS41ODA2NDUpICI+PC9wYXRoPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik01LjgwNjQ1MTYxLDQuMDY0NTE2MTMgTDEzLjY0NTE2MTMsNC4wNjQ1MTYxMyBDMTQuNDQ2ODY1LDQuMDY0NTE2MTMgMTUuMDk2Nzc0Miw0LjcxNDQyNTM2IDE1LjA5Njc3NDIsNS41MTYxMjkwMyBMMTUuMDk2Nzc0Miw1LjUxNjEyOTAzIEMxNS4wOTY3NzQyLDYuMzE3ODMyNyAxNC40NDY4NjUsNi45Njc3NDE5NCAxMy42NDUxNjEzLDYuOTY3NzQxOTQgTDUuODA2NDUxNjEsNi45Njc3NDE5NCBMNS44MDY0NTE2MSw0LjA2NDUxNjEzIFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0yIiBmaWxsPSIjZmZmIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMC40NTE2MTMsIDUuNTE2MTI5KSByb3RhdGUoOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTEwLjQ1MTYxMywgLTUuNTE2MTI5KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IEw5LDMuNDgzODcwOTcgQzkuODAxNzAzNjcsMy40ODM4NzA5NyAxMC40NTE2MTI5LDQuMTMzNzgwMiAxMC40NTE2MTI5LDQuOTM1NDgzODcgTDEwLjQ1MTYxMjksNC45MzU0ODM4NyBDMTAuNDUxNjEyOSw1LjczNzE4NzU0IDkuODAxNzAzNjcsNi4zODcwOTY3NyA5LDYuMzg3MDk2NzcgTDEuNzQxOTM1NDgsNi4zODcwOTY3NyBMMS43NDE5MzU0OCwzLjQ4Mzg3MDk3IFoiIGlkPSJSZWN0YW5nbGUtMTEtQ29weS0zIiBmaWxsPSIjZmZmIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2LjA5Njc3NCwgNC45MzU0ODQpIHJvdGF0ZSg5MC4wMDAwMDApIHRyYW5zbGF0ZSgtNi4wOTY3NzQsIC00LjkzNTQ4NCkgIj48L3BhdGg+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTS0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgTDMuMTkzNTQ4MzksMi4zMjI1ODA2NSBDMy45OTUyNTIwNiwyLjMyMjU4MDY1IDQuNjQ1MTYxMjksMi45NzI0ODk4OCA0LjY0NTE2MTI5LDMuNzc0MTkzNTUgTDQuNjQ1MTYxMjksMy43NzQxOTM1NSBDNC42NDUxNjEyOSw0LjU3NTg5NzIyIDMuOTk1MjUyMDYsNS4yMjU4MDY0NSAzLjE5MzU0ODM5LDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDUuMjI1ODA2NDUgTC0xLjE2MTI5MDMyLDIuMzIyNTgwNjUgWiIgaWQ9IlJlY3RhbmdsZS0xMS1Db3B5LTQiIGZpbGw9IiNmZmYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuNzQxOTM1LCAzLjc3NDE5NCkgcm90YXRlKDkwLjAwMDAwMCkgdHJhbnNsYXRlKC0xLjc0MTkzNSwgLTMuNzc0MTk0KSAiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIDAuMDAwMDAwKSIgc3Ryb2tlPSIjZmZmIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2Utd2lkdGg9IjEuMiI+DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLjE0NzM3NDkyLDEuMTQxMjc5OTkgTDIxLjA1MDYwMDcsMS4xNDEyNzk5OSIgaWQ9IkxpbmUiPjwvcGF0aD4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICAgICAgICAgIDwvZz4NCiAgICAgICAgICAgICAgICA8L2c+DQogICAgICAgICAgICA8L2c+DQogICAgICAgIDwvZz4NCiAgICA8L2c+DQo8L3N2Zz4NCg=='
@@ -39,6 +36,7 @@ const heteroscedasticityImg = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDo
 const largeImg = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNzEiIGhlaWdodD0iMjU1IiB2aWV3Qm94PSIwIDAgMjcxIDI1NSI+DQogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4NCiAgICAgICAgPHBhdGggZmlsbD0iI0ZGRiIgZD0iTTI4LjU2NyAxNi44NzJoMjAwdjE5MGgtMjAweiIvPg0KICAgICAgICA8cGF0aCBzdHJva2U9IiNEOEQ4RDgiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIGQ9Ik0zMC4xNjcgODQuOTcyaDE5OS4zODdNMzAuMTY3IDEwNi4wOTJoMTk5LjM4N00zMC4xNjcgNDIuNzMzaDE5OS4zODdNMzAuMTY3IDYzLjg1M2gxOTkuMzg3TTMwLjE2NyAxMjcuNjQyaDE5OS4zODdNMzAuMTY3IDE0OC43NjJoMTk5LjM4N00zMC4xNjcgMTY5Ljg4MWgxOTkuMzg3TTMwLjE2NyAxOTFoMTk5LjM4NyIvPg0KICAgICAgICA8cGF0aCBzdHJva2U9IiM0QTRBNEEiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIGQ9Ik0zMC4xNjcgMjEyLjEyaDE5OS4zODciLz4NCiAgICAgICAgPHBhdGggc3Ryb2tlPSIjRDhEOEQ4IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBkPSJNMjkuNzgzIDIyLjQ3NmgxOTkuMzg4TTU3LjgwNCAyMTEuMjU4di0xOTEuOE04NS40NiAyMTEuMjU4di0xOTEuOE0xMTMuMTE2IDIxMS4yNTh2LTE5MS44TTE0MC43NzIgMjExLjI1OHYtMTkxLjhNMTY4LjQyOCAyMTEuMjU4di0xOTEuOE0xOTYuMDg0IDIxMS4yNTh2LTE5MS44TTIyMy43NCAyMTEuMjU4di0xOTEuOCIvPg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9IjkuMTc3IiB5PSIxMTUuNTcxIj4wPC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9IjIiIHk9IjEzNi42ODYiPi01PC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9Ii41ODkiIHk9IjE1Ny44Ij4tMjA8L3RzcGFuPg0KICAgICAgICA8L3RleHQ+DQogICAgICAgIDx0ZXh0IGZpbGw9IiM0QTRBNEEiIGZvbnQtZmFtaWx5PSJBcmlhbE1ULCBBcmlhbCIgZm9udC1zaXplPSIxNCI+DQogICAgICAgICAgICA8dHNwYW4geD0iLjU4OSIgeT0iMTc4LjkxNCI+LTI1PC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9Ii41ODkiIHk9IjIwMC4wMjgiPi0yMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSI4LjE3NyIgeT0iMzEuMTE0Ij4yMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSI4LjE3NyIgeT0iNTIuMjI4Ij4xNTwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSI4LjE3NyIgeT0iNzMuMzQzIj4xMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSI5LjE3NyIgeT0iOTQuNDU3Ij41PC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8cGF0aCBzdHJva2U9IiM5QjlCOUIiIHN0cm9rZS1kYXNoYXJyYXk9IjUiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIGQ9Ik0zMC44NTUgMTA1Ljg5OUgyMzEuMDEiLz4NCiAgICAgICAgPHBhdGggc3Ryb2tlPSIjNEE0QTRBIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBkPSJNMzAuMTQ4IDIxMS4yNTh2LTE5MS44Ii8+DQogICAgICAgIDx0ZXh0IGZpbGw9IiM0QTRBNEEiIGZvbnQtZmFtaWx5PSJBcmlhbE1ULCBBcmlhbCIgZm9udC1zaXplPSIxNCI+DQogICAgICAgICAgICA8dHNwYW4geD0iOTUuOTc1IiB5PSIyNTEuNTc1Ij5QcmVkaWN0ZWQgVGFyZ2V0IFZhbHVlPC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9IjE2LjI5NCIgeT0iMTMuMjAyIj5SZXNpZHVhbDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIyNi44NjciIHk9IjIyNy4zNSI+MTAwPC90c3Bhbj4NCiAgICAgICAgPC90ZXh0Pg0KICAgICAgICA8dGV4dCBmaWxsPSIjNEE0QTRBIiBmb250LWZhbWlseT0iQXJpYWxNVCwgQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPg0KICAgICAgICAgICAgPHRzcGFuIHg9IjU0LjU3NSIgeT0iMjI3LjM1Ij4yMDA8L3RzcGFuPg0KICAgICAgICA8L3RleHQ+DQogICAgICAgIDx0ZXh0IGZpbGw9IiM0QTRBNEEiIGZvbnQtZmFtaWx5PSJBcmlhbE1ULCBBcmlhbCIgZm9udC1zaXplPSIxNCI+DQogICAgICAgICAgICA8dHNwYW4geD0iODIuMjgzIiB5PSIyMjcuMzUiPjMwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIxMDkuOTkxIiB5PSIyMjcuMzUiPjQwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIxMzcuNjk5IiB5PSIyMjcuMzUiPjUwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIxNjUuNDA3IiB5PSIyMjcuMzUiPjYwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIxOTMuMTE1IiB5PSIyMjcuMzUiPjcwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHRleHQgZmlsbD0iIzRBNEE0QSIgZm9udC1mYW1pbHk9IkFyaWFsTVQsIEFyaWFsIiBmb250LXNpemU9IjE0Ij4NCiAgICAgICAgICAgIDx0c3BhbiB4PSIyMjAuODIzIiB5PSIyMjcuMzUiPjgwMDwvdHNwYW4+DQogICAgICAgIDwvdGV4dD4NCiAgICAgICAgPHBhdGggc3Ryb2tlPSIjMDFCOEJFIiBzdHJva2UtZGFzaGFycmF5PSIxLDI5IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iNCIgZD0iTTg3LjE2MyAxMDcuNDQ1bC04Ljk1OC02LjQxOC00MC45NTEgNi40MTggNjguMi00LjMyNCAyMC43NC0xLjMxNC05NS4zMzkgMi43MTggMTkzLjIzNy03LjE0My0xNTIuMjg2IDExLjA3LTExLjUxNy0zLjkyN2MxNi4wMjggMS42OTEgMjkuNjc5IDMgNDAuOTUgMy45MjcgMTIuOTI2IDEuMDYyIDIzLjM4IDQuMjAyIDQyLjIzMSA0LjM3NiAzMC4yNTMuMjgtNDMuNTgtLjE3My01Ni4zMDctNS4zODMtNS40NDEtMi4yMjggMTguNDI2LTYuMjAxIDE0LjA3Ny04LjY1OS03LjQyNC00LjE5NSA4MC4xMjcgMi4yMjggODAuNjIyIDEuMDI2Ljk3NC0yLjM2OSA1LjY2Ny00LjkxNCAxNC4wNzYtNy42MzYtNjAuOTM1IDQuMjYtODYuOTU1IDcuNDcxLTc4LjA2MiA5LjYzIDQuNTEyIDEuMDk2IDIzLjUyNy01LjY2NCAzOC4zOTEtMy4wMi44MDIuMTQzLTguNjIyIDEuNjkzIDAgNC4zMjMgMjAuMzU1IDYuMjExIDY4LjcyMSAxNi45OTYgNjcuODI1IDE5LjA5MS0uNzkgMS44NDktNzAuNTI4LTEzLjE0Ny02Ny44MjUtMTIuMTQ4IDUuNjg1IDIuMDk4LTguMzkyLjU5NC00Mi4yMy00LjUxM2gyOS40MzNsLTE3LjI3NiAyLjkxMyAzMC4wNzMtMS4wMDctNDIuMjMtLjE3OCIvPg0KICAgICAgICA8cGF0aCBzdHJva2U9IiMwMUI4QkUiIHN0cm9rZS1kYXNoYXJyYXk9IjEsNzgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSI0IiBkPSJNMTYzLjk0MiAxNzQuMjY5bDguOTU4LTYuNDE4IDQwLjk1IDYuNDE4LTY4LjItNC4zMjMtMjAuNzQtMS4zMTUgOTUuMzM5IDIuNzE4TDEyIDE3Mi4zNjNsMTY3LjI5OCAyLjkxMyAxMS41MTgtMy45MjdjLTE2LjAyOSAxLjY5Mi0yOS42OCAzLTQwLjk1MSAzLjkyNy0xMi45MjYgMS4wNjItMjMuMzggNC4yMDItNDIuMjMgNC4zNzctMzAuMjU0LjI4IDQzLjU4LS4xNzMgNTYuMzA3LTUuMzg0IDUuNDQtMi4yMjgtMTguNDI3LTYuMi0xNC4wNzctOC42NTkgNy40MjQtNC4xOTUtODAuMTI4IDIuMjI4LTgwLjYyMiAxLjAyNi0uOTc1LTIuMzY5LTUuNjY3LTQuOTE0LTE0LjA3Ny03LjYzNiA2MC45MzUgNC4yNjEgODYuOTU2IDcuNDcxIDc4LjA2MyA5LjYzLTQuNTEyIDEuMDk2LTIzLjUyOC01LjY2NC0zOC4zOTItMy4wMi0uODAxLjE0MyA4LjYyMyAxLjY5MyAwIDQuMzI0LTIwLjM1NCA2LjIxIDIuNzAzIDUuOTQ0IDAgNi45NDItNS42ODQgMi4wOTkgOC4zOTIuNTk1IDQyLjIzLTQuNTEzaC0yOS40MzNsMTcuMjc2IDIuOTEzLTMwLjA3My0xLjAwNyA0Mi4yMy0uMTc4Ii8+DQogICAgICAgIDxwYXRoIHN0cm9rZT0iIzAxQjhCRSIgc3Ryb2tlLWRhc2hhcnJheT0iMSw4OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjQiIGQ9Ik0xNzAuOTQyIDQzLjIwMmw4Ljk1OC02LjQxOCA0MC45NSA2LjQxOC02OC4yLTQuMzI0LTIwLjc0LTEuMzE1IDk1LjMzOSAyLjcxOS0xOTMuMjM3LTcuMTQzIDE1Mi4yODYgMTEuMDcgMTEuNTE4LTMuOTI3Yy0xNi4wMjkgMS42OTEtMjkuNjggMy00MC45NTEgMy45MjYtMTIuOTI2IDEuMDYzLTIzLjM4IDQuMjAzLTQyLjIzIDQuMzc3LTMwLjI1NC4yOCA0My41OC0uMTczIDU2LjMwNy01LjM4MyA1LjQ0LTIuMjI4LTE4LjQyNy02LjIwMS0xNC4wNzctOC42NiA3LjQyNC00LjE5NS04MC4xMjggMi4yMjktODAuNjIyIDEuMDI3LS45NzUtMi4zNy01LjY2Ny00LjkxNS0xNC4wNzctNy42MzYgNjAuOTM1IDQuMjYgODYuOTU2IDcuNDcgNzguMDYzIDkuNjMtNC41MTIgMS4wOTYtMjMuNTI4LTUuNjY0LTM4LjM5Mi0zLjAyLS44MDEuMTQyIDguNjIzIDEuNjkyIDAgNC4zMjMtMjAuMzU0IDYuMjEtNjguNzIxIDE2Ljk5Ni02Ny44MjUgMTkuMDkxLjc5MSAxLjg0OCA3MC41MjgtMTMuMTQ3IDY3LjgyNS0xMi4xNDktNS42ODQgMi4xIDguMzkyLjU5NSA0Mi4yMy00LjUxMmgtMjkuNDMzbDE3LjI3NiAyLjkxMi0zMC4wNzMtMS4wMDYgNDIuMjMtLjE3OCIvPg0KICAgIDwvZz4NCjwvc3ZnPg0K'
 
 const { TabPane } = Tabs;
+const {Option} = Select;
 
 @inject('projectStore')
 @observer
@@ -295,7 +293,16 @@ export default class Score extends Component {
 }
 
 const questMarks = {
-  Accuracy: EN.Givenaparticularpopulation,
+  Accuracy: EN.AccuracyHint,
+  "Micro-P":EN.MicroPHint,
+  "Micro-R":EN.MicroRHint,
+  "Micro-F1":EN.MicroF1Hint,
+  "Micro-AUC":EN.MicroAUCHint,
+  "Macro-P":EN.MacroPHint,
+  "Macro-R":EN.MacroRHint,
+  "Macro-F1":EN.MacroF1Hint,
+  "Macro-AUC":EN.MacroAUCHint,
+  Kappa:EN.KappaHint,
   Recall: EN.Itrepresentsthecompleteness,
   'Cutoff Threshold': EN.Manyclassifiersareabletoproduce,
   'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
@@ -310,7 +317,7 @@ const questMarks = {
   MAE: EN.MeanAbsoluteError,
   AdjustR2: EN.TheadjustedR2tells,
   LogLoss: <p>{EN.LogLossis}<br /><br />{EN.Thelikelihoodfunctionanswers}</p>
-}
+};
 
 @observer
 class AdvancedModelTable extends Component {
@@ -323,7 +330,9 @@ class AdvancedModelTable extends Component {
   };
 
   render() {
-    const { models, project: { problemType, selectModel, targetArray, targetColMap, renameVariable, target, mapHeader }, sort, handleSort, metric, project } = this.props;
+    const { models,
+      project: { problemType, selectModel, targetArray, targetColMap, renameVariable, target, mapHeader,m_cro},
+      sort, handleSort, metric, project } = this.props;
     const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
     const [no, yes] = [renameVariable[v0] || v0, renameVariable[v1] || v1];
     
@@ -334,13 +343,14 @@ class AdvancedModelTable extends Component {
         texts = [EN.ModelName, EN.Time, 'Fbeta', 'Precision', 'Recall', 'LogLoss', 'Cutoff Threshold', 'KS', EN.Validation, EN.Holdout];
         break;
       case 'MultiClassification':
-        texts = [EN.ModelName, EN.Time, 'Accuracy', "Macro-P", "Macro-R","Macro-F1","Macro-AUC","Kappa","HammingLoss",EN.Validation, EN.Holdout];
+        texts = [EN.ModelName, EN.Time, 'Accuracy',"Micro-P", "Micro-R","Micro-F1","Micro-AUC", "Macro-P", "Macro-R","Macro-F1","Macro-AUC","MCC","Kappa","Jaccard","HammingLoss",EN.Validation, EN.Holdout].filter(itm=>{
+          const rm = ['macro', 'micro'].filter(itm => itm !== m_cro.toLowerCase())[0];
+          return itm.toLowerCase().startsWith(m_cro) || !itm.toLowerCase().startsWith(rm);
+        });
         break;
       default:
         texts = [EN.ModelName, EN.Time, 'Normalized RMSE', 'RMSE', 'MSLE', 'RMSLE', 'MSE', 'MAE', 'R2', 'AdjustR2', EN.Validation, EN.Holdout];
     }
-    
-    
     const arr = [];
     const replaceR2 = str => str.replace(/R2/g, 'R²');
     const getHint = (text) => questMarks.hasOwnProperty(text.toString()) ? <Hint content={questMarks[text.toString()]} /> : ''
@@ -383,10 +393,11 @@ class AdvancedModelTable extends Component {
             onClickCheckbox={this.onClickCheckbox(m.id)}
             checked={selectModel.id === m.id}
             model={m}
-            metric={metric.key} />;
+            metric={metric} />;
         default:
           return <RegressionModleRow
-            project={this.props.project} key={m.id} texts={texts}
+            project={this.props.project} key={m.id}
+            texts={texts}
             onClickCheckbox={this.onClickCheckbox(m.id)}
             checked={selectModel.id === m.id}
             model={m} metric={metric.key} />
@@ -431,7 +442,6 @@ class AdvancedModelTable extends Component {
     const { score, modelName, reason } = model;
     // const { detail } = this.state;
     const { validate, holdout } = reason || {};
-
 
     return (
       <div>
@@ -585,22 +595,31 @@ class RegressionDetailCurves extends Component {
 
 @observer
 class MultiClassificationModelRow extends Component{
-  state = {
-    detail: false
+  handleM_cro = (e) => {
+    this.props.project.upM_cro(e)
   };
-  handleResult = () => {
-    this.setState({ detail: !this.state.detail });
-  };
+  
   render() {
-    const { model, texts, checked, yes, no, project } = this.props;
+    const { model, texts, checked, yes, no, project} = this.props;
+    const {isHoldout,measurement,m_cro} = project;
     if (!model.chartData) return null;
-    const { modelName, chartData: { roc_auc }, score:{holdoutScore,validateScore},executeSpeed,createTime } = model;
+    const { modelName,
+      score:{holdoutScore,validateScore},
+      createTime,
+      holdoutChartData,
+      chartData,
+    } = model;
   
-    const modelScore = project.isHoldout ? holdoutScore : validateScore;
+    const modelScore = isHoldout ? holdoutScore : validateScore;
+    const modelChartData = isHoldout ? holdoutChartData : chartData;
   
+    const [t, p] = measurement.split("_");
+  
+    const validate = measurement === 'macro_auc' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`];
+    const holdout = measurement === 'macro_auc' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`];
     return (
       <div >
-        <Row onClick={this.handleResult} >
+        <Row>
           {texts.map(t => {
             switch (t) {
               case EN.ModelName:
@@ -619,21 +638,60 @@ class MultiClassificationModelRow extends Component{
                   : ''} />;
               case 'Accuracy':
                 return <RowCell key={3} data={formatNumber(modelScore.Accuracy.toString())} />;
+              case 'Micro-P':
+                return <RowCell key={4} data={formatNumber(modelScore.micro_P.toString())} />;
+              case 'Micro-R':
+                return <RowCell key={5} data={formatNumber(modelScore.micro_R.toString())} />;
+              case 'Micro-F1':
+                return <RowCell key={6} data={formatNumber(modelScore.micro_F1.toString())} />;
+              case 'Micro-AUC':
+                return <RowCell key={7} data={formatNumber(modelChartData.roc_auc.micro.toString())} />;
+              case 'Macro-P':
+                return <RowCell key={8} data={formatNumber(modelScore.macro_P.toString())} />;
+              case 'Macro-R':
+                return <RowCell key={9} data={formatNumber(modelScore.macro_R.toString())} />;
+              case 'Macro-F1':
+                return <RowCell key={10} data={formatNumber(modelScore.macro_F1.toString())} />;
               case 'Macro-AUC':
-                return <RowCell key={3} data={formatNumber(roc_auc.macro.toString())} />;
-              case EN.ExecutionSpeed:
-                return <RowCell key={4} data={formatNumber(executeSpeed.toString()) + EN.Rowss} />;
-              
+                return <RowCell key={11} data={formatNumber(modelChartData.roc_auc.macro.toString())} />;
+              case "MCC":
+                return <RowCell key={12} data={formatNumber(modelScore.MCC.toString())} />;
+              case "Kappa":
+                return <RowCell key={13} data={formatNumber(modelScore.Kappa.toString())} />;
+              case "Jaccard":
+                return <RowCell key={14} data={formatNumber(modelScore.Jaccard.toString())} />;
+              case "HammingLoss":
+                return <RowCell key={15} data={formatNumber(modelScore.HammingLoss.toString())} />;
+              case EN.Validation:
+                return <RowCell key={16} data={formatNumber(validate.toString())} />;
+              case EN.Holdout:
+                return <RowCell key={17} data={formatNumber(holdout.toString())} />;
               default:
                 return null;
             }
           })}
         </Row>
-        <div className={styles.metricSwitch}>
-          <span>{EN.Validation}</span>
-          <Switch checked={project.isHoldout} onChange={() => project.isHoldout = !project.isHoldout} style={{ backgroundColor: '#1D2B3C' }} />
-          <span>{EN.Holdout}</span>
+        <div className={styles.tools}>
+          <div className={styles.m_croSwitch}>
+            <div>
+              <Select
+                size="large"
+                value={m_cro}
+                onChange={this.handleM_cro}
+                style={{ width: '140px', fontSize: '1rem' }}
+                getPopupContainer={el => el.parentElement}
+              >
+                {['macro','micro'].map(mo => <Option value={mo} key={mo} >{mo}</Option>)}
+              </Select>
+            </div>
+          </div>
+          <div className={styles.metricSwitch}>
+            <span>{EN.Validation}</span>
+            <Switch checked={isHoldout} onChange={() => project.isHoldout = !isHoldout} style={{ backgroundColor: '#1D2B3C' }} />
+            <span>{EN.Holdout}</span>
+          </div>
         </div>
+       
         <MultiClassificationDetailCurves
           project={project}
           model={model}
@@ -865,8 +923,6 @@ class PredictTable extends Component {
     // set default value
 
   
-    console.log(12312)
-
     const { project = {}, model, yes, no } = this.props;
     const { fitIndex, chartData } = model;
     let TN = chartData.roc.TN[fitIndex];

@@ -47,6 +47,8 @@ export default function Chart(props){
 				y_name={y_name}
 				data={data}
 				across={problemType === 'MultiClassification'}
+				width = {550}
+				height = {330}
 			/>;
 			break;
 		case 'histogram-numerical':

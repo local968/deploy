@@ -35,6 +35,8 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         x_name={value}
         y_name={'count'}
         data={data}
+        width = {550}
+        height = {330}
       />
     </div>
   }

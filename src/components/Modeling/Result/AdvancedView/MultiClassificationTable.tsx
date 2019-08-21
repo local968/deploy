@@ -261,7 +261,13 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
   }, [models.map(m => m.fitIndex), sort.key, sort.value, currentSettingId])
 
   const modelElements = useMemo(() => {
-    return models.reduce((els, m) => ({ ...els, [m.id]: <MultiClassificationTableRow model={m} project={project} metric={metric} key={m.id} detail={detailArr.includes(m.id)} handleDetail={handleDetail} /> }), {})
+    return models.reduce((els, m) => ({ ...els, [m.id]: <MultiClassificationTableRow
+        model={m}
+        project={project}
+        metric={metric}
+        key={m.id}
+        detail={detailArr.includes(m.id)}
+        handleDetail={handleDetail} /> }), {})
   }, [detailArr, metric]);
 
   return <div className={styles.main}>
@@ -338,26 +344,25 @@ interface MultiClassificationTableRowProps {
 }
 
 const MultiClassificationTableRow = observer((props: MultiClassificationTableRowProps) => {
-  const { model, project, metric, detail, handleDetail } = props
-  const { isHoldout, mapHeader, newVariable, selectModel, recommendModel,m_cro } = project
-  const { score, holdoutChartData, chartData } = model
-  const newMapHeader = { ...mapHeader.reduce((prev, v, k) => Object.assign(prev, { [k]: v }), {}), ...newVariable.reduce((prev, v) => Object.assign(prev, { [v]: v }), {}) }
-  const [t, p] = metric.split("_")
+  const { model, project, metric, detail, handleDetail } = props;
+  const { isHoldout, selectModel, recommendModel,m_cro } = project;
+  const { score, holdoutChartData, chartData } = model;
+  const [t, p] = metric.split("_");
   const validate = metric === 'macro_auc' ? chartData.roc_auc.macro : p === 'f1' ? score.validateScore[`${t}_F1`] : score.validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
   const holdout = metric === 'macro_auc' ? holdoutChartData.roc_auc.macro : p === 'f1' ? score.holdoutScore[`${t}_F1`] : score.holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
 
-  const modelScore = isHoldout ? score.holdoutScore : score.validateScore
-  const modelChartData = isHoldout ? holdoutChartData : chartData
-  const isRecommend = recommendModel.id === model.id
+  const modelScore = isHoldout ? score.holdoutScore : score.validateScore;
+  const modelChartData = isHoldout ? holdoutChartData : chartData;
+  const isRecommend = recommendModel.id === model.id;
   const handleResult = (id) => () => {
     handleDetail(id)
-  }
+  };
 
   const handleClick = (e: MouseEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    if (selectModel.id === model.id) return
+    if (selectModel.id === model.id) return;
     project.updateProject({ selectId: model.id })
-  }
+  };
 
   return <div className={styles.rowBody}>
     <Tooltip
@@ -396,5 +401,5 @@ const MultiClassificationTableRow = observer((props: MultiClassificationTableRow
       model={model}
     />}
   </div>
-})
+});
 

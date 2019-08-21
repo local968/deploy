@@ -110,6 +110,6 @@ const Association = (props: AssociationProps) => {
       </div>
     </div>
   </div>
-}
+};
 
 export default Association

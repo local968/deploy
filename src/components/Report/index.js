@@ -259,7 +259,7 @@ class Report extends Component {
             </div>}
             {list[0].problemType === 'Classification' && <div className={styles.metrics}>
               <div className={classnames(styles.metricsRow, styles.metricsHeader)}>
-                <span className={styles.metricsCell}></span>
+                <span className={styles.metricsCell}/>
                 <span className={styles.metricsCell}>AUC</span>
                 <span className={styles.metricsCell}>Cutoff</span>
                 <span className={styles.metricsCell}>{EN.Accuracy}</span>
@@ -314,7 +314,8 @@ class Report extends Component {
             {/*<h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>*/}
             <div className={styles.blockRow}>
               {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
-              <AdvancedView models={list[0].models} project={list[0]} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')} metric={this.metric} handleChange={this.handleChange} />
+              <AdvancedView models={list[0].models} project={list[0]} sort={this.sort.advanced} handleSort={this.handleSort.bind(null, 'advanced')}
+                            metric={this.metric} handleChange={this.handleChange} />
             </div>
           </div>}
 
