@@ -4,6 +4,7 @@ import EN from '../../../constant/en';
 
 interface Interface {
   project: any;
+  diagnoseType:any
 }
 
 export default class DiagnoseResult extends Component<Interface> {

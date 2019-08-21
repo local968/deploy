@@ -8,6 +8,7 @@ import FitPlot from '../../Charts/FitPlot';
 import ResidualPlot from '../../Charts/ResidualPlot';
 import { Modal } from 'antd';
 import ResidualDiagnose from './ResidualDiagnose';
+import Thumbnail from './Thumbnail';
 
 interface Interface {
   model:any
