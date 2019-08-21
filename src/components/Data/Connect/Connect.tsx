@@ -224,7 +224,6 @@ export default class DataConnect extends Component<DataConnectProps> {
     e.preventDefault();
     const process = this.props.projectStore.project.etling ? 50 : this.process;
     if (process) return false;
-    console.log('aaaa')
     let file = e.dataTransfer.files[0];
     this.file = file;
   });
@@ -253,7 +252,6 @@ export default class DataConnect extends Component<DataConnectProps> {
   };
 
   afterClose = (index: string) => {
-    console.log("delete", index)
     this.props.projectStore.project.deleteIndex(index)
   }
 
@@ -268,7 +266,6 @@ export default class DataConnect extends Component<DataConnectProps> {
     const charsetChange = action(charset => {
       project.updateProject({ charset });
     });
-    console.log(this.file, 'sss')
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.schemaInfo}>

@@ -124,7 +124,6 @@ export default class Uploader extends Component {
   }
 
   abort = () => {
-    console.log(this.uploader, "abort")
     this.uploader && this.uploader.abort()
   }
 
