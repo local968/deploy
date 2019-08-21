@@ -2131,9 +2131,10 @@ class Project {
     this.models = []
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
-      const { status, message } = returnValue
+      const { status, result } = returnValue
       if (status !== 200) {
-        antdMessage.error(message)
+        console.log(result['processError'])
+        antdMessage.error(result['processError'])
       }
     })
   }
@@ -2345,6 +2346,7 @@ class Project {
   }
 
   correlationMatrix = () => {
+    if (this.problemType === 'Association') return Promise.resolve();
     if (this.correlationMatrixData) return Promise.resolve();
     if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
