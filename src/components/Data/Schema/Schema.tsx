@@ -411,7 +411,8 @@ class DataSchema extends Component<DataSchemaProps> {
         } else {
           if (this.dataType[h] === 'Categorical') {
             if (isMulti) {
-              if (rawDataView[h].uniqueValues > 2) prev[h] = mapHeader[h];
+              const count = rawDataView[h].uniqueValues + +(!!project.nullLineCounts[h])
+              if (count > 2) prev[h] = mapHeader[h];
             } else {
               prev[h] = mapHeader[h];
             }
@@ -503,37 +504,37 @@ class DataSchema extends Component<DataSchemaProps> {
             /> : <Show
               name='schema_VariableSelection'
             >
-              {isMissed || isDuplicated ? (
-                <div
-                  className={classnames(styles.schemaSelect, styles.disabled)}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              ) : (
-                <div
-                  className={styles.schemaSelect}
-                  onClick={this.toggleSelect}
-                >
-                  <span>{EN.UnselectUndesirableVariables}</span>
-                </div>
-              )}
-              <Hint
-                themeStyle={{
-                  fontSize: '1.5rem',
-                  lineHeight: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-                content={
-                  <div>
-                    {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
-                    {EN.VariableIDs} <br />
-                    {EN.Variablesthatarederivedfromthetarget} <br />
-                    {EN.Anyothervariablesyou}
+                {isMissed || isDuplicated ? (
+                  <div
+                    className={classnames(styles.schemaSelect, styles.disabled)}
+                  >
+                    <span>{EN.UnselectUndesirableVariables}</span>
                   </div>
-                }
-              />
-            </Show>}
+                ) : (
+                    <div
+                      className={styles.schemaSelect}
+                      onClick={this.toggleSelect}
+                    >
+                      <span>{EN.UnselectUndesirableVariables}</span>
+                    </div>
+                  )}
+                <Hint
+                  themeStyle={{
+                    fontSize: '1.5rem',
+                    lineHeight: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  content={
+                    <div>
+                      {EN.Unselectpredictorsthatleadtolesswantedmodeling} <br />
+                      {EN.VariableIDs} <br />
+                      {EN.Variablesthatarederivedfromthetarget} <br />
+                      {EN.Anyothervariablesyou}
+                    </div>
+                  }
+                />
+              </Show>}
 
             {isMissed && (
               <div className={styles.schemaMissed}>
