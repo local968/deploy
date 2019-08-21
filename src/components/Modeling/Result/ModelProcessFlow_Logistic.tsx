@@ -120,6 +120,7 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 			targetCounts,
 			nullFillMethod,
 			nullLineCounts,
+			targetUnique,
 		} = this.props.project;
 
 		let drop = [],mapping=[];
@@ -127,7 +128,7 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 		let ta =[...targetArray];
 
 		if(!targetArray.length){
-			ta = Object.keys(targetCounts).splice(0,2)
+			ta = Object.keys(targetCounts).splice(0,targetUnique)
 		}
 
 		const df = _.without(Object.keys(colValueCounts[target]),...ta);
@@ -164,7 +165,7 @@ export default class ModelProcessFlow_Logistic extends Component<Interface> {
 		}
 
 		return <Fragment>
-			<dt>{EN.TargetMore2Unique}</dt>
+			<dt>{EN.TargetMoreUnique + targetUnique + EN.GE}</dt>
 			{
 				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
 			}

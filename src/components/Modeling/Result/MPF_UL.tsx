@@ -92,86 +92,17 @@ export default class MPF_UL extends Component<Interface> {
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.OutlierDetection}`,outlierLineCounts[target],true);
 
-		const dqft = problemType==='Classification'&&this.DQFT();
-
-		if(!mv&&!mi&&!out&&!dqft){
+		if(!mv&&!mi&&!out){
 			return <dl>
 				<dd>{EN.none}</dd>
 			</dl>
 		}
 
 		return <dl className={styles.over}>
-			{dqft}
 			{mv}
 			{mi}
 			{out}
 		</dl>
-	}
-
-	DQFT(){
-		const {
-			otherMap,
-			targetArray,
-			colValueCounts,
-			target,
-			targetCounts,
-			nullFillMethod,
-			nullLineCounts,
-		} = this.props.project;
-
-		let drop = [],mapping=[];
-
-		let ta =[...targetArray];
-
-		if(!targetArray.length){
-			ta = Object.keys(targetCounts).splice(0,2)
-		}
-
-		const df = _.without(Object.keys(colValueCounts[target]),...ta);
-
-		const om = {};
-		Object.entries(toJS(otherMap)).forEach(itm=>{
-			om[itm[0]] = (itm[1]||'NULL')
-		});
-
-		df.forEach(itm=>{
-			if(om[itm]){
-				mapping.push([itm,om[itm]])
-			}else{
-				drop.push(itm);
-			}
-		});
-
-
-		if(ta.find(itm=>itm === '') === undefined){
-			const NFMT = om['']||nullFillMethod[target];
-
-			if(NFMT&&nullLineCounts[target]){
-				if(NFMT === 'drop'){
-					drop.push('NULL')
-				}else{
-					mapping.push(['NULL',NFMT])
-				}
-			}
-
-		}
-
-		if(!drop.length&&!mapping.length){
-			return null;
-		}
-
-		return <Fragment>
-			<dt>{EN.TargetMore2Unique}</dt>
-			{
-				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
-			}
-			{
-				<dd title={mapping.map(itm=>`${itm[0]}->${itm[1]}`).join(',')}
-				    style={{display:(mapping.length?'':'none')}}>
-					{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}
-				</dd>
-			}
-		</Fragment>
 	}
 
 	DQFData(data,title,showTarget,outlier=false){

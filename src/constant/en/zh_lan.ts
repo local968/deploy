@@ -1136,6 +1136,8 @@ const ZH_LAN = {
   Minimum: '有效值下界',
   Maximum: '有效值上界',
   TargetMore2Unique: '目标变量类别数量超过2个',
+  TargetMoreUnique: '目标变量类别数量超过',
+  GE: '个',
   Areyousuretodeletethismodeldeployment: '您确定要删除此模型部署吗？ 此操作无法恢复。',
   DropTheRows: '删除整行',
   Mapping: '映射',
