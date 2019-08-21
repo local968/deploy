@@ -398,7 +398,7 @@ function ModelResult(props) {
         {!selectModel.getContainer ? <button className={classes.button} onClick={createContainer}>
           <span>{`${EN.CreateContainer}`}</span>
         </button> : !selectModel.containerData ?
-            <Tooltip title={EN.CannotExportContainer}>
+            <Tooltip title={EN.CannotExportPmml}>
               <button className={`${classes.button} ${classes.disabled}`}>
                 <span>{`${EN.DownloadContainer}`}</span>
               </button>

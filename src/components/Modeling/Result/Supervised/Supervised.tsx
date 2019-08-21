@@ -132,6 +132,7 @@ export default class ModelResult extends Component<ModelResultProps> {
 
     const modelName = selectModel.modelName;
     const cannotDownload = !isHoldout && selectModel.isCV && (modelName.startsWith('Ensemble') || modelName.startsWith('r2-solution-DNN'))
+    const cannotCreate = selectModel.id.startsWith('r2-solution-')
 
     const type = isHoldout ? 'holdout' : 'validate'
     const realName = fileName.endsWith('.csv') ? fileName.slice(0, -4) : fileName
@@ -187,9 +188,13 @@ export default class ModelResult extends Component<ModelResultProps> {
                 <span>{`${EN.Exportmodelresults}(${isHoldout ? EN.Holdout : EN.Validation})`}</span>
               </button>
             </a>)}
-          {this.view === 'advanced' && (!selectModel.getPmml ? <button className={styles.button} onClick={this.createPmml}>
-            <span>{`${EN.CreatePmml}`}</span>
-          </button> : !selectModel.pmmlData ?
+          {this.view === 'advanced' && (!selectModel.getPmml ? (cannotCreate ? <Tooltip title={EN.CannotCreatePmml}>
+            <button className={classnames(styles.button, styles.disabled)}>
+              <span>{`${EN.CreatePmml}`}</span>
+            </button>
+          </Tooltip> : <button className={styles.button} onClick={this.createPmml}>
+              <span>{`${EN.CreatePmml}`}</span>
+            </button>) : !selectModel.pmmlData ?
               <Tooltip title={EN.CannotExportPmml}>
                 <button className={classnames(styles.button, styles.disabled)}>
                   <span>{`${EN.DownloadPmml}`}</span>
@@ -199,10 +204,14 @@ export default class ModelResult extends Component<ModelResultProps> {
                   <span>{`${EN.DownloadPmml}`}</span>
                 </button>
               </a>)}
-          {this.view === 'advanced' && (!selectModel.getContainer ? <button className={styles.button} onClick={this.createContainer}>
-            <span>{`${EN.CreateContainer}`}</span>
-          </button> : !selectModel.containerData ?
-              <Tooltip title={EN.CannotExportContainer}>
+          {this.view === 'advanced' && (!selectModel.getContainer ? (cannotCreate ? <Tooltip title={EN.CannotCreatePmml}>
+            <button className={classnames(styles.button, styles.disabled)}>
+              <span>{`${EN.CreateContainer}`}</span>
+            </button>
+          </Tooltip> : <button className={styles.button} onClick={this.createContainer}>
+              <span>{`${EN.CreateContainer}`}</span>
+            </button>) : !selectModel.containerData ?
+              <Tooltip title={EN.CannotExportPmml}>
                 <button className={classnames(styles.button, styles.disabled)}>
                   <span>{`${EN.DownloadContainer}`}</span>
                 </button>

@@ -1281,8 +1281,8 @@ const ZH_LAN = {
   MicroF1Hint: '微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的F1。',
   MicroAUCHint: "微平均（Micro-averaging）是对数据集中的每一个示例不分类别进行统计建立全局混淆矩阵，然后计算相应的AUC。",
   CreateContainer: '生成容器',
-  CannotExportContainer: '无法导出容器',
   DownloadContainer: '导出容器',
+  CannotCreatePmml: '无法生成',
 };
 
 export default ZH_LAN;

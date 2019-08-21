@@ -456,6 +456,9 @@ class Model {
   }
 
   createPmml = () => {
+    if (this.id.startsWith('r2-solution-')) return Promise.resolve({ status: 100 })
+    if (this.getPmml) return Promise.resolve({ status: 100 })
+    if (this.pmmlData) return Promise.resolve({ status: 100 })
     this.getPmml = true
     const prev = ((this.problemType === 'Classification' || this.problemType === 'Regression') && 'clfreg') || (this.problemType === 'Clustering' && 'clustering') || (this.problemType === 'Outlier' && 'outlier') || (this.problemType === 'MultiClassification' && 'multi') || ''
     if (!prev) return Promise.resolve()
@@ -465,6 +468,8 @@ class Model {
   }
 
   createContainer = () => {
+    if (this.getContainer) return Promise.resolve({ status: 100 })
+    if (this.containerData) return Promise.resolve({ status: 100 })
     this.getContainer = true
     return socketStore.ready().then(api => {
       return api.createContainer({ command: 'top.dockerRuntime', id: this.id, projectId: this.projectId })
