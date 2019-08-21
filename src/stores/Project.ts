@@ -272,7 +272,7 @@ class Project {
   @observable outlierFillMethodTemp: StringObject = {};
   @observable outlierDictTemp: unknown = {};
   @observable deleteColumns: string[] = [];
-  @observable m_cro:string= "macro";
+  @observable m_cro: string = "macro";
 
   // train
   // 训练状态
@@ -801,7 +801,7 @@ class Project {
   };
 
   @action
-  upM_cro(mc){
+  upM_cro(mc) {
     this.m_cro = mc;
   }
 
@@ -1602,7 +1602,8 @@ class Project {
     if (problemType === 'Association') return this.models
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score' || problemType === 'MultiClassification' && 'macro_auc')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+    // const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+    const currentModels = models
 
     return (!currentModels.length ? models : currentModels)
       .map(m => {
