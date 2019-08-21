@@ -2,10 +2,11 @@ import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import EN from '../../../constant/en';
 import RowCell from './RowCell';
-import { Radio, Row, Switch, Tooltip } from 'antd';
+import { Radio, Switch, Tooltip } from 'antd';
 import styles from './AdvancedView.module.css';
 import moment from 'moment';
 import DetailCurves from '../../Modeling/Result/AdvancedView/DetailCurves';
+import Row from './Row';
 interface Interface {
   model:any
   texts:any

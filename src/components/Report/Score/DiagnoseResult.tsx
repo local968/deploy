@@ -23,7 +23,6 @@ export default class DiagnoseResult extends Component<Interface> {
   render() {
     const { diagnoseType } = this.props;
     let result;
-    // const type = 'large';
     switch (diagnoseType) {
       case 'random':
         result = (

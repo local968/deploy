@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './AdvancedView.module.css';
 import EN from '../../../constant/en';
 import { Button, Modal, Tabs } from 'antd';

@@ -1,12 +1,14 @@
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import EN from '../../../constant/en';
-import { Radio, Row, Select, Switch, Tooltip } from 'antd';
+import { Radio, Select, Switch, Tooltip } from 'antd';
 import styles from './AdvancedView.module.css';
 import moment from 'moment';
 import { formatNumber } from "../../../util";
 import MultiClassificationDetailCurves from '../../Modeling/Result/AdvancedView/MultiClassificationDetailCurves';
 import RowCell from './RowCell';
+import Row from './Row';
+const {Option} = Select;
 interface Interface {
   project:any
   model:any

@@ -9,6 +9,10 @@ import { Hint } from '../../Common';
 import MultiClassificationModelRow from './MultiClassificationModelRow';
 import ClassificationModelRow from './ClassificationModelRow';
 import RegressionModleRow from './RegressionModleRow';
+import RowCell from './RowCell';
+import config from '../../../config';
+import Row from './Row';
+const {isEN} = config;
 
 const questMarks = {
   Accuracy: EN.AccuracyHint,
@@ -24,7 +28,7 @@ const questMarks = {
   Recall: EN.Itrepresentsthecompleteness,
   'Cutoff Threshold': EN.Manyclassifiersareabletoproduce,
   'F1-Score': <p>{EN.TheF1scoreistheharmonicmean}<br /><br />{EN.PrecisionRecall}</p>,
-  'Fbeta': <p>{EN.TheFbetascoreistheharmonicmean}<br /><br />{EN.PrecisionRecallbeta}</p>,
+  Fbeta: <p>{EN.TheFbetascoreistheharmonicmean}<br /><br />{EN.PrecisionRecallbeta}</p>,
   Precision: <p>{EN.Itmeasureshowmanytruepositivesamong}</p>,
   KS: EN.Efficientwaytodetermine,
   'Normalized RMSE': EN.RootMeanSquareError,
