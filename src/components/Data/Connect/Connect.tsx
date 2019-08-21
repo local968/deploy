@@ -60,6 +60,7 @@ export default class DataConnect extends Component<DataConnectProps> {
   }
 
   onUpload = ({ pause, resume, abort }: { pause: () => void; resume: () => void, abort: () => void }) => {
+    this.file = null;
     this.uploading = true;
     this.isPause = false;
     this.pause = pause;
@@ -69,7 +70,7 @@ export default class DataConnect extends Component<DataConnectProps> {
 
   upload = action((data: UploadProps) => {
     this.process = 50;
-    this.file = null;
+    // this.file = null;
 
     this.props.projectStore.project.fastTrackInit(data).then(() => {
       this.process = 0;
@@ -223,6 +224,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     e.preventDefault();
     const process = this.props.projectStore.project.etling ? 50 : this.process;
     if (process) return false;
+    console.log('aaaa')
     let file = e.dataTransfer.files[0];
     this.file = file;
   });
@@ -247,7 +249,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.abort && this.abort();
     this.uploading = false;
     this.process = 0;
-    this.file = null;
+    // this.file = null;
   };
 
   afterClose = (index: string) => {
@@ -266,7 +268,7 @@ export default class DataConnect extends Component<DataConnectProps> {
     const charsetChange = action(charset => {
       project.updateProject({ charset });
     });
-
+    console.log(this.file, 'sss')
     return (
       <div className={styles.connect} onDrop={this.handleDrop} onDragOver={this.handleDragOver}>
         <div className={styles.schemaInfo}>

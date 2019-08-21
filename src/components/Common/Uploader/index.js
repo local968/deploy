@@ -22,7 +22,8 @@ export default class Uploader extends Component {
     }
     if (onStart && typeof onStart === 'function') onStart({
       pause: this.pause,
-      resume: this.resume
+      resume: this.resume,
+      abort: this.abort
     })
     this.upload(file)
   }
