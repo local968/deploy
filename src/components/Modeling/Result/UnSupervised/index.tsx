@@ -383,7 +383,7 @@ function ModelResult(props) {
             </button>
           </a>
         )}
-        {view === 'advanced' && (!selectModel.getPmml ? <button className={classes.button} onClick={createPmml}>
+        {!selectModel.getPmml ? <button className={classes.button} onClick={createPmml}>
           <span>{`${EN.CreatePmml}`}</span>
         </button> : !selectModel.pmmlData ?
             <Tooltip title={EN.CannotExportPmml}>
@@ -394,8 +394,8 @@ function ModelResult(props) {
               <button className={classes.button}>
                 <span>{`${EN.DownloadPmml}`}</span>
               </button>
-            </a>)}
-        {view === 'advanced' && (!selectModel.getContainer ? <button className={classes.button} onClick={createContainer}>
+            </a>}
+        {!selectModel.getContainer ? <button className={classes.button} onClick={createContainer}>
           <span>{`${EN.CreateContainer}`}</span>
         </button> : !selectModel.containerData ?
             <Tooltip title={EN.CannotExportContainer}>
@@ -406,7 +406,7 @@ function ModelResult(props) {
               <button className={classes.button}>
                 <span>{`${EN.DownloadContainer}`}</span>
               </button>
-            </a>)}
+            </a>}
       </div>
     </div>
   );
