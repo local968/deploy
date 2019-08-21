@@ -12,7 +12,7 @@ import { FitBar } from './index';
 
 export default function Chart(props){
 	let {x_name='',y_name='',title='',project,name} = props;
-	const {problemType} = project;
+	const {problemType,mapHeader,target} = project;
 	const {data:_data={}} = props;
 	let data;
 	if(name){
@@ -26,7 +26,7 @@ export default function Chart(props){
 	switch (name) {
 		case 'correlation-matrix':
 			const { header } = data;
-			const {mapHeader,target,colType,trainHeader,dataHeader} = project;
+			const {colType,trainHeader,dataHeader} = project;
 			const fields = Object.entries(colType)
 				.filter(itm => itm[1] !== 'Raw'&&itm[0]!==target)
 				.map(itm => itm[0])
@@ -46,7 +46,7 @@ export default function Chart(props){
 				x_name={x_name}
 				y_name={y_name}
 				data={data}
-				across={problemType === 'MultiClassification'}
+				across={problemType === 'MultiClassification'&& mapHeader[target] === x_name}
 				width = {550}
 				height = {330}
 			/>;
