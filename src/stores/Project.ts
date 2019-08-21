@@ -930,7 +930,7 @@ class Project {
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      await this.abortTrainByEtl(false)
+      await this.abortTrainByEtl()
       if (this.originalIndex) await this.deleteIndex(this.originalIndex)
       if (this.etlIndex) await this.deleteIndex(this.etlIndex)
       this.models = []
@@ -953,7 +953,7 @@ class Project {
   @action
   fastTrackInit = async (data: UploadProps) => {
 
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.originalIndex) await this.deleteIndex(this.originalIndex)
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
@@ -1064,7 +1064,7 @@ class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -1160,7 +1160,7 @@ class Project {
   endQuality = async () => {
     if (!this.qualityHasChanged) return
     this.etling = true
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -2222,14 +2222,13 @@ class Project {
     })
   }
 
-  abortTrain = (stopId: string, isModeling: boolean = true) => {
+  abortTrain = (stopId: string) => {
     if (!stopId) return Promise.resolve()
     // if (this.isAbort) return Promise.resolve()
     const command = {
-      command: 'stop',
+      command: 'top.stop',
       action: 'train',
       projectId: this.id,
-      isModeling,
       stopId
     }
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
@@ -2240,13 +2239,13 @@ class Project {
     }))
   }
 
-  abortTrainByEtl = async (isModeling: boolean = true) => {
+  abortTrainByEtl = async () => {
     // this.models = []
     this.isAbort = true
     // const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        await this.abortTrain(si, isModeling)
+        await this.abortTrain(si)
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)

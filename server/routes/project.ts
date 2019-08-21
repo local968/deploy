@@ -1020,17 +1020,21 @@ wss.register('createNewVariable', async (message, socket, progress) => {
 });
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, _id: requestId, stopId, isModeling } = message;
+  const { projectId, _id: requestId, stopId } = message;
   const { userId } = socket.session;
   return getProjectField(projectId, 'stopIds').then((stopIds = []) => {
     if (!stopIds.length) return { status: 200, message: 'ok' };
     if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' };
-    return axios
-      .get(
-        `${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([
-          { ...message, userId, requestId, stopId },
-        ])}`,
-      )
+    // return axios
+    //   .get(
+    //     `${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([
+    //       { ...message, userId, requestId, stopId },
+    //     ])}`,
+    //   )
+    return command({ ...message, userId, requestId, stopId }, (progressValue) => {
+      const { status } = progressValue
+      if (status < 0 || status === 100) return progressValue
+    })
       .then(async () => {
         command.clearListener(stopId);
         userLogger.warn({
