@@ -2,8 +2,16 @@ import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash'
 import './echarts.config'
+interface Interface {
+	chartDate:any
+	title:string
+	x_name?:string
+	y_name:string
+	width?:number
+	height?:number
+}
 
-export default function FitPlot(props){
+export default function FitPlot(props:Interface){
 	const {chartDate={},title='',x_name='',y_name='',width=500,height=300} = props;
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{

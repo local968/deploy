@@ -61,13 +61,11 @@ class RegressionDetailCurves extends Component<Interface> {
       case EN.FitPlot:
         curComponent = (
           <div className={styles.plot}>
-            {
               <FitPlot
                 title={EN.FitPlot}
                 y_name={EN.Predictvalue}
                 chartDate={isHoldout ? holdOutChartDate : chartDate}
               />
-            }
           </div>
         );
         break;

@@ -27,7 +27,7 @@ interface Interface {
 	x_name:string
 	y_name:string
 	z_name:string
-	data:any
+	data:Array<any>
 }
 
 export default class ThreeVariable extends PureComponent<Interface>{
@@ -43,7 +43,7 @@ export default class ThreeVariable extends PureComponent<Interface>{
 
 		let xmin:any = Infinity;
 
-		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
+		const series:any = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
 			if(!color[ind]){
 				color.push('#'+Math.random().toString(16).substring(2,8))
 			}
