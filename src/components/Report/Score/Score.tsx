@@ -8,7 +8,7 @@ import ModelComp from './ModelComp';
 interface Interface {
   models:any
   project:any
-  projectStore:any
+  projectStore?:any
   sort:any
   metric:any
   handleSort:any

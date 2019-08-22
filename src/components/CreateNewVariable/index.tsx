@@ -11,9 +11,9 @@ import store from './NewVariableStore';
 import { DialogProps } from '@material-ui/core/Dialog';
 
 interface InterfaceCreateNewVariableProps extends DialogProps {
-  title: string;
-  variables: string[];
-  mapHeader;
+  title?: string;
+  variables?: string[];
+  mapHeader?;
   expression;
   addNewVariable;
 }

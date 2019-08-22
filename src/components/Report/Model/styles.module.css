@@ -694,12 +694,6 @@ margin-right: 10px;
   fill: rgb(68, 142, 237);
 }
 
-.d3line {
-  stroke: rgb(68, 142, 237);
-  stroke-width: 1.5px;
-  fill: transparent;
-}
-
 .modelInsightsLoading {
   display: flex;
   flex: auto;
