@@ -1,7 +1,14 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import { toJS } from 'mobx';
-export default function TwinBar(props) {
+interface Interface {
+  x:any
+  same:any
+  diff:any
+  x_name:string
+  index:number
+}
+export default function TwinBar(props:Interface) {
   const { x, same, diff,x_name,index } = props;
   const x_values = toJS(x);
   const _same = toJS(same);

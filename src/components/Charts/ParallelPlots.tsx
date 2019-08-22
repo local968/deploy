@@ -1,48 +1,35 @@
-import React, {PureComponent} from 'react'
+import React, { useContext, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import request from '../Request';
 import EN from "../../constant/en";
-import { inject } from 'mobx-react';
+import { MobXProviderContext } from 'mobx-react';
 
-interface DataSampleProps {
+interface Interface {
 	url:string
-	projectStore?:any
 }
 
-@inject('projectStore')
-export default class ParallelPlot extends PureComponent<DataSampleProps>{
-	constructor(props){
-		super(props);
-		this.state = {
-			ready:false,
-		}
-	}
+export default function ParallelPlot(props:Interface){
+	const { projectStore:{project:{mapHeader}} } = useContext(MobXProviderContext);
+	const [ready,upReady] = useState(false);
+	const [result,upResult] = useState({} as any);
 
-	async componentDidMount() {
-		const {url} = this.props as any;
-		const result = await request.post({
+	useState(()=>{
+		const {url} = props;
+		request.post({
 			url: '/graphics/parallel-coordinate-map',
 			data: {
 				url,
 			},
+		}).then(result=>{
+			upReady(true);
+			upResult(result)
 		});
-
-		this.setState({
-				result,
-				ready:true
-			})
-	}
-
-	getOption() {
-		const {result,ready} = this.state as any;
-
-		if(!ready){
-			return {
-				xAxis:{},
-				yAxis:{},
-			}
-		}
-
+	});
+	let option:any = {
+		xAxis:{},
+		yAxis:{},
+	};
+	if(ready){
 		let {title='',schema=[],data=[]} = result;
 		let len = 0;
 
@@ -67,8 +54,6 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 		const nameTextStyle = {
 			color:'#000',
 		};
-
-		const {projectStore:{project:{mapHeader}}} = this.props;
 
 		schema.forEach((itm,index)=>{
 			const name = (mapHeader[itm]||itm).split('').map((itm,index)=>(!index||index%15)?itm:`${itm}\n`).join('');
@@ -98,7 +83,7 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 			}),
 		}));
 
-		return {
+		option = {
 			title: {
 				text: title,
 			},
@@ -145,13 +130,11 @@ export default class ParallelPlot extends PureComponent<DataSampleProps>{
 		};
 	}
 
-	render(){
 		return <ReactEcharts
-			option={this.getOption()}
+			option={option}
 			style={{height: 310, width: 710}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
 		/>
-	}
 }
