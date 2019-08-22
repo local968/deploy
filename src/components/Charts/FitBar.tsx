@@ -73,6 +73,9 @@ export default function FitBar(props:Interface){
 	__data = __data.map(itm=>{
 		const {value} = itm;
 		value[1] = 0;
+		if(!value[2]){
+				value[7] = '';
+		}
 
 		return {
 			...itm,
