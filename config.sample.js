@@ -59,7 +59,6 @@ const YOUR_MODEL = process.env.YOUR_MODEL || '您的建模数据量超出当前�
 const YOUR_USAGE = process.env.YOUR_USAGE || '您的并发项目数量已达到当前许可证的最大限制。。';
 const SPLIT_COMMAND = process.env.SPLIT_COMMAND || false;
 const STRAPI = process.env.STRAPI || '//192.168.0.23';
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN || '';
 const redis =
   REDIS_TYPE === "2"
     ? {
@@ -138,7 +137,6 @@ const config = {
   },
   splitCommand: SPLIT_COMMAND,
   STRAPI,
-  STRAPI_TOKEN,
 };
 
 module.exports = config;

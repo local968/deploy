@@ -9,7 +9,6 @@ import D3D2List from './D3D2List'
 
 interface Interface {
 	url:string
-	projectStore?:any
 }
 const D3D2 = observer((props:Interface)=>{
 	const {url} = props;

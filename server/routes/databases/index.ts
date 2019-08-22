@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { config } from 'dotenv';
-import { join } from 'path';
+// import { config } from 'dotenv';
+// import { join } from 'path';
 import uuid from 'uuid/v4'
 import { mysqlCheck, mysqlUpload } from './mysql'
 import { hiveCheck, hiveUpload } from './hive'
@@ -22,7 +22,7 @@ export interface DatabaseConfig {
   mapHeader?: string[]
 }
 
-config({ path: join(__dirname, '../.env') });
+// config({ path: join(__dirname, '../.env') });
 
 const router = Router()
 
