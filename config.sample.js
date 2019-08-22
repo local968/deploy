@@ -39,6 +39,7 @@ const SCHEMA_SERVICE =
   process.env.SCHEMA_SERVICE || "//192.168.0.88:4015";
 const TASK_SERVICE = process.env.TASK_SERVICE || "//192.168.0.88:4016";
 const USER_SERVICE = process.env.USER_SERVICE || "//192.168.0.88:4017";
+const R2LEARN_API = process.env.R2LEARN_API || "http://192.168.0.120:8085";
 
 const AMQPLIB_PROTOCOL = process.env.AMQPLIB_PROTOCOL || "amqp.ts";
 const AMQPLIB_HOSTNAME = process.env.AMQPLIB_HOSTNAME || "127.0.0.1";
@@ -120,7 +121,8 @@ const config = {
     SCHEMA_SERVICE,
     TASK_SERVICE,
     USER_SERVICE,
-    BACK_API_SERVICE
+    BACK_API_SERVICE,
+    R2LEARN_API
   },
   mq: {
     AMQPLIB_PROTOCOL,

@@ -22,6 +22,7 @@
     "log4js": "^4.5.1",
     "module-alias": "^2.2.0",
     "moment": "^2.24.0",
+    "mysql": "^2.17.1",
     "nodemailer": "^5.1.1",
     "papaparse": "^5.0.0",
     "superagent": "^5.1.0",
