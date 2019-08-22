@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { createBrowserHistory, createHashHistory } from 'history';
 import { Provider } from 'mobx-react';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
@@ -24,49 +24,41 @@ const stores = {
   routing: routingStore
 };
 
-class App extends Component {
-
-  render() {
-    return (
-      <ErrorBoundary>
-        {
-          isEN ?
-            <ConfigProvider >
-              <Provider {...stores}>
-                {r2Report ? <Report /> : <Router history={history}>
-                  <div className={styles.app}>
-                    <Sider />
-                    <div className={styles.main}>
-                      <Header />
-                      <ErrorBoundary>
-                        <Layout />
-                      </ErrorBoundary>
-                      {/*<Test/>*/}
-                    </div>
+export default function App(){
+  return <ErrorBoundary>
+      {
+        isEN ?
+          <ConfigProvider >
+            <Provider {...stores}>
+              {r2Report ? <Report /> : <Router history={history}>
+                <div className={styles.app}>
+                  <Sider />
+                  <div className={styles.main}>
+                    <Header />
+                    <ErrorBoundary>
+                      <Layout />
+                    </ErrorBoundary>
+                    {/*<Test/>*/}
                   </div>
-                </Router>}
-              </Provider>
-            </ConfigProvider> :
-            <ConfigProvider locale={zh_CN}>
-              <Provider {...stores}>
-                {r2Report ? <Report /> : <Router history={history}>
-                  <div className={styles.app}>
-                    <Sider />
-                    <div className={styles.main}>
-                      <Header />
-                      <ErrorBoundary>
-                        <Layout />
-                      </ErrorBoundary>
-                    </div>
+                </div>
+              </Router>}
+            </Provider>
+          </ConfigProvider> :
+          <ConfigProvider locale={zh_CN}>
+            <Provider {...stores}>
+              {r2Report ? <Report /> : <Router history={history}>
+                <div className={styles.app}>
+                  <Sider />
+                  <div className={styles.main}>
+                    <Header />
+                    <ErrorBoundary>
+                      <Layout />
+                    </ErrorBoundary>
                   </div>
-                </Router>}
-              </Provider>
-            </ConfigProvider>
-        }
-
-      </ErrorBoundary>
-    );
-  }
+                </div>
+              </Router>}
+            </Provider>
+          </ConfigProvider>
+      }
+    </ErrorBoundary>
 }
-
-export default App;

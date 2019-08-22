@@ -1,3 +1,1 @@
-import Problem from './Problem'
-
-export default Problem
+export {default} from './Problem'

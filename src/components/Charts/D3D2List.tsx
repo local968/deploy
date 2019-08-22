@@ -1,10 +1,16 @@
-import React, { Fragment, useState } from 'react';
+import React, {useState } from 'react';
 import {Select} from 'antd';
 import styles from './charts.module.css';
 import EN from '../../constant/en';
 const {Option} = Select;
 
-export default function D3D2List(props){
+interface Interface {
+  featuresLabel:any
+  mapHeader:any
+  update:any
+}
+
+export default function D3D2List(props:Interface){
   const {featuresLabel,mapHeader,update} = props;
 
   const [x_name,y_name,z_name] = featuresLabel;
@@ -36,7 +42,7 @@ export default function D3D2List(props){
       }
     </Select>
   }
-  return <Fragment>
+  return <>
     {
       ['x_name','y_name','z_name'].map((itm,index)=><dd key={itm} id={itm}>Var{index+1}:{selection(itm)}</dd>)
     }
@@ -45,5 +51,5 @@ export default function D3D2List(props){
         <span>{EN.Save}</span>
       </button>
     </dd>
-  </Fragment>
+  </>
 }

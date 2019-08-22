@@ -1,71 +1,50 @@
-import React, {PureComponent, Fragment} from 'react'
+import React, {useContext, useState, useEffect } from 'react';
 import TSEN from './T-SEN'
 import request from '../Request'
 import styles from './charts.module.css';
 import THREE from './3Variable';
 import EN from "../../constant/en";
-import { inject, observer } from 'mobx-react';
+import {MobXProviderContext, observer } from 'mobx-react';
 import D3D2List from './D3D2List'
 
 interface Interface {
 	url:string
 	projectStore?:any
 }
-
-@inject('projectStore')
-@observer
-export default class D3D2 extends PureComponent<Interface>{
-	state:any;
-	constructor(props) {
-		super(props);
-		this.state = {
-			ready: false,
-			show:false,
-			x_name:'',
-			y_name:'',
-			z_name:'',
-			result:null,
-			changing:false,
-		};
-	}
-
-	componentWillReceiveProps(nextProps) {
-		const {url} = this.props;
-		if(nextProps.url !== url){
-			this.setState({
-				show:false,
-				changing:true,
-			},()=>this.componentDidMount(nextProps.url));
-		}
-	}
-
-	async componentDidMount(url=this.props.url) {
-		const result:any = await request.post({
+const D3D2 = observer((props:Interface)=>{
+	const {url} = props;
+	const {projectStore:{project:{mapHeader}}} = useContext(MobXProviderContext);
+	const [ready,upReady] = useState(false);
+	const [show,upShow] = useState(false);
+	const [x_name,upx_name] = useState('');
+	const [y_name,upy_name] = useState('');
+	const [z_name,upz_name] = useState('');
+	const [result,upResult] = useState({} as any);
+	const [changing,upChanging] = useState(false);
+	useEffect(()=>{
+		upShow(false);
+		upChanging(true);
+		request.post({
 			url: '/graphics/residual-plot-diagnosis',
 			data: {
 				url,
 			},
-		});
-		const {featuresLabel} = result;
+		}).then((result:any)=>{
+			const {featuresLabel} = result;
 
-		const [x_name,y_name,z_name=''] = featuresLabel;
-
-		this.setState({
-			result,
-			ready:true,
-			show:true,
-			x_name,
-			y_name,
-			z_name,
-			changing:false,
-		});
-	}
-
-	chart(){
-		const {x_name,y_name,z_name,result} = this.state;
+			const [x_name,y_name,z_name=''] = featuresLabel;
+			upResult(result);
+			upx_name(x_name);
+			upy_name(y_name);
+			upz_name(z_name);
+			upChanging(false);
+			upReady(true);
+			upShow(true);
+		})
+	},[url]);
+	function chart(){
+		if(!show)return null;
 		const { featuresLabel, featureData, labels } = result;
-		const {mapHeader} = this.props.projectStore.project;
-
 		const data = [...new Set(labels)].map(itm => {
 			return {
 				name: itm,
@@ -96,41 +75,33 @@ export default class D3D2 extends PureComponent<Interface>{
 			average={true}
 		/>
 	}
-
-	async save(show_name){
+	async function save(show_name){
 		const {x_name,y_name,z_name} = show_name;
-		await this.setState({
-			show:false,
-		});
-		this.setState({
-			x_name,
-			y_name,
-			z_name,
-			show:true,
-		})
+		await upShow(false);
+
+		upx_name(x_name);
+		upy_name(y_name);
+		upz_name(z_name);
+		upShow(true);
+	}
+	if (!ready) {
+		return <div/>
 	}
 
-	render() {
-		const {ready,show,result,changing} = this.state;
-		const {projectStore:{project:{mapHeader}}} = this.props;
-		if (!ready) {
-			return <div/>
-		}
-
-		return <section className={styles.d3d2}>
-			<dl>
-				{
-					!changing&&<Fragment>
-						<dt>{EN.Choose2or3Variables}</dt>
-						<D3D2List
-							featuresLabel = {result.featuresLabel}
-							mapHeader = {mapHeader}
-							update = {this.save.bind(this)}
-						/>
-					</Fragment>
-				}
-			</dl>
-			{show&&this.chart()}
-		</section>
-	}
-}
+	return <section className={styles.d3d2}>
+		<dl>
+			{
+				!changing&&<>
+					<dt>{EN.Choose2or3Variables}</dt>
+					<D3D2List
+						featuresLabel = {result.featuresLabel}
+						mapHeader = {mapHeader}
+						update = {save}
+					/>
+				</>
+			}
+		</dl>
+		{chart()}
+	</section>
+});
+export default D3D2;

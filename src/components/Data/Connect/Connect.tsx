@@ -387,18 +387,16 @@ export default class DataConnect extends Component<DataConnectProps> {
               });
           })}
         />
-        {
-          <Confirm
-            width={'6em'}
-            visible={this.visiable}
-            title={EN.Warning}
-            content={EN.Thisactionmaywipeoutallofyourprevious}
-            onClose={this.onClose}
-            onConfirm={this.onConfirm}
-            confirmText={EN.Continue}
-            closeText={EN.CANCEL}
-          />
-        }
+        <Confirm
+          width={'6em'}
+          visible={this.visiable}
+          title={EN.Warning}
+          content={EN.Thisactionmaywipeoutallofyourprevious}
+          onClose={this.onClose}
+          onConfirm={this.onConfirm}
+          confirmText={EN.Continue}
+          closeText={EN.CANCEL}
+        />
       </div>
     );
   }

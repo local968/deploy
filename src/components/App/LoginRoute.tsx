@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import styles from './styles.module.css';
 import { Background } from 'components/Common';
@@ -10,8 +10,7 @@ import ForgetPassword from 'components/User/ForgetPassword';
 import Support from 'components/Support';
 import config from 'config'
 
-export default class LoginRouter extends Component {
-  render() {
+export default function LoginRouter(){
     return (
       <div className={styles.warp}>
         <Background />
@@ -28,5 +27,4 @@ export default class LoginRouter extends Component {
         </div>
       </div>
     );
-  }
 }
