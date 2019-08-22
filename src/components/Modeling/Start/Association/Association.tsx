@@ -14,26 +14,26 @@ interface AssociationProps {
 
 const Association = (props: AssociationProps) => {
   const { project } = props;
-  const { associationOption, associationView, target, rawDataView } = project;
+  const { associationOption, associationView } = project;
 
   const [chartData, upChartData] = useState([]);
   const [state, setState] = useState(associationOption);
 
-  useEffect(()=>{
-      request.post({
-        url:'/graphics/new',
-        data:{
-          url:associationView.plot,
+  useEffect(() => {
+    request.post({
+      url: '/graphics/new',
+      data: {
+        url: associationView.plot,
+      }
+    }).then((data: any) => {
+      upChartData(data.keys.map((name, index) => {
+        return {
+          name,
+          value: data.values[index],
         }
-      }).then((data:any)=>{
-        upChartData(data.keys.map((name,index)=>{
-          return {
-            name,
-            value:data.values[index],
-          }
-        }))
-      })
-  },[]);
+      }))
+    })
+  }, []);
   const { type } = state;
   const list = [
     'support',
@@ -62,7 +62,7 @@ const Association = (props: AssociationProps) => {
     project.associationOption = state;
     project.associationModeling()
   };
-  const minAp = 2 / rawDataView[target].uniqueValues;
+  const minAp = 2 / associationView.view.users;
   return <div className={styles.association}>
     <div className={styles.options}>
       <div className={styles.tabs}>
@@ -97,9 +97,8 @@ const Association = (props: AssociationProps) => {
       </div>
     </div>
     <div className={styles.views}>
-       <HistogramCategorical
-        title={EN.AssociationViewTitle}
-        x_name={EN.NumberofClusters}
+      <HistogramCategorical
+        title=' '
         data={chartData}
       />
       <div className={styles.summary}>
@@ -111,6 +110,6 @@ const Association = (props: AssociationProps) => {
       </div>
     </div>
   </div>
-}
+};
 
 export default Association

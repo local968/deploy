@@ -82,7 +82,9 @@ class DataSchema extends Component<DataSchemaProps> {
       outlierFillMethod: outlierFillMethod,
       outlierFillMethodTemp: outlierFillMethod,
       nullFillMethod: nullFillMethod,
-      nullFillMethodTemp: nullFillMethod
+      nullFillMethodTemp: nullFillMethod,
+      mismatchFillMethod: {},
+      mismatchFillMethodTemp: {}
     };
 
     project.setProperty({ ...data, ...(isMulti ? { targetUnique: this.uniques } : {}) });
@@ -99,20 +101,23 @@ class DataSchema extends Component<DataSchemaProps> {
     const { role } = this.props.userStore.info;
     const { schema_TargetVariable = true } = role as any;
     if (schema_TargetVariable) {
-      // if (!isNaN(+value)) {
       this.target = value;
+      // if (!isNaN(+value)) {
+      this.uniques = 0
       this.tableRef.current.updateGrids();
       this.checkList = [...this.checkList.filter(v => v !== value)];
 
       // const { project } = this.props.projectStore
       // const isMulti = project.problemType === 'MultiClassification'
       // if (isMulti && value) {
-      //   const maxCounts = project.rawDataView[value].uniqueValues
+      //   const hasNull = !!project.nullLineCounts[value]
+      //   const maxCounts = project.rawDataView[value].uniqueValues + +hasNull
       //   if (maxCounts === 3) this.uniques = 3
+      //   else this.uniques = 0
       // }
-
       // } else {
-      //   this.checkList = [...this.checkList, this.target]
+      // this.uniques = 0
+      // this.checkList = [...this.checkList, this.target]
       // }
     }
   };
@@ -392,7 +397,8 @@ class DataSchema extends Component<DataSchemaProps> {
     const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
     const isAssociation = problemType === 'Association'
     const isMulti = problemType === 'MultiClassification'
-    const maxCounts = 100//this.target ? rawDataView[this.target].uniqueValues : 0
+    const hasNull = this.target ? !!project.nullLineCounts[this.target] : false
+    const maxCounts = (this.target ? rawDataView[this.target].uniqueValues : 0) + +hasNull
     const newDataHeader = rawHeader.filter(d => !this.checkList.includes(d) && (isUnsupervised ? d !== this.target : true));
     //target选择列表
     const targetOption = rawHeader.reduce((prev, h) => {
@@ -404,11 +410,12 @@ class DataSchema extends Component<DataSchemaProps> {
           if (this.dataType[h] === 'Numerical') prev[h] = mapHeader[h];
         } else {
           if (this.dataType[h] === 'Categorical') {
-            // if (isMulti) {
-            //   if (rawDataView[h].uniqueValues > 2) prev[h] = mapHeader[h];
-            // } else {
-            prev[h] = mapHeader[h];
-            // }
+            if (isMulti) {
+              const count = rawDataView[h].uniqueValues + +(!!project.nullLineCounts[h])
+              if (count > 2) prev[h] = mapHeader[h];
+            } else {
+              prev[h] = mapHeader[h];
+            }
           }
         }
       }
@@ -451,7 +458,7 @@ class DataSchema extends Component<DataSchemaProps> {
             />
             {isMulti && <div className={styles.multiInput}>
               <span>{EN.MultiUnique}</span>
-              {maxCounts > 3 && <Hint
+              {!!this.target && <Hint
                 themeStyle={{
                   fontSize: '1.5rem',
                   lineHeight: '2rem',
@@ -466,7 +473,7 @@ class DataSchema extends Component<DataSchemaProps> {
                   </div>
                 }
               />}
-              <NumberInput min={3} max={maxCounts} value={this.uniques || ''} isInt={true} onBlur={this.handleUnique} />
+              <NumberInput min={3} max={maxCounts} disabled={!this.target} value={this.uniques || ''} isInt={true} onBlur={this.handleUnique} />
             </div>}
             {isUnsupervised && <Hint
               themeStyle={{

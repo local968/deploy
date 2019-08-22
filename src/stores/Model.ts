@@ -153,6 +153,9 @@ class Model {
   @observable accuracyData: NumberObject = {}
   @observable getPmml: boolean = false
   @observable pmmlData: string = ''
+  @observable getContainer: boolean = false
+  @observable containerData: string = ''
+  @observable runTimeData: string = ''
   // @observable featureImportanceDetail = {}
 
   constructor(projectId: string, model: unknown, modelName?: string) {
@@ -453,9 +456,23 @@ class Model {
   }
 
   createPmml = () => {
+    if (this.id.startsWith('r2-solution-')) return Promise.resolve({ status: 100 })
+    if (this.getPmml) return Promise.resolve({ status: 100 })
+    if (this.pmmlData) return Promise.resolve({ status: 100 })
     this.getPmml = true
+    const prev = ((this.problemType === 'Classification' || this.problemType === 'Regression') && 'clfreg') || (this.problemType === 'Clustering' && 'clustering') || (this.problemType === 'Outlier' && 'outlier') || (this.problemType === 'MultiClassification' && 'multi') || ''
+    if (!prev) return Promise.resolve()
     return socketStore.ready().then(api => {
-      return api.createPmml({ command: 'clfreg.pmml', id: this.id, projectId: this.projectId })
+      return api.createPmml({ command: `${prev}.pmml`, id: this.id, projectId: this.projectId })
+    })
+  }
+
+  createContainer = () => {
+    if (this.getContainer) return Promise.resolve({ status: 100 })
+    if (this.containerData) return Promise.resolve({ status: 100 })
+    this.getContainer = true
+    return socketStore.ready().then(api => {
+      return api.createContainer({ command: 'top.dockerRuntime', id: this.id, projectId: this.projectId })
     })
   }
   // outlierPlot = (featureList) => {

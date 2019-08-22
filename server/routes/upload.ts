@@ -308,6 +308,24 @@ function getSampleIndex() {
   return Object.values(sampleIndex)
 }
 
+router.get('/download/container', async (req, res) => {
+  const { mid, projectId } = req.query;
+  const model = await redis.hgetall(`project:${projectId}:model:${mid}`);
+  const url = model.containerData
+  if (!url) return res.status(404).send("error")
+  res.attachment(`${mid}.img`);
+  return http.get(JSON.parse(url), response => {
+    if (response.statusCode !== 200) return res.status(404).send('error')
+    response.on('data', (str) => {
+      res.write(str)
+    })
+    response.on('end', () => {
+      res.end()
+    })
+    return null
+  })
+})
+
 router.get('/download/pmml', async (req, res) => {
   const { mid, projectId } = req.query;
   const model = await redis.hgetall(`project:${projectId}:model:${mid}`);

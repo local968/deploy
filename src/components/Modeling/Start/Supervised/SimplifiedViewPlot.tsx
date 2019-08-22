@@ -38,6 +38,8 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         data={data}
         xAxisName = {data.map((itm)=>target?(renameVariable[itm.name]||itm.name):itm.name)}
         across = {across}
+        width = {550}
+        height = {330}
       />
     </div>
   }

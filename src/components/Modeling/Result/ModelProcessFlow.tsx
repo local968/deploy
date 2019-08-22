@@ -128,6 +128,9 @@ export default class ModelProcessFlow extends Component<Interface> {
 		</dl>
 	}
 
+	/**
+	 * 数据质量修复
+	 */
 	DQF(){
 		const {
 			nullFillMethod,nullLineCounts,
@@ -147,7 +150,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 			nfm[itm[0]] = colType[itm[0]] === 'Numerical' ? 'mean' : 'mode';
 		});
 
-		if(problemType==='Classification'){
+		if(['MultiClassification','Classification'].includes(problemType)){
 			Reflect.deleteProperty(nfm,target)
 		}
 
@@ -163,7 +166,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 		const mi = this.DQFData(mfm,EN.mismatch,mismatchLineCounts[target]);
 		const out = this.DQFData(outlierFillMethod,`${EN.OutlierDetection}(${mapHeader[target]})`,outlierLineCounts[target],true);
 
-		const dqft = problemType==='Classification'&&this.DQFT();
+		const dqft = ['MultiClassification','Classification'].includes(problemType)&&this.DQFT();
 
 		if(!mv&&!mi&&!out&&!dqft){
 			return <dl>
@@ -188,6 +191,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 			targetCounts,
 			nullFillMethod,
 			nullLineCounts,
+			targetUnique,
 		} = this.props.project;
 
 		let drop = [],mapping=[];
@@ -195,7 +199,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 		let ta =[...targetArray];
 
 		if(!targetArray.length){
-			ta = Object.keys(targetCounts).splice(0,2)
+			ta = Object.keys(targetCounts).splice(0,targetUnique)
 		}
 
 		const df = _.without(Object.keys(colValueCounts[target]),...ta);
@@ -231,8 +235,8 @@ export default class ModelProcessFlow extends Component<Interface> {
 			return null;
 		}
 
-		return <Fragment>
-			<dt>{EN.TargetMore2Unique}</dt>
+		return <>
+			<dt>{EN.TargetMoreUnique + targetUnique + EN.GE}</dt>
 			{
 				<dd title={drop.join(',')} style={{display:(drop.length?'':'none')}}>{EN.DropTheRows}:{drop.join(',')}</dd>
 			}
@@ -242,7 +246,7 @@ export default class ModelProcessFlow extends Component<Interface> {
 					{EN.Mapping}:{mapping.map((itm,index)=>`${index?',':''}${itm[0]}->${itm[1]}`)}
 				</dd>
 			}
-		</Fragment>
+		</>
 	}
 
 

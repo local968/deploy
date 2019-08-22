@@ -5,7 +5,6 @@ import request from 'components/Request'
 
 interface Interface {
   path:any
-  getPath:any
   isNew:any
 }
 @observer
@@ -27,8 +26,8 @@ export default class SimplePlot extends Component<Interface> {
   }
 
   getData(props = this.props) {
-    const { getPath, path, isNew } = props;
-    if (isNew && !path) getPath();
+    const { path, isNew } = props;
+    if (isNew && !path) return;
     if (!isNew) {
       return (this.visible = true);
     }

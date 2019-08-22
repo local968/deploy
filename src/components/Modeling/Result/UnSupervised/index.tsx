@@ -4,7 +4,7 @@ import classes from './styles.module.css';
 import VariableImpact from '../VariableImpact';
 import Explanation from './explanation';
 import AdvancedView from '../AdvancedView';
-import { Tooltip, Icon, Popover, Select } from 'antd';
+import { Tooltip, Icon, Popover, Select, message } from 'antd';
 import { observer, inject } from 'mobx-react';
 import { formatNumber } from '../../../../util';
 import EN from '../../../../constant/en';
@@ -148,6 +148,18 @@ function ModelResult(props) {
       )
       .then(id => props.routing.push('/deploy/project/' + id));
   };
+
+  const createPmml = () => {
+    selectModel.createPmml().then(result => {
+      if (result.status < 0) message.error(result['processError'])
+    })
+  }
+
+  const createContainer = () => {
+    selectModel.createContainer().then(result => {
+      if (result.status < 0) message.error(result['processError'])
+    })
+  }
 
   return (
     <div className={classes.root}>
@@ -371,6 +383,30 @@ function ModelResult(props) {
             </button>
           </a>
         )}
+        {!selectModel.getPmml ? <button className={classes.button} onClick={createPmml}>
+          <span>{`${EN.CreatePmml}`}</span>
+        </button> : !selectModel.pmmlData ?
+            <Tooltip title={EN.CannotExportPmml}>
+              <button className={`${classes.button} ${classes.disabled}`}>
+                <span>{`${EN.DownloadPmml}`}</span>
+              </button>
+            </Tooltip> : <a href={`/upload/download/pmml?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+              <button className={classes.button}>
+                <span>{`${EN.DownloadPmml}`}</span>
+              </button>
+            </a>}
+        {!selectModel.getContainer ? <button className={classes.button} onClick={createContainer}>
+          <span>{`${EN.CreateContainer}`}</span>
+        </button> : !selectModel.containerData ?
+            <Tooltip title={EN.CannotExportPmml}>
+              <button className={`${classes.button} ${classes.disabled}`}>
+                <span>{`${EN.DownloadContainer}`}</span>
+              </button>
+            </Tooltip> : <a href={`/upload/download/container?projectId=${id}&mid=${selectModel.modelName}`} target='_blank'>
+              <button className={classes.button}>
+                <span>{`${EN.DownloadContainer}`}</span>
+              </button>
+            </a>}
       </div>
     </div>
   );
@@ -1073,7 +1109,7 @@ const ClusteringRow = observer(props => {
     project,
   } = props;
   const { realLabelScore, target, dbscanClusters, labelWithImportance } = model;
-  // const { adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore;
+  // const {adjust_mutual_info = '', adjust_rand_score = '' } = realLabelScore;
   const [type, setType] = React.useState('');
   const [visible, setVisible] = React.useState(false);
   const toggleImpact = _type => {

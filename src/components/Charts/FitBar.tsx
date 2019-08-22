@@ -41,6 +41,8 @@ export default function FitBar(props:Interface){
 		return itm.map((it=0)=>+it/sum)
 	});
 
+	const yNameL = Math.max(...y_names.map(itm=>itm.length));
+
 	let data = [];
 	let sum = 0;
 	x.map((itm,index)=>{
@@ -108,7 +110,7 @@ export default function FitBar(props:Interface){
 				show: true,
 				position: 'bottom',
 				rotate:'30',
-				color:'#000',
+				// color:'#000',
 				distance:20,
 			}
 		},
@@ -125,7 +127,7 @@ export default function FitBar(props:Interface){
 			normal: {
 				show: true,
 				position: 'left',
-				color:'#000',
+				// color:'#000',
 			}
 		},
 		data:__data,
@@ -163,7 +165,10 @@ export default function FitBar(props:Interface){
       axisLabel:{
         show:false
       },
-      name:"收缩压分组（mmHg)"
+			splitLine:{
+		  	show:false
+			}
+      // name:"收缩压分组（mmHg)"
 		},{
 		  min:0,
       max:1,
@@ -171,6 +176,9 @@ export default function FitBar(props:Interface){
         show:false
       },
       name:EN.Scale,
+			splitLine:{
+		  	show:false
+			}
     }],
 		series,
 		dataZoom:{
@@ -181,13 +189,14 @@ export default function FitBar(props:Interface){
     grid:{
       top:50,
       bottom:100,
+	    left:Math.max(7*yNameL,50),
     }
 	};
 
 
 	return <ReactEcharts
 		option={option}
-		style={{height: 500, width: 600}}
+		style={{height: 500, width: 600+7*yNameL}}
 		notMerge={true}
 		lazyUpdate={true}
 		theme="customed"

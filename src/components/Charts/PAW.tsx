@@ -9,9 +9,13 @@ const {Option} = Select;
 import { Hint } from 'components/Common';
 import _ from 'lodash';
 
-export default function PAW(props){
+interface Interface {
+	url:string
+}
+
+export default function PAW(props:Interface){
 	const {url}  = props;
-	const [data,setData] = useState({});
+	const [data,setData] = useState({} as any);
 	const [pcs,setPcs] = useState([0,1]);
 	const [pcsD,setPcsD] = useState([]);
 	const [tsenD,setTsenD] = useState([]);
@@ -27,7 +31,7 @@ export default function PAW(props){
 			name,
 			value:[],
 		}));
-		pcaData.map((itm,index)=>{
+		pcaData.forEach((itm,index)=>{
 			const re = [];
 			itm.forEach((it,index)=>{
 				if(pcs.includes(index)){
@@ -41,21 +45,19 @@ export default function PAW(props){
 	}
 
 	useEffect( function() {
-		async function fetchData() {
-			const result:any = await request.post({
+			request.post({
 				url: '/graphics/paw',
 				data: {
 					url,
 				},
-			});
-			setData(result);
-			setPcsD(setPcsData(result.corrData));
-			setTsenD(setTsenData(result.pcaData,result.predicts))
-		}
-		fetchData();
+			}).then((result:any)=>{
+				setData(result);
+				setPcsD(setPcsData(result.corrData));
+				setTsenD(setTsenData(result.pcaData,result.predicts))
+			})
 	}, []);
 
-	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data as any;
+	const {corrData=[],ve=[],pcaData=[],predicts,fields} = data;
 
 	useEffect(() => {
 		setPcsD(setPcsData(corrData));

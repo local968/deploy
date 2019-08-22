@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Bread,Show} from 'components/Common';
+import { Bread, Show } from 'components/Common';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 import { runInAction } from 'mobx';
@@ -16,18 +16,18 @@ import styles from './styles.module.css';
 import EN from '../../constant/en';
 
 interface Interface {
-  routing:any
-  match:any
-  location:any
-  deploymentStore:any
-  userStore?:any
+  routing: any
+  match: any
+  location: any
+  deploymentStore: any
+  userStore?: any
 }
 
-@inject('routing', 'deploymentStore','userStore')
+@inject('routing', 'deploymentStore', 'userStore')
 @observer
 export default class Detail extends Component<Interface> {
   render() {
-    const { routing, match, location, deploymentStore,userStore:{info:{role:{deployment=true,performance=true}}} } = this.props;
+    const { routing, match, location, deploymentStore, userStore: { info: { role: { deployment = true, performance = true } } } } = this.props;
     runInAction(() => (deploymentStore.currentId = match.params.id));
     const cd = deploymentStore.currentDeployment || {};
     const isUnsupervised = ['Clustering', 'Outlier'].includes(cd.modelType);
@@ -37,9 +37,9 @@ export default class Detail extends Component<Interface> {
         <Bread list={[EN.Home]} />
         <div className={styles.tabs}>
           {!isUnsupervised && (
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', flex: 'auto' }}>
               <Show
-                name = 'deployment'
+                name='deployment'
               >
                 <div
                   className={classnames([styles.tab, styles.deployment], {
@@ -75,12 +75,12 @@ export default class Detail extends Component<Interface> {
               </div>
 
               <Show
-                name = 'performance'
+                name='performance'
               >
                 <div
                   className={classnames([styles.tab, styles.performance], {
                     [styles.active]:
-                    location.pathname.indexOf('performance') >= 0,
+                      location.pathname.indexOf('performance') >= 0,
                   })}
                   onClick={() =>
                     routing.push(`/deploy/project/${match.params.id}/performance`)
@@ -109,9 +109,9 @@ export default class Detail extends Component<Interface> {
           )}
 
           {isUnsupervised && (
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', flex: 'auto' }}>
               <Show
-                name = 'performance'
+                name='performance'
               >
                 <div
                   className={classnames([styles.tab, styles.performance], {
@@ -147,10 +147,10 @@ export default class Detail extends Component<Interface> {
         <div className={styles.content}>
           <Switch>
             {!isUnsupervised && deployment && (
-                <Route
-                  path="/deploy/project/:id/deployment"
-                  component={props => <Deployment {...props} />}
-                />
+              <Route
+                path="/deploy/project/:id/deployment"
+                component={props => <Deployment {...props} />}
+              />
             )}
 
             {!isUnsupervised && (
@@ -160,7 +160,7 @@ export default class Detail extends Component<Interface> {
               />
             )}
 
-            {performance&&<Route
+            {performance && <Route
               path="/deploy/project/:id/performance"
               component={props => <Performance {...props} />}
             />}
@@ -172,8 +172,8 @@ export default class Detail extends Component<Interface> {
               render={() => (
                 <Redirect
                   to={`/deploy/project/${match.params.id}/${
-                    !isUnsupervised ? (deployment?'deployment':'operation') : (performance?'performance':"status")
-                  }`}
+                    !isUnsupervised ? (deployment ? 'deployment' : 'operation') : (performance ? 'performance' : "status")
+                    }`}
                 />
               )}
             />

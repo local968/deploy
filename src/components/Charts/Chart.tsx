@@ -8,10 +8,11 @@ import EN from "../../constant/en";
 import PIE from "./PIE";
 import PVA from "./PVA";
 import HS from "./HS";
+import { FitBar } from './index';
 
 export default function Chart(props){
 	let {x_name='',y_name='',title='',project,name} = props;
-	const {mapHeader} = project;
+	const {problemType,mapHeader,target} = project;
 	const {data:_data={}} = props;
 	let data;
 	if(name){
@@ -23,11 +24,31 @@ export default function Chart(props){
 
 	let chart;
 	switch (name) {
+		case 'correlation-matrix':
+			const { header } = data;
+			const {colType,trainHeader,dataHeader} = project;
+			const fields = Object.entries(colType)
+				.filter(itm => itm[1] !== 'Raw'&&itm[0]!==target)
+				.map(itm => itm[0])
+				.filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm))
+				.map(itm => mapHeader[itm]);
+			chart = <CorrelationMatrixs
+				message={{
+					data:data.data,
+					header:header.map(itm => mapHeader[itm]),
+					target:mapHeader[target],
+					fields,
+				}}
+			/>;
+			break;
 		case 'histogram-categorical':
 			chart = <HistogramCategorical
 				x_name={x_name}
 				y_name={y_name}
 				data={data}
+				across={problemType === 'MultiClassification'&& mapHeader[target] === x_name}
+				width = {550}
+				height = {330}
 			/>;
 			break;
 		case 'histogram-numerical':
@@ -38,20 +59,19 @@ export default function Chart(props){
 			/>;
 			break;
 		case 'classification-numerical':
-			chart = <UnivariantPlots
-				x_name={x_name}
-				y_name={y_name}
-				result={data}
-				renameVariable={project.renameVariable}
-			/>;
-			break;
 		case 'classification-categorical':
-			chart = <UnivariantPlots
-				x_name={x_name}
-				y_name={y_name}
-				result={data}
-				renameVariable={project.renameVariable}
-			/>;
+			if(problemType === "MultiClassification"){
+				chart = <FitBar
+					message={data}
+				/>
+			}else{
+				chart = <UnivariantPlots
+					x_name={x_name}
+					y_name={y_name}
+					result={data}
+					renameVariable={project.renameVariable}
+				/>;
+			}
 			break;
 		case 'regression-numerical':
 			chart = <TSENOne

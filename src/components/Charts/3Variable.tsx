@@ -1,4 +1,4 @@
-import React,{PureComponent} from 'react'
+import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
 import EN from "../../constant/en";
@@ -27,23 +27,16 @@ interface Interface {
 	x_name:string
 	y_name:string
 	z_name:string
-	data:any
+	data:Array<any>
 }
 
-export default class ThreeVariable extends PureComponent<Interface>{
-	private chart: React.RefObject<any>;
-	constructor(props){
-		super(props);
-		this.chart = React.createRef();
-	}
-
-	getOption() {
+export default function ThreeVariable(props:Interface){
 		const symbolSize = 5;
-		const {x_name='',y_name='',z_name='',data=[]} = this.props;
+		const {x_name='',y_name='',z_name='',data=[]} = props;
 
 		let xmin:any = Infinity;
 
-		const series = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
+		const series:any = data.sort((a,b)=>a.name - b.name).map((itm,ind)=>{
 			if(!color[ind]){
 				color.push('#'+Math.random().toString(16).substring(2,8))
 			}
@@ -68,7 +61,6 @@ export default class ThreeVariable extends PureComponent<Interface>{
 			name:EN._Average,
 			symbolSize:2,
 			type: 'scatter3D',
-			// symbol:'triangle',
 			symbol:'path://M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z',
 			itemStyle:{
 				color:'#1c2b3b'
@@ -96,7 +88,7 @@ export default class ThreeVariable extends PureComponent<Interface>{
 			})
 		});
 
-		return {
+		const option = {
 			tooltip: {
 				show:true,
 				formatter: function (params) {
@@ -141,15 +133,11 @@ export default class ThreeVariable extends PureComponent<Interface>{
 			},
 			series,
 		};
-	}
-
-	render(){
-		return <ReactEcharts
-			option={this.getOption()}
+		 return <ReactEcharts
+			option={option}
 			style={{height: 400, width: 450}}
 			notMerge={true}
 			lazyUpdate={true}
 			theme='customed'
 		/>
-	}
 }

@@ -19,6 +19,11 @@ interface StartTrainInterface {
 @inject('projectStore', 'userStore')
 @observer
 export default class StartTrain extends Component<StartTrainInterface> {
+  componentDidMount() {
+    // const { project } = this.props.projectStore;
+    return this.props.projectStore.project.correlationMatrix()
+  }
+
   @observable visible = false;
 
   fastTrain(run = true) {

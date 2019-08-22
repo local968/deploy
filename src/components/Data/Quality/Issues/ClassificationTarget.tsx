@@ -115,10 +115,11 @@ class ClassificationTarget extends Component<ClassificationTargetProps> {
     const error = (Object.keys(targetCounts).filter(_k => _k !== '').length + (hasNull ? 1 : 0)) < targetUniques;
     const nullPercent = ((targetCounts[''] || 0) / (totalRawLines || 1)) * 85;
     const text =
-      (isGood && EN.Targetvariablequalityisgood) || (isNa ? EN.Thetargetvariablehassomenoise :
-        `${EN.YourtargetvariableHas}${
-        error ? `${EN.Less}${targetUniques}${EN.ge}`/**onlyOnevalue */ : `${EN.More}${targetUniques}${EN.ge}`//Thantwouniquealues
-        }`);
+      (isGood && EN.Targetvariablequalityisgood) ||
+      // (isNa && EN.Thetargetvariablehassomenoise) ||
+      (error && `${EN.YourtargetvariableHas}${EN.Less}${targetUniques}${EN.ge}`/**onlyOnevalue */) ||
+      (isMore && `${EN.YourtargetvariableHas}${EN.More}${targetUniques}${EN.ge}`/** Thantwouniquealues*/) ||
+      EN.Thetargetvariablehassomenoise;
     return (
       <div className={styles.block}>
         <div className={styles.name}>

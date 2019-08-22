@@ -27,6 +27,8 @@ export default function HistogramCategorical(props:Interface){
     xAxisName = data.map((itm)=>itm.name),
     title = `Feature:${x_name}`,
     across,
+    height = '100%',
+    width = '100%'
   } = props;
 
   const dt = data.map(itm=>itm.value);
@@ -52,13 +54,13 @@ export default function HistogramCategorical(props:Interface){
     itemStyle:{},
     barGap:'-100%',
   }];
-  const dataZoom = {
+  const dataZoom:any = [{
     type: 'inside',
     zoomLock:true,
     start: 0,
     end: 100 / data.length * 8,
     orient:"horizontal",
-  };
+  }];
 
   if(across){
     _data.reverse();
@@ -91,10 +93,21 @@ export default function HistogramCategorical(props:Interface){
         }
       }
     });
-    /////////////////////////
-    dataZoom.orient = "vertical";
-    dataZoom.start = 100;
-    dataZoom.end = 100 - 100 / data.length * 8;
+
+    dataZoom[0].orient = "vertical";
+    dataZoom[0].start = 100;
+    dataZoom[0].end = 100 - 100 / data.length * 7;
+    dataZoom[0].maxValueSpan = 15;
+    if(data.length>7){
+      dataZoom.push({
+        type:"slider",
+        filterMode: 'none',
+        rangeMode: ['percent', 'percent'],
+        // zoomLock:true,
+        // maxSpan:50,
+        orient:"vertical",
+      })
+    }
   }
 
   const option = {
@@ -113,7 +126,7 @@ export default function HistogramCategorical(props:Interface){
       }
     },
     toolbox:{
-      show : data.length>8,
+      show : data.length>(across?7:8),
       right:30,
       itemSize:20,
       feature : {
@@ -139,17 +152,22 @@ export default function HistogramCategorical(props:Interface){
       nameTextStyle,
       type: across?'category':"value",
       data: across?xAxisName.reverse():null,
+      axisLabel:{
+        interval:0,
+        rotate:across?45:0,
+      },
     },
     dataZoom,
     grid:{
-      x:`${Math.floor(+max+1)}`.length * 10 +20,
+      left:across?Math.max(Math.max(...xAxisName.map(itm=>itm.length))*6,35):`${Math.floor(+max+1)}`.length * 10 +20,
     },
     series,
+    animation:false,
   };
 
   return <ReactEcharts
     option={option}
-    style={{height:"100%", width:"100%"}}
+    style={{height, width}}
     notMerge={true}
     lazyUpdate={true}
     theme="customed"

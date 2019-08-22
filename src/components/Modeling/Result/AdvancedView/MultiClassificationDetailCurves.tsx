@@ -18,6 +18,7 @@ import Thumbnail from './Thumbnail';
 import MulitiPredictTable from './MulitiPredictTable'
 import { MultiRoc } from '../../../Charts';
 import MultiReportTable from './MulitiReportTable';
+import { toJS } from 'mobx';
 
 interface Interface {
   model: any
@@ -73,7 +74,7 @@ export default class MultiClassificationDetailCurves extends Component<Interface
         curComponent = show && <MultiRoc chartData={isHoldout?holdoutChartData:chartData}/>;
         break;
       case EN.ConfusionMatrix:
-        curComponent = <MulitiPredictTable project={project} data={isHoldout?holdoutConfusion:validateConfusion}/>;
+        curComponent = <MulitiPredictTable project={project} data={isHoldout?toJS(holdoutConfusion):toJS(validateConfusion)}/>;
         break;
       case EN.Report:
         curComponent = <MultiReportTable data={isHoldout?holdoutReport:validateReport}/>;

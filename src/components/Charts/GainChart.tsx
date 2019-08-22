@@ -1,16 +1,25 @@
 import React from 'react'
 import ReactEcharts from 'echarts-for-react';
 
-export default function GainChart(props){
+interface Interface {
+	x_name:string
+	y_name:string
+	width?:number
+	height?:number
+	model:any
+	isHoldout:boolean
+}
+
+export default function GainChart(props:Interface){
 	const {x_name='',y_name='',width=600,height=400,model,isHoldout} = props;
 	const {holdoutChartData,chartData} = model;
 	const {lift={}} = isHoldout?holdoutChartData:chartData;
 
 	const data =  Object.values(lift.GAIN||{})
 		.map((itm,index)=>[(index+1)*10,itm]);
-	
+
 	data.unshift([0,0]);
-	
+
 	const option = {
 		xAxis: {
 			name:x_name,

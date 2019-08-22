@@ -3,7 +3,15 @@ import ReactEcharts from 'echarts-for-react';
 import './echarts.config'
 import {toJS} from "mobx";
 
-export default function TSENOne(props){
+interface Interface {
+	x_name:string
+	y_name:string
+	data:any
+	width?:number
+	height?:number
+}
+
+export default function TSENOne(props:Interface){
 	const {x_name='',y_name='',data={},width=400,height=350} = props;
 	const nameTextStyle = {
 		color:'#000',

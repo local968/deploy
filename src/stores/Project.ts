@@ -271,7 +271,8 @@ class Project {
   @observable nullFillMethodTemp: StringObject = {};
   @observable outlierFillMethodTemp: StringObject = {};
   @observable outlierDictTemp: unknown = {};
-  @observable deleteColumns: string[] = []
+  @observable deleteColumns: string[] = [];
+  @observable m_cro: string = "macro";
 
   // train
   // 训练状态
@@ -607,7 +608,7 @@ class Project {
         'random_forest',
         'sgd',
         'xgradient_boosting',
-        'r2-logistics',
+        // 'r2-logistics',
       ]
     }
     return algorithms.filter(a => !disableList.includes(a))
@@ -616,6 +617,10 @@ class Project {
   @computed
   get defaultTrain() {
     const measurement = this.problemType === 'Classification' && 'auc' || this.problemType === 'Regression' && 'r2' || this.problemType === 'Clustering' && 'CVNN' || this.problemType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
+    const version = [1, 2]
+
+    if (this.problemType === 'Classification' || this.problemType === 'Regression') version.push(4)
+    const min = (this.problemType === 'Classification' || this.problemType === 'MultiClassification') ? Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, this.targetUnique)) : Infinity
 
     return {
       train2Finished: false,
@@ -629,14 +634,14 @@ class Project {
       randSeed: 0,
       resampling: 'no',
       runWith: this.totalLines < 10000 ? 'cross' : 'holdout',
-      crossCount: 5,
+      crossCount: Math.min(min - 1, 5),
       dataRange: 'all',
       customField: '',
       customRange: [],
       algorithms: this.defaultAlgorithms,
       measurement,
       selectId: '',
-      version: [1, 2, 4],
+      version,
       trainHeader: [],
       customHeader: [],
       newVariable: [],
@@ -796,6 +801,11 @@ class Project {
   };
 
   @action
+  upM_cro(mc) {
+    this.m_cro = mc;
+  }
+
+  @action
   upIsHoldout(isHoldout: boolean) {
     // if(this.problemType === "Classification"){
     //   const {chartData,holdoutChartData,fitIndex} = this.selectModel;
@@ -920,7 +930,7 @@ class Project {
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      await this.abortTrainByEtl(false)
+      await this.abortTrainByEtl()
       if (this.originalIndex) await this.deleteIndex(this.originalIndex)
       if (this.etlIndex) await this.deleteIndex(this.etlIndex)
       this.models = []
@@ -943,7 +953,7 @@ class Project {
   @action
   fastTrackInit = async (data: UploadProps) => {
 
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.originalIndex) await this.deleteIndex(this.originalIndex)
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
@@ -1054,7 +1064,7 @@ class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -1083,8 +1093,9 @@ class Project {
     if (isMulti) data.targetUnique = this.targetUnique
     if (this.noComputeTemp || isAssociation) {
       if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
+        const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 100), 3) : 3
         const min = Math.min(...Object.values(this.targetCounts).sort((a, b) => b - a).slice(0, this.targetUnique))
-        if (min < 3) {
+        if (min < defaultCount) {
           console.error("数量太小");
           return await Promise.reject()
         }
@@ -1149,7 +1160,7 @@ class Project {
   endQuality = async () => {
     if (!this.qualityHasChanged) return
     this.etling = true
-    await this.abortTrainByEtl(false)
+    await this.abortTrainByEtl()
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -1174,8 +1185,9 @@ class Project {
     }
 
     if (this.problemType === 'Classification' || this.problemType === 'MultiClassification') {
+      const defaultCount = this.problemType === 'MultiClassification' ? Math.max(Math.ceil(this.totalLines / 100), 3) : 3
       const min = Math.min(...Object.values(this.targetCounts))
-      if (min < 3) {
+      if (min < defaultCount) {
         console.error("数量太小");
         return Promise.reject()
       }
@@ -1590,7 +1602,8 @@ class Project {
     if (problemType === 'Association') return this.models
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score' || problemType === 'MultiClassification' && 'macro_auc')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
-    const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+    // const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
+    const currentModels = models
 
     return (!currentModels.length ? models : currentModels)
       .map(m => {
@@ -1606,10 +1619,10 @@ class Project {
         } else if (problemType === 'Clustering' || problemType === 'Outlier') {
           validate = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
           holdout = Reflect.get(score, currentMeasurement) || Infinity //score[currentMeasurement]
-        } else if (problemType === 'Classification') {
+        } else if (problemType === 'MultiClassification') {
           const [t, p] = currentMeasurement.split("_")
-          validate = currentMeasurement === 'measurement' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
-          holdout = currentMeasurement === 'measurement' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          validate = currentMeasurement === 'macro_auc' ? chartData.roc_auc.macro : p === 'f1' ? validateScore[`${t}_F1`] : validateScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
+          holdout = currentMeasurement === 'macro_auc' ? holdoutChartData.roc_auc.macro : p === 'f1' ? holdoutScore[`${t}_F1`] : holdoutScore[`${t}_${p.slice(0, 1).toUpperCase()}`]
         }
         if (isNaN(+(validate)) || isNaN(+(holdout))) return null
         return { id: m.id, value: validate + holdout }
@@ -1818,7 +1831,7 @@ class Project {
           featureLabel,
           targetLabel: [target],
           projectId: id,
-          version: '1,2,3,4',
+          version: '1,2,3',
           command,
           sampling: 'no',
           speedVSaccuracy: 5,
@@ -1845,7 +1858,7 @@ class Project {
             'random_forest',
             'sgd',
             'xgradient_boosting',
-            'r2-logistics',
+            // 'r2-logistics',
           ],
           featuresPreprocessor: ['Extra Trees', 'Random Trees', 'Fast ICA', 'Kernel PCA', 'PCA', 'Polynomial', 'Feature Agglomeration', 'Kitchen Sinks', 'Linear SVM', 'Nystroem Sampler', 'Select Percentile', 'Select Rates'].map(fe => Reflect.get(formatFeature('Classification'), fe)),
           esIndex: this.etlIndex,
@@ -2112,14 +2125,16 @@ class Project {
       train2Error: false,
       selectId: '',
       settings: this.settings,
-      settingId: this.settingId
+      settingId: this.settingId,
+      associationOption: this.associationOption
     }, this.nextSubStep(2, 3))
     this.models = []
     // socketStore.ready().then(api => api.train({...trainData, data: updateData,command: "clfreg.train"}, progressResult => {
     socketStore.ready().then(api => api.train({ ...trainData, data: updateData })).then(returnValue => {
-      const { status, message } = returnValue
+      const { status, result } = returnValue
       if (status !== 200) {
-        antdMessage.error(message)
+        console.log(result['processError'])
+        antdMessage.error(result['processError'])
       }
     })
   }
@@ -2127,7 +2142,7 @@ class Project {
   newSetting = () => {
     const { problemType, dataHeader, newVariable, targetCounts, trainHeader, defaultAlgorithms, informativesLabel } = this;
     const featureLabel = [...dataHeader, ...newVariable].filter(h => !trainHeader.includes(h))
-    const min = problemType === 'Classification' ? Math.min(...Object.values(targetCounts)) : Infinity
+    const min = (problemType === 'Classification' || problemType === 'MultiClassification') ? Math.min(...Object.values(targetCounts)) : Infinity
 
 
     switch (problemType) {
@@ -2208,14 +2223,13 @@ class Project {
     })
   }
 
-  abortTrain = (stopId: string, isModeling: boolean = true) => {
+  abortTrain = (stopId: string) => {
     if (!stopId) return Promise.resolve()
     // if (this.isAbort) return Promise.resolve()
     const command = {
-      command: 'stop',
+      command: 'top.stop',
       action: 'train',
       projectId: this.id,
-      isModeling,
       stopId
     }
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
@@ -2226,13 +2240,13 @@ class Project {
     }))
   }
 
-  abortTrainByEtl = async (isModeling: boolean = true) => {
+  abortTrainByEtl = async () => {
     // this.models = []
     this.isAbort = true
     // const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        await this.abortTrain(si, isModeling)
+        await this.abortTrain(si)
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
@@ -2332,10 +2346,11 @@ class Project {
   }
 
   correlationMatrix = () => {
+    if (this.problemType === 'Association') return Promise.resolve();
     if (this.correlationMatrixData) return Promise.resolve();
     if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
-      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw'&&h!==this.target);
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target);
       if (this.target) featureLabel.push(this.target);
       const command = {
         command: 'top.correlationMatrix',
@@ -2840,25 +2855,17 @@ class Project {
 
   //在这里获取所以直方图折线图数据
   allVariableList = async (model: any) => {
-    const { target, colType, etlIndex, dataHeader, newVariable, preImportance, trainHeader, informativesLabel } = this;
-
-    console.log(informativesLabel, 'informativesLabel');
+    const { target, correlationMatrixData, dataHeader, newVariable, preImportance, trainHeader } = this;
 
     const list = [];
     list.push(await this.histogram(target));
 
-    const fields = Object.entries(toJS(colType))
-      .filter(itm => itm[1] === 'Numerical')
-      .map(itm => itm[0]);
-
     list.push({
       name: 'correlation-matrix',
       data: {
-        fields,
-        id: etlIndex,
+        url: correlationMatrixData
       }
     });
-
 
     const allVariables = [...dataHeader.filter(h => h !== target), ...newVariable];
     const checkedVariables = allVariables.filter(v => !trainHeader.includes(v));

@@ -2,48 +2,48 @@ import React, { useEffect, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config';
 import { Switch } from 'antd';
-import EN from "../../constant/en";
+import EN from '../../constant/en';
+import _ from 'lodash';
+import { toJS } from 'mobx';
 
 interface Interface {
   height?;
   width?;
-  message:any
+  message: any;
 }
 
 export default function CorrelationMatrixs(props: Interface) {
-  const { message, height = 400, width = 500 } = props;
+  const { message, height = 500, width = 600 } = props;
 
-  const {header, data, target} = message;
-
+  const { header, data, target } = message;
   const [show, upShow] = useState(!!target);
   const [_data, upData] = useState([]);
   const [fields, upFields] = useState(message.fields);
 
-
-	useEffect(()=>{
-	  const _fields = message.fields;
-  	if(show){
-		  _fields.push(target);
-	  }
+  useEffect(() => {
+    const _fields = _.cloneDeep(toJS(message.fields));
+    if (show) {
+      _fields.push(target);
+    }
     let _index = -1;
-  	const __data = [];
-    data.forEach((itm, index) => {
-      if (_fields.includes(header[index])) {
+    const __data = [];
+    _.forEach(data, (itm, index) => {
+      if (_.includes(_fields, header[index])) {
         _index++;
         let _ind = _fields.length;
-        itm.forEach((it, ind) => {
+        _.forEach(itm, (it, ind) => {
           if (_fields.includes(header[ind])) {
             _ind--;
-            __data.push([_index, _ind, it]);
+            __data.push([_ind, _index, it]);
           }
         });
       }
     });
     upData(__data.map(item => [item[1], item[0], item[2] || '-']));
     upFields(_fields);
-  },[show]);
+  }, [show]);
 
-  const len = Math.max(...header.map(itm => itm.length), 0);
+  const len = _.max([...header.map(itm => itm.length), 0]);
   const nameTextStyle = {
     color: '#000',
   };
@@ -103,8 +103,9 @@ export default function CorrelationMatrixs(props: Interface) {
     },
     animation: true,
     grid: {
-      x: 8 * len + 10,
-      y: 4 * len + 20,
+      left: 8 * len + 10,
+      top: 4 * len + 20,
+      right:100,
     },
     xAxis: {
       type: 'category',
@@ -121,17 +122,31 @@ export default function CorrelationMatrixs(props: Interface) {
       data: [...fields].reverse(),
       nameTextStyle,
     },
+    dataZoom: [
+      {
+        type: 'slider',
+        // filterMode: 'none',
+        rangeMode: ['percent', 'percent'],
+      },
+      {
+        type: 'slider',
+        // filterMode: 'none',
+        rangeMode: ['percent', 'percent'],
+        orient: 'vertical',
+        right:0,
+      },
+    ],
     visualMap: {
       min: -1,
       max: 1,
       calculable: true,
       orient: 'vertical',
-      left: 'right',
       bottom: 'center',
       precision: 1,
       itemHeight: 280,
       inRange: { color: ['#80BDFD', '#fff', '#B0E39B'] },
       align: 'bottom',
+      right:40,
     },
     series,
   };
@@ -139,18 +154,17 @@ export default function CorrelationMatrixs(props: Interface) {
     <section>
       <ReactEcharts
         option={option}
-        style={{ height: height + 6 * len, width: width + 6 * len }}
+        style={{ height: height + 10 * len, width: width + 10 * len }}
         notMerge={true}
         lazyUpdate={true}
         theme="customed"
       />
-      {target&&<div>
-        <Switch
-          checked={show}
-          onClick={upShow}
-        />
-        {EN.DisplayTargetVariable}
-      </div>}
+      {target && (
+        <div>
+          <Switch checked={show} onClick={upShow} />
+          {EN.DisplayTargetVariable}
+        </div>
+      )}
     </section>
   );
 }

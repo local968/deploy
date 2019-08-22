@@ -61,12 +61,16 @@ const Association = (props: AssociationProps) => {
     <div className={styles.main}>
       <div className={styles.title}><span>{EN.AssociateRules}</span></div>
       <div className={styles.buttons}>
-        <div className={styles.button}>
-          <a style={{ display: 'flex' }} target='_blank' href={`/upload/download/association?projectId=${id}&modelId=${mid}&filename=${encodeURIComponent(`${realName}-${mid}.csv`)}`}>
+        <div className={classnames(styles.button, {
+          [styles.disabled]: !texts.length
+        })}>
+          {!texts.length ? <span>{EN.AssociateExport}</span> : <a style={{ display: 'flex' }} target='_blank' href={`/upload/download/association?projectId=${id}&modelId=${mid}&filename=${encodeURIComponent(`${realName}-${mid}.csv`)}`}>
             <span>{EN.AssociateExport}</span>
-          </a>
+          </a>}
         </div>
-        <div className={styles.button} onClick={changeVisible}><span>{EN.AssociatePlots}</span></div>
+        <div className={classnames(styles.button, {
+          [styles.disabled]: !texts.length
+        })} onClick={changeVisible}><span>{EN.AssociatePlots}</span></div>
         <div className={styles.button} onClick={remodel}><span>{EN.AssociateReModel}</span></div>
       </div>
       <div className={styles.content}>
@@ -75,12 +79,12 @@ const Association = (props: AssociationProps) => {
             return <li className={styles.row} key={k}>
               <span>{k + 1}: {t}</span>
             </li>
-          }) : EN.AssociateNotFind}
+          }) : <div className={styles.row}><span>{EN.AssociateNotFind}</span></div>}
         </div>
         <div className={classnames(styles.views, {
           [styles.viewsHidden]: !visible
         })}>
-          <div className={styles.view}>
+          {!!texts.length && <div className={styles.view}>
             <div className={styles.options}>
               <div className={styles.tabs}>
                 <div className={classnames(styles.tab, {
@@ -101,7 +105,7 @@ const Association = (props: AssociationProps) => {
                 />
               </div>
             </div>
-          </div>
+          </div>}
         </div>
         <div className={styles.empty} />
       </div>

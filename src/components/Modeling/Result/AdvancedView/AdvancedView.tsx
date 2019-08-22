@@ -181,9 +181,17 @@ const AdvancedView = (props: AdvancedViewProps) => {
       {problemType === 'Classification' && <ModelComp models={models} />}
     </div>
     <div className={styles.table}>
-      <AdvancedViewTable project={project} sort={sort} handleSort={handleSort} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+      <AdvancedViewTable
+        project={project}
+        sort={sort}
+        handleSort={handleSort}
+        metric={metric}
+        handleChange={handleChange}
+        models={models}
+        currentSettingId={currentSettingId}
+      />
     </div>
   </div>
-}
+};
 
 export default observer(AdvancedView)

@@ -1,3 +1,1 @@
-import AdvancedView from './AdvancedView'
-
-export default AdvancedView
+export {default} from './AdvancedView'

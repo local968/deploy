@@ -11,9 +11,9 @@ interface ResultProps {
 }
 
 const Result = (props: ResultProps) => {
-  const { resetSide, project } = props
-  const { problemType } = project
-  const isAssociation = problemType === 'Association'
+  const { resetSide, project } = props;
+  const { problemType } = project;
+  const isAssociation = problemType === 'Association';
   const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
   if (isAssociation) return <Association project={project} />
   return isUnsupervised ? <UnSupervised resetSide={resetSide} /> : <Supervised resetSide={resetSide} />

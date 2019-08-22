@@ -22,7 +22,8 @@ export default class Uploader extends Component {
     }
     if (onStart && typeof onStart === 'function') onStart({
       pause: this.pause,
-      resume: this.resume
+      resume: this.resume,
+      abort: this.abort
     })
     this.upload(file)
   }
@@ -59,7 +60,7 @@ export default class Uploader extends Component {
   }
 
   upload = file => {
-    const { params, onProgress, onError, onComplete, charset } = this.props;
+    const { params, onProgress, onError, onComplete, charset, afterClose } = this.props;
     axios.post(`/upload/check`, { fileSize: file.size, type: 'modeling', projectId: params.projectId }).then(response => {
       if (response.data.status !== 200) return onError(response.data.message)
       const token = response.data.token
@@ -75,7 +76,8 @@ export default class Uploader extends Component {
           token,
           fileSize: file.size,
           type: 'modeling'
-        }
+        },
+        afterClose: afterClose
       })
     })
   }
@@ -95,7 +97,8 @@ export default class Uploader extends Component {
       }
       if (onStart && typeof onStart === 'function') onStart({
         pause: this.pause,
-        resume: this.resume
+        resume: this.resume,
+        abort: this.abort
       })
       this.upload(file)
     }
@@ -118,6 +121,10 @@ export default class Uploader extends Component {
 
   pause = () => {
     this.uploader && this.uploader.pause()
+  }
+
+  abort = () => {
+    this.uploader && this.uploader.abort()
   }
 
   render() {

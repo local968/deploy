@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
-import { formatNumber } from 'util'
+import { formatNumber } from '../../../util'
 import EN from '../../../constant/en';
+interface Interface {
+  model:any
+}
 @observer
-export default class VariableImpact extends Component {
+export default class VariableImpact extends Component<Interface> {
   render() {
     const { model } = this.props;
     const { featureImportance } = model;
     const arr = Object.entries(featureImportance).sort(
-      (a, b) => b[1] - a[1]
+      (a:any, b:any) => b[1] - a[1]
     );
     return (
       <div className={styles.detail}>
@@ -17,7 +20,7 @@ export default class VariableImpact extends Component {
           <div className={styles.detailNone}>
             <span title={EN.VariableImpactnotavailableforthisalgorithm}>{EN.VariableImpactnotavailableforthisalgorithm}</span>
           </div>
-          : arr.map((row, index) => {
+          : arr.map((row:any, index) => {
             return (
               <div key={index} className={styles.detailRow}>
                 <div className={styles.detailName}>
