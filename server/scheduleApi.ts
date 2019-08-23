@@ -3,7 +3,10 @@ import wss from './webSocket';
 import moment from 'moment';
 import axios from 'axios';
 import config from '../config';
-const {restriction} = require("./apis/service/planService");
+import database, { uploadDatabase } from './routes/database'
+import { DatabaseConfig } from './routes/databases';
+
+const { restriction } = require("./apis/service/planService");
 const esServicePath = config.services.ETL_SERVICE; //'http://localhost:8000'
 const setSchedule = schedule => {
   const pipeline = redis.pipeline();
@@ -171,9 +174,9 @@ const api = {
     const fileId =
       source === 'database'
         ? await api.getDatabaseData(options, schedule, async ({ count }) => {
-            schedule.status = `${count} downloaded.`;
-            await api.upsertSchedule(schedule);
-          })
+          schedule.status = `${count} downloaded.`;
+          await api.upsertSchedule(schedule);
+        })
         : deployment[`${type}Options`].fileId;
     schedule.status = `checking user limitation.`;
     await api.upsertSchedule(schedule);
@@ -182,12 +185,12 @@ const api = {
       deployment[`${type}Options`].fileId = fileId;
       deployment[`${type}Options`].file = `${
         options.databaseType
-      }-${moment().unix()}`;
+        }-${moment().unix()}`;
       await redis.set(`deployment:${deploymentId}`, JSON.stringify(deployment));
     }
     if (!fileId) return restrictQuery;
     const count = await redis.get(restrictQuery);
-    const {userDeployRestriction} = await restriction();
+    const { userDeployRestriction } = await restriction();
     if (parseInt(count) + parseInt(lineCount) >= userDeployRestriction[level])
       return false;
     await redis.incrby(restrictQuery, lineCount);
@@ -214,7 +217,7 @@ const api = {
             name = JSON.parse(name);
             fitIndex = JSON.parse(fitIndex);
             chartData = JSON.parse(chartData);
-          } catch (e) {}
+          } catch (e) { }
           return { name, fitIndex, chartData };
         });
         const model = models.find(m => m.name === modelName) || {};
@@ -239,7 +242,7 @@ const api = {
           try {
             name = JSON.parse(name);
             rate = JSON.parse(rate);
-          } catch (e) {}
+          } catch (e) { }
           return { name, rate };
         });
         const model = models.find(m => m.name === modelName) || {};
@@ -257,7 +260,7 @@ const api = {
         let value = values[index];
         try {
           value = JSON.parse(value);
-        } catch (e) {}
+        } catch (e) { }
         start[k] = value;
         return start;
       }, {});
@@ -282,8 +285,8 @@ const api = {
     return await etl(schedule, index, projectId, modelName);
   },
 
-  getDatabaseData: async (message, schedule, onProgress) => {
-    const databaseConfig = {
+  getDatabaseData: async (message, schedule, progress) => {
+    const databaseConfig: DatabaseConfig = {
       type: message.databaseType,
       host: message.sqlHostName,
       port: parseInt(message.sqlPort),
@@ -296,42 +299,9 @@ const api = {
       mapHeader: message.mapHeader
     };
 
-    const indexResponse = await axios.get(`${esServicePath}/etls/createIndex`);
-    if (indexResponse.data.status !== 200) return indexResponse.data;
-    const index = indexResponse.data.index;
-
-    const uploadResponse = await axios.post(
-      `${esServicePath}/etls/database/${index}/upload`,
-      databaseConfig,
-    );
-    if (uploadResponse.data.status !== 200) return uploadResponse.data;
-    const opaqueId = uploadResponse.data.opaqueId;
-    const mapHeader = uploadResponse.data.rawHeader;
+    const mapHeader = await uploadDatabase(databaseConfig, progress)
     schedule.mapHeader = mapHeader
-    await api.upsertSchedule(schedule)
-
-    return await new Promise((resolve, reject) => {
-      let emptyCount = 0;
-      const interval = setInterval(async () => {
-        const countReponse = await axios.get(
-          `${esServicePath}/etls/${index}/count`,
-        );
-        if (countReponse.data.status === 200)
-          onProgress({ count: countReponse.data.count });
-        const { data } = await axios.get(
-          `${esServicePath}/etls/getTaskByOpaqueId/${opaqueId}`,
-        );
-        if (data.task) emptyCount = 0;
-        else {
-          emptyCount++;
-          if (emptyCount > 10) {
-            clearInterval(interval);
-            // await redis.incrby(`user:${userId}:upload`, parseInt(size))
-            resolve(index);
-          }
-        }
-      }, 1000);
-    });
+    api.upsertSchedule(schedule)
   },
   getLineCount: async index => {
     const { data } = await axios.get(`${esServicePath}/etls/${index}/count`);
@@ -361,7 +331,7 @@ const etl = async (schedule, index, projectId, modelName) => {
   problemType = JSON.parse(problemType)
 
   const mappingResponse = await
-  axios.get(`${esServicePath}/etls/${index}/header`)
+    axios.get(`${esServicePath}/etls/${index}/header`)
   const dataHeader = mappingResponse.data.split(',')
   const headerArray = dataHeader.filter(h => h !== '__no')
   Object.keys(stats).forEach(key => {
@@ -373,11 +343,13 @@ const etl = async (schedule, index, projectId, modelName) => {
   });
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
     === -1)
-  if(lackHeaders.length > 0) {
+  if (lackHeaders.length > 0) {
     schedule.status = 'issue';
     schedule.updatedDate = moment().unix();
-    schedule.result = { ['processError']: `column "${lackHeaders.map(k =>
-      mapHeader[k]).join(',')}" not in data` };
+    schedule.result = {
+      ['processError']: `column "${lackHeaders.map(k =>
+        mapHeader[k]).join(',')}" not in data`
+    };
     await api.upsertSchedule(schedule);
     return false
   }
@@ -396,7 +368,7 @@ const etl = async (schedule, index, projectId, modelName) => {
         const status = data.task.status;
         const progress =
           (100 * (status.created + status.deleted)) / status.total || 0;
-        if(progress !== 0) {
+        if (progress !== 0) {
           schedule.status = `ETL: ${progress.toFixed(2)}%`;
           await api.upsertSchedule(schedule);
         }

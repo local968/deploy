@@ -43,6 +43,10 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
     encode: message.sqlEncoding,
   };
 
+  uploadDatabase(databaseConfig, progress)
+});
+
+export const uploadDatabase = async (databaseConfig: DatabaseConfig, progress) => {
   const indexResponse = await axios.get(`${esServicePath}/etls/createIndex`);
   if (indexResponse.data.status !== 200) return indexResponse.data;
   const index = indexResponse.data.index;
@@ -98,15 +102,6 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
       }, 1000);
     })
   }
-  // const uploadResponse = await axios.post(
-  //   `${esServicePath}/etls/database/${index}/upload`,
-  //   databaseConfig,
-  // );
-  // if (uploadResponse.data.status !== 200) return uploadResponse.data;
-  // const rawHeader = uploadResponse.data.rawHeader;
-  // const opaqueId = uploadResponse.data.opaqueId;
-
-  ;
-});
+}
 
 export default {};
