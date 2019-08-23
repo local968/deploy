@@ -19,7 +19,7 @@ export default class Thumbnail extends Component<Interface>{
     const { curSelected, value } = this.props;
     this.setState({ clickActive: curSelected === value });
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { curSelected, value } = nextProps;
     this.setState({ clickActive: curSelected === value });
   }

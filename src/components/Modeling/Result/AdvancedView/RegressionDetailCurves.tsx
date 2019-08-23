@@ -56,7 +56,7 @@ class RegressionDetailCurves extends Component<RegressionDetailCurvesProps> {
     this.setChartDate();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.isHoldout !== this.props.project.isHoldout) {
       this.setState(
         {

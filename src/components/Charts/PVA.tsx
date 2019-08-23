@@ -38,7 +38,7 @@ export default class PVA extends Component<DataSampleProps>{
 		};
 	}
 
-	componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
 		const {model} = this.props as any;
 		if(nextProps.model.validatePlotData !== model.validatePlotData){
 			return this.componentDidMount(nextProps.model);

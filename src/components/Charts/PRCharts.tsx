@@ -27,7 +27,7 @@ export default class PRCharts extends PureComponent<DataSampleProps>{
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),300);
 	}
 
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		const {isHoldout} = this.props.project;
 		const {startIndex} = this.state;
 		if(nextProps.isHoldout!==isHoldout||nextProps.model.fitIndex!==startIndex){

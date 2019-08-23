@@ -14,7 +14,7 @@ class ProcessLoading extends Component {
     this.setProgress(props.progress)
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     this.setProgress(props.progress)
   }
 

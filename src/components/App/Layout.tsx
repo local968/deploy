@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import { withRouter } from 'react-router';
+import { withRouter } from 'react-router-dom';
 import Route from 'components/App/Route';
 
 import LoginRouter from 'components/App/LoginRoute';

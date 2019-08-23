@@ -9,7 +9,7 @@ import helpActive from './icon-help-active.svg';
 import community from './community.png'
 import switchIcon from './switch.svg';
 import { inject, observer } from 'mobx-react';
-import { withRouter } from 'react-router';
+import { withRouter } from 'react-router-dom';
 import EN from '../../../constant/en';
 import { Icon } from 'antd';
 import axios from 'axios';

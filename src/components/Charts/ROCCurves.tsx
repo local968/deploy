@@ -26,7 +26,7 @@ export default class ROCCurves extends PureComponent<Interface>{
 		this.updatePoint = _.debounce(this.updatePoint.bind(this),200);
 	}
 
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		const {isHoldout} = this.props;
 		const {startIndex} = this.state;
 
