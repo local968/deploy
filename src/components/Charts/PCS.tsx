@@ -1,45 +1,29 @@
-import React,{PureComponent} from 'react'
+import React, { useContext } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
 import EN from "../../constant/en";
 import config from 'config'
-import { inject } from 'mobx-react';
+import { MobXProviderContext } from 'mobx-react';
 const {isEN} = config;
 
-interface DataSampleProps {
+interface Interface {
 	data:any
 	x_name:string
 	y_name:string
 	fields:any
-	projectStore?:any
 }
-@inject('projectStore')
-export default class PCS extends PureComponent<DataSampleProps>{
-	private chart: any;
-	constructor(props){
-		super(props);
-		this.chart = React.createRef();
-	}
 
-	componentDidMount() {
-		const chart = this.chart.getEchartsInstance();
-		chart.showLoading();
-	}
+export default function PCS(props:Interface) {
+	const {data=[],x_name='',y_name='',fields} = props;
+	const {projectStore:{project:{mapHeader}}} = useContext(MobXProviderContext);
 
-	getOption() {
-		const {data=[],x_name='',y_name='',fields,projectStore:{project:{mapHeader}}} = this.props;
+	let option:any = {
+		xAxis:{},
+		yAxis:{},
+	};
 
-		if(data.length){
-			const chart = this.chart.getEchartsInstance();
-			chart.hideLoading();
-		}else{
-			return {
-				xAxis:{},
-				yAxis:{},
-			}
-		}
-
-		return {
+	if(data.length){
+		option =  {
 			xAxis: {
 				max:1,
 				min:-1,
@@ -60,9 +44,6 @@ export default class PCS extends PureComponent<DataSampleProps>{
 					onZero:false
 				},
 			},
-			// grid:{
-			// 	x:10,
-			// },
 			title: {
 				text: EN.PCSTitle,
 				textStyle:{
@@ -112,14 +93,11 @@ export default class PCS extends PureComponent<DataSampleProps>{
 		};
 	}
 
-	render(){
-		return <ReactEcharts
-			option={this.getOption()}
-			ref = {chart=>this.chart=chart}
-			style={{height: 360, width: 300}}
-			notMerge={true}
-			lazyUpdate={true}
-			theme='customed'
-		/>
-	}
+	return <ReactEcharts
+		option={option}
+		style={{height: 360, width: 300}}
+		notMerge={true}
+		lazyUpdate={true}
+		theme='customed'
+	/>
 }
