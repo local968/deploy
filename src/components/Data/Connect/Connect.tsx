@@ -355,7 +355,6 @@ export default class DataConnect extends Component<DataConnectProps> {
             this.hideSql();
             this.isSql = true;
             this.uploading = true;
-            let processInterval;
             const api = await socketStore.ready();
             this.process = 0;
             const resp = await api.downloadFromDatabase(
@@ -365,11 +364,9 @@ export default class DataConnect extends Component<DataConnectProps> {
                 if (res.count) this.sqlProgress = res.count;
               }),
             );
-            clearInterval(processInterval);
             if (resp.status !== 200) {
               this.process = 0;
               this.uploading = false;
-
               window.alert(resp.message)
               return
               // message.destroy();

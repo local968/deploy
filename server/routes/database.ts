@@ -2,7 +2,7 @@ import wss from '../webSocket';
 import axios from 'axios';
 import uuid from 'uuid/v4'
 import config from '../../config';
-import { DatabaseConfig, checks, uploads, oracleUpload } from './databases'
+import { DatabaseConfig, checks, uploads, oracleUpload, mysqlUpload } from './databases'
 const esServicePath = config.services.ETL_SERVICE;
 
 wss.register('checkDatabase', async (message = {}) => {
@@ -47,9 +47,10 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
   if (indexResponse.data.status !== 200) return indexResponse.data;
   const index = indexResponse.data.index;
   const opaqueId = uuid()
-  if (databaseConfig.type === 'oracle') {
+  if (databaseConfig.type === 'oracle' || databaseConfig.type === 'mysql') {
+    const upload = ({ oracle: oracleUpload, mysql: mysqlUpload })[databaseConfig.type]
     try {
-      for await (let count of oracleUpload(index, databaseConfig, opaqueId)) {
+      for await (let count of upload(index, databaseConfig, opaqueId)) {
         if (Array.isArray(count)) return {
           status: 200,
           message: 'ok',

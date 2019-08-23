@@ -70,6 +70,7 @@ const fetchOracleData = async function (token): Promise<string> {
 }
 
 const uploadCsv = async (csv: string, index: string, opaqueId: string) => await axios.request({
+
   url: `${esServicePath}/etls/${index}/upload?opaqueId=${opaqueId}`,
   headers: {
     'Content-Type': "text/plain",
@@ -97,7 +98,7 @@ export const oracleUpload = async function* (index: string, setting: DatabaseCon
           return newRow
         })
         const csv = Papa.unparse(finalData)
-        for (let uploadErrorTimes = 0; uploadErrorTimes < 5;) {
+        for (let uploadErrorTimes = 0; uploadErrorTimes < 10;) {
           try {
             const uploadResponse = await uploadCsv(csv, index, opaqueId)
             yield no
@@ -107,6 +108,7 @@ export const oracleUpload = async function* (index: string, setting: DatabaseCon
           } catch (error) {
             console.error(error)
             uploadErrorTimes++
+            if (uploadErrorTimes >= 8) throw { status: 400, message: 'exceed max upload try times.', error: 'exceed max upload try times.' }
           }
         }
       }
@@ -114,6 +116,7 @@ export const oracleUpload = async function* (index: string, setting: DatabaseCon
       // for of ignore return value
       return
     } catch (error) {
+      if (error.status && error.status === 400) throw error
       times++
     }
   }

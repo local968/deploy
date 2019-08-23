@@ -6,6 +6,7 @@ import { mysqlCheck, mysqlUpload } from './mysql'
 import { hiveCheck, hiveUpload } from './hive'
 import { oracleCheck } from './oracle'
 export { oracleUpload } from './oracle'
+export { mysqlUpload } from './mysql'
 
 const REQUEST_START = '1'
 const REQUEST_CONTINUE = '2'
@@ -26,7 +27,7 @@ export interface DatabaseConfig {
 
 const router = Router()
 
-export const uploads: { [x: string]: (index: string, setting: DatabaseConfig, opaqueId: string) => Promise<{ status: number, message: string, rawHeader: string[], error?: any }> } = { mysqlUpload, hiveUpload }
+export const uploads: { [x: string]: (index: string, setting: DatabaseConfig, opaqueId: string) => Promise<{ status: number, message: string, rawHeader: string[], error?: any }> } = { hiveUpload }
 
 export const checks: { [x: string]: (setting: DatabaseConfig) => Promise<void> } = { mysqlCheck, oracleCheck, hiveCheck }
 
