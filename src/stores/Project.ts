@@ -1002,16 +1002,17 @@ class Project {
     const temp: NumberObject = {};
     const header = this.mapHeader.map((h, i) => {
       h = h.trim();
+      let _h = h
       if (/^$/.test(h)) {
-        h = `Unnamed: ${i}`;
+        _h = `Unnamed: ${i}`;
       }
       if (!temp[h]) {
         temp[h] = 1;
       } else {
-        h = h + '.' + temp[h];
+        _h = h + '.' + temp[h];
         temp[h]++;
       }
-      return h;
+      return _h;
     });
 
     // 上传文件，target为空
