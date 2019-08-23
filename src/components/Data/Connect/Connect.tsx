@@ -82,9 +82,9 @@ export default class DataConnect extends Component<DataConnectProps> {
     this.file = null;
     this.process = 0;
     this.uploading = false;
-
-    message.destroy();
-    message.error(error.toString());
+    window.alert(error.toString())
+    // message.destroy();
+    // message.error(error.toString());
     console.log(error, times);
   });
 
@@ -370,8 +370,10 @@ export default class DataConnect extends Component<DataConnectProps> {
               this.process = 0;
               this.uploading = false;
 
-              message.destroy();
-              return message.error(resp.message);
+              window.alert(resp.message)
+              return
+              // message.destroy();
+              // return message.error(resp.message);
             }
             this.process = 50;
             project
