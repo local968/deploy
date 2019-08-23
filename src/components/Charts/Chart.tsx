@@ -26,9 +26,9 @@ export default function Chart(props){
 	switch (name) {
 		case 'correlation-matrix':
 			const { header } = data;
-			const {colType,trainHeader,dataHeader} = project;
+			const {colType,trainHeader,dataHeader,dataViews} = project;
 			const fields = Object.entries(colType)
-				.filter(itm => itm[1] !== 'Raw'&&itm[0]!==target)
+				.filter(itm => itm[1] !== 'Raw'&&itm[0]!==target&&!(itm[1] === 'Categorical'&&dataViews[itm[0]].uniqueValues === 1))
 				.map(itm => itm[0])
 				.filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm))
 				.map(itm => mapHeader[itm]);

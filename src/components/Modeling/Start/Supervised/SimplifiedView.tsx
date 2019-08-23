@@ -97,14 +97,14 @@ export default class SimplifiedView extends Component<Interface> {
 
   showCorrelationMatrix = () => {
     const { project } = this.props;
-    const {target,mapHeader,correlationMatrixData} = project;
+    const {target,mapHeader,correlationMatrixData,dataViews} = project;
 
     const colType = toJS(project.colType);
     const trainHeader = toJS(project.trainHeader);
     const dataHeader = toJS(project.dataHeader);
 
     const fields = Object.entries(colType)
-      .filter(itm => itm[1] !== 'Raw'&&itm[0]!==target)
+      .filter(itm => itm[1] !== 'Raw'&&itm[0]!==target&&!(itm[1] === 'Categorical'&&dataViews[itm[0]].uniqueValues === 1))
       .map(itm => itm[0])
       .filter(itm => !trainHeader.includes(itm) && dataHeader.includes(itm))
       .map(itm => mapHeader[itm]);

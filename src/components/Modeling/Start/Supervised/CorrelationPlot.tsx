@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { Component } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import { CorrelationMatrixs } from '../../../Charts';
 import { Icon } from 'antd';
@@ -12,16 +12,15 @@ interface Interface {
     fields:Array<string>
   }
 }
-@observer
-export default class CorrelationPlot extends Component<Interface> {
-  render() {
-    const { onClose, CorrelationMatrixData } = this.props;
-    return (
-      <div className={styles.correlationPlot}>
-        <div
-          onClick={onClose}
-          style={{ zIndex: 5 }}
-          className={styles.plotClose}><span>
+
+const CorrelationPlot = observer((props:Interface)=>{
+  const { onClose, CorrelationMatrixData } = props;
+  return (
+    <div className={styles.correlationPlot}>
+      <div
+        onClick={onClose}
+        style={{ zIndex: 5 }}
+        className={styles.plotClose}><span>
           <Icon
             style={{
               float: 'right',
@@ -34,10 +33,10 @@ export default class CorrelationPlot extends Component<Interface> {
           />
           </span></div>
 
-        <CorrelationMatrixs
-          message={CorrelationMatrixData}
-        />
-      </div>
-    )
-  }
-}
+      <CorrelationMatrixs
+        message={CorrelationMatrixData}
+      />
+    </div>
+  )
+});
+export default CorrelationPlot;
