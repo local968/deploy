@@ -240,7 +240,6 @@ export default class VariableList extends Component<Interface> {
                     <Chart
                       x_name={newMapHeader[target]}
                       y_name={'count'}
-                      title={`Feature:${target}`}
                       data={top1}
                       project={project}
                     />

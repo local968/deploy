@@ -26,7 +26,7 @@ interface AdvancedViewProps {
 }
 
 const AdvancedView = (props: AdvancedViewProps) => {
-  const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange } = props
+  const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange } = props;
   const { selectModel, problemType, train2Finished, metricCorrection, fbeta } = project;
 
   const performance = useMemo(() => {

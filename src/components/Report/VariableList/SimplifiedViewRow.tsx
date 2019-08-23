@@ -112,7 +112,6 @@ class SimplifiedViewRow extends Component<Interface> {
                 <Chart
                   x_name={mapHeader[value]}
                   y_name={'count'}
-                  title={`Feature:${value}`}
                   data={chartDatas[0]}
                   project={project}
                 />

@@ -1,8 +1,14 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
-
-export default function PIE(props){
+interface Interface {
+	width?:number
+	height?:number
+	RowsWillBeFixed
+	RowsWillBeDeleted
+	CleanData
+}
+export default function PIE(props:Interface){
 		const {width=120,height=120,RowsWillBeFixed,RowsWillBeDeleted,CleanData} = props;
 		const option = {
 			tooltip : {

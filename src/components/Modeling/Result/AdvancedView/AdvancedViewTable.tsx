@@ -33,8 +33,8 @@ export interface TableHeader {
 }
 
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {
-  const { project, sort, handleSort, metric, handleChange, models, currentSettingId } = props
-  const { problemType } = project
+  const { project, sort, handleSort, metric, handleChange, models, currentSettingId } = props;
+  const { problemType } = project;
   const [fbeta, setFbeta] = useState(project.fbeta);
 
   const handleBeta = value => {
