@@ -384,7 +384,7 @@ router.get('/download/result', async (req, res) => {
           const headerTexts = [
             ...header.map(h => mapHeader[h]),
             ...Object.keys(row).map(v =>
-              v.startsWith(`${target}_`) ? v.replace(target, mapHeader[target]) : v,
+              (v.startsWith(`${target}_`) || v === target) ? v.replace(target, mapHeader[target]) : v,
             ),
           ].filter(key => key !== '__no');
           res.write(Papa.unparse([headerTexts, []], { header: false }));
@@ -742,7 +742,7 @@ function scheduleDownloadCsv(
           const headerTexts = [
             ...header.filter(key => !(key === '__no' || key.toString() === '-1')).map(h => mapHeader[h]),
             ...Object.keys(row).map(v =>
-              target && v.startsWith(`${target}_`) ? v.replace(target, mapHeader[target]) : v
+              target && (v.startsWith(`${target}_`) || v === target) ? v.replace(target, mapHeader[target]) : v
             )
           ].filter(key => key !== '__no')
           res.write(Papa.unparse([headerTexts, []], { header: false }));
