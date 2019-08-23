@@ -14,7 +14,6 @@ interface Interface {
 
 export default function CorrelationMatrixs(props: Interface) {
   const { message, height = 500, width = 600 } = props;
-
   const { header, data, target } = message;
   const [show, upShow] = useState(!!target);
   const [_data, upData] = useState([]);

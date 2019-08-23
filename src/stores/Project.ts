@@ -2351,7 +2351,7 @@ class Project {
     if (this.correlationMatrixData) return Promise.resolve();
     if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
-      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target);
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target&&!(this.colType[h] === 'Categorical'&&this.dataViews[h].uniqueValues === 1));
       if (this.target) featureLabel.push(this.target);
       const command = {
         command: 'top.correlationMatrix',
