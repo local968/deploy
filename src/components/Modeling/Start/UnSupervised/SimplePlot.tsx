@@ -20,7 +20,7 @@ export default class SimplePlot extends Component<SimplePlotInterface> {
     this.getData();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.path !== this.props.path) {
       this.getData(nextProps);
     }

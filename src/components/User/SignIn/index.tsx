@@ -8,6 +8,7 @@ import { Modal, Checkbox } from 'antd';
 import copyIcon from './icon-test copy.svg'
 import deleteIcon from './delete.png'
 import config from 'config'
+import { Link } from 'react-router-dom';
 
 const {confirm} = Modal;
 
@@ -127,11 +128,6 @@ export default class SignIn extends Component {
     history.push("/signup")
   };
 
-  forget(){
-    const {history} = this.props as any;
-    history.push("/forgetpassword")
-  }
-
   render() {
     return <div className={styles.signin}>
       <div className={styles.title}><span>{EN.SignIn}</span></div>
@@ -144,13 +140,11 @@ export default class SignIn extends Component {
         <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword.bind(this)} onKeyUp={this.onKeyUp} />
       </div>
       <div className={styles.row}>
-        <a
+        <Link
           className={styles.forgetPassword}
-          href="javascript:"
-          onClick={this.forget.bind(this)}
-        >
+          to='/forgetpassword'>
           {EN.ForgetPassword}?
-        </a>
+        </Link>
       </div>
       <div className={styles.buttonRow}>
         <button className={styles.button} onClick={this.login}>

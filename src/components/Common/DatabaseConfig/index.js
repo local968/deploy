@@ -104,7 +104,7 @@ export default class DatabaseConfig extends Component {
   @action
   checkboxChange = key => event => this.changeState(key, event.target.checked);
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     runInAction(() => {
       let storedProfile = storage.getItem('DatabaseConnectionProfile');
       const storedPassword = storage.getItem('DatabaseConnectionPassword');

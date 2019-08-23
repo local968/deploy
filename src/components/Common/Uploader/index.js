@@ -13,7 +13,7 @@ export default class Uploader extends Component {
     this.inputRef = React.createRef()
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     const { file, onError, onStart } = props
     if (!file) return
     const checkd = this.check(file)

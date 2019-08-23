@@ -44,7 +44,7 @@ export default class MultiClassificationDetailCurves extends Component<Interface
     });
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.isHoldout !== this.props.project.isHoldout) {
       this.setState(
         {

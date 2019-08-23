@@ -60,7 +60,7 @@ export default class AutoRepeat extends Component {
     });
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     runInAction(() => {
       this.localState = { ...this.localState, ...props.options };
     });

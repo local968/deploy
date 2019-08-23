@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import ClassificationResult from './Classification/ClassificationResult';
 import RegressionResult from './Regression/RegressionResult';
 import MultiClassification from './MultiClassification'

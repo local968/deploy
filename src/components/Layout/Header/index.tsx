@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { withRouter } from 'react-router';
+import { withRouter } from 'react-router-dom';
 
 import WelcomeHeader from './WelcomeHeader'
 import NormalHeader from './NormalHeader'

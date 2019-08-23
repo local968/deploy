@@ -17,7 +17,7 @@ export default class ProgressBar extends Component<Interface> {
     this.setProgress(props.progress);
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     this.setProgress(props.progress, props.allowRollBack);
   }
 

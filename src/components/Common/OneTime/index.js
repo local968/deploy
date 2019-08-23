@@ -15,7 +15,7 @@ export default class OneTime extends Component {
     runInAction(() => (this.time = props.options.time || 'completed'));
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     runInAction(() => (this.time = props.options.time || 'completed'));
   }
 
