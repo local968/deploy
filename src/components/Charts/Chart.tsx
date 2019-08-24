@@ -18,10 +18,11 @@ interface Interface {
   y_name?: string;
   name?: string;
   data: any;
+  report?:boolean
 }
 
 export default function Chart(props: Interface) {
-  let { x_name = '', y_name = '', project, name, data: _data = {} } = props;
+  let { x_name = '', y_name = '', project, name, data: _data = {},report=false} = props;
   const { problemType, mapHeader, target } = project;
   let data;
   if (name) {
@@ -103,6 +104,7 @@ export default function Chart(props: Interface) {
           y_name={y_name}
           data={data}
           project={project}
+          report={report}
         />
       );
       break;

@@ -22,6 +22,7 @@ interface AdvancedViewTableProps {
   handleChange?: (k: string) => void,
   models?: Model[],
   currentSettingId: string
+  report?:boolean
 }
 
 export interface TableHeader {
@@ -33,17 +34,15 @@ export interface TableHeader {
 }
 
 const AdvancedViewTable = (props: AdvancedViewTableProps) => {
-  const { project, sort, handleSort, metric, handleChange, models, currentSettingId } = props;
+  const { project, sort, handleSort, metric, handleChange, models, currentSettingId,report=false} = props;
   const { problemType } = project;
   const [fbeta, setFbeta] = useState(project.fbeta);
 
   const handleBeta = value => {
     setFbeta(value)
-  }
-
-  const submitBeta = () => {
-    project.updateProject({ fbeta })
   };
+
+  const submitBeta = () => project.updateProject({ fbeta });
 
   const renderTable = () => {
     switch (problemType) {
@@ -78,7 +77,7 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
 
   return <div className={styles.main}>
     {(problemType === 'Classification' || problemType === 'Regression' || problemType === 'MultiClassification') && <div className={styles.option}>
-      {problemType === 'Classification' && <div className={styles.metricFbeta}>
+      {problemType === 'Classification' &&!report&& <div className={styles.metricFbeta}>
         <span>{EN.FbetaValue}<Hint content={EN.FbetaValueHint} /></span>
         <InputNumber min={0.1} max={10} step={0.1} style={{ marginLeft: 10 }} onChange={handleBeta} value={fbeta} />
         <div className={styles.metricFbetaBlock}>

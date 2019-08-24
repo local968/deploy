@@ -8,6 +8,7 @@ import AdvancedViewTable from './AdvancedViewTable'
 import MetricBased from '../Supervised/Classification/MetricBased'
 import ModelComp from './ModelComp'
 import { observer } from 'mobx-react';
+import classnames from 'classnames'
 
 const { Option } = Select;
 
@@ -23,10 +24,11 @@ interface AdvancedViewProps {
   handleSort: (k: string) => void,
   metric?: string,
   handleChange?: (k: string) => void
+  report?:boolean
 }
 
 const AdvancedView = (props: AdvancedViewProps) => {
-  const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange } = props;
+  const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange,report=false } = props;
   const { selectModel, problemType, train2Finished, metricCorrection, fbeta } = project;
 
   const performance = useMemo(() => {
@@ -166,19 +168,28 @@ const AdvancedView = (props: AdvancedViewProps) => {
   return <div className={styles.main}>
     {(problemType === 'Classification' || problemType === 'Regression') && <div className={styles.title}>
       <div className={styles.model}>
-        <span className={styles.label}>{EN.ModelingResults} :<div className={styles.status} style={{ marginLeft: 10 }}>{performance}</div></span>
+        <span className={styles.label}>{EN.ModelingResults} :<div className={styles.status}>{performance}</div></span>
       </div>
     </div>}
-    <div className={styles.options}>
+    <div className={classnames(styles.options,styles.sb)}>
       <div className={styles.filter}>
-        <span className={styles.label}>{EN.ModelNameContains} :</span>
-        <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={el => el.parentElement}>
-          <Option value={'all'}>{EN.All}</Option>
-          {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
-        </Select>
+        {!report&&<>
+          <span className={styles.label}>{EN.ModelNameContains} :</span>
+          <Select className={styles.settingsSelect} value={currentSettingId} onChange={changeSetting} getPopupContainer={el => el.parentElement}>
+            <Option value={'all'}>{EN.All}</Option>
+            {project.settings.map(setting => <Option key={setting.id} value={setting.id} >{setting.name}</Option>)}
+          </Select>
+        </>}
       </div>
-      {problemType === 'Classification' && <MetricBased finished={train2Finished} MetricCorrection={handleMetricCorrection} metricCorrection={metricCorrection} handleReset={handleReset} />}
-      {problemType === 'Classification' && <ModelComp models={models} />}
+      <div className={styles.flex}>
+        {problemType === 'Classification' && !report && <MetricBased
+          finished={train2Finished}
+          MetricCorrection={handleMetricCorrection}
+          metricCorrection={metricCorrection}
+          handleReset={handleReset} />
+        }
+        {problemType === 'Classification' && <ModelComp models={models} />}
+      </div>
     </div>
     <div className={styles.table}>
       <AdvancedViewTable
@@ -189,6 +200,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
         handleChange={handleChange}
         models={models}
         currentSettingId={currentSettingId}
+        report={report}
       />
     </div>
   </div>

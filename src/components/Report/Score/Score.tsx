@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import styles from './AdvancedView.module.css';
-import { observable, computed, action } from 'mobx';
+import { observable, computed } from 'mobx';
 import EN from '../../../constant/en';
 import AdvancedModelTable from './AdvancedModelTable';
 import ModelComp from './ModelComp';
@@ -156,11 +156,6 @@ export default class Score extends Component<Interface> {
             (aModel.modelName > bModel.modelName ? 1 : -1) *
             (sort.value === 1 ? 1 : -1)
           );
-        // const aModelTime = aModel.name.split('.').splice(1, Infinity).join('.');
-        // const aModelUnix = moment(aModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-        // const bModelTime = bModel.name.split('.').splice(1, Infinity).join('.');
-        // const bModelUnix = moment(bModelTime, 'MM.DD.YYYY_HH:mm:ss').unix();
-        // return this.sortState[currentSort] === 1 ? aModelUnix - bModelUnix : bModelUnix - aModelUnix
       }
     };
 

@@ -17,11 +17,13 @@ interface Interface {
 	project:any
 	data?:any
 	model?:any
+	report?:boolean
 }
 
 @observer
 export default class PVA extends Component<Interface>{
 	private chart: any;
+	state:any;
 	constructor(props){
 		super(props);
 		this.chart = React.createRef();
@@ -83,7 +85,7 @@ export default class PVA extends Component<Interface>{
 	}
 
 	async setSlider(sliderValue,loading=''){
-		const {loading:_loading,sliderValue:_sliderValue} = this.state as any;
+		const {loading:_loading,sliderValue:_sliderValue} = this.state;
 		const [start,end] = _sliderValue;
 		const [_start,_end] = sliderValue;
 
@@ -129,9 +131,8 @@ export default class PVA extends Component<Interface>{
 	}
 
 	getOption() {
-		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue,selected} = this.state as any;
-		const {project,y_name} = this.props as any;
-		const {isHoldout} = project;
+		const {ready,chartDate,holdOutChartDate,sliderValue:_sliderValue,selected} = this.state;
+		const {project:{isHoldout},y_name} = this.props;
 		const data = isHoldout?holdOutChartDate:chartDate;
 		const _data = _.cloneDeep(data);
 		if(!ready){
@@ -298,14 +299,14 @@ export default class PVA extends Component<Interface>{
 
 	}
 	handleHoldout(){
-		const {project} = this.props as any;
+		const {project} = this.props;
 		const {isHoldout} = project;
 		project.upIsHoldout(!isHoldout);
 	}
 
 	render(){
-		const {loading,chartDate,holdOutChartDate} = this.state as any;
-		const {isHoldout} = this.props.project;
+		const {loading,chartDate,holdOutChartDate} = this.state;
+		const {report,project:{isHoldout}} = this.props;
 		const data = isHoldout?holdOutChartDate:chartDate;
 
 		if(!data[0]){
@@ -335,11 +336,11 @@ export default class PVA extends Component<Interface>{
 						{EN.ChartReset}</section>}
 						/>
 				</div>
-				<div className={styles.metricSwitch} style={{top:-25}}>
+				{!report && <div className={styles.metricSwitch} style={{top:-25}}>
 					<span>{EN.Validation}</span>
 					<Switch checked={isHoldout} onChange={this.handleHoldout.bind(this)} style={{ backgroundColor: '#1D2B3C' }} />
 					<span>{EN.Holdout}</span>
-				</div>
+				</div>}
 				<ReactEcharts
 					key='echart'
 					option={this.getOption()}

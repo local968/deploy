@@ -83,19 +83,7 @@ export default class RegressionView extends Component<Interface> {
                 <a className={styles.nohover}>&nbsp;{dataViews[target].uniqueValues}</a>
               </span>
             </div>
-            {/* <Performance current={current} /> */}
           </div>
-          {/* <PVA
-            key="pva"
-            x_name={EN.PointNumber}
-            y_name={
-              isEN
-                ? `${EN.Groupaverage} ${mapHeader[target]}`
-                : `${mapHeader[target]} ${EN.Groupaverage}`
-            }
-            model={selectModel}
-            project={project}
-          /> */}
         </div>
         <div className={styles.line} />
         <ModelTable

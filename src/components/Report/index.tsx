@@ -4,12 +4,14 @@ import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 import Summary from './Summary';
 import VariableList from './VariableList';
-import AdvancedView, { PredictTable } from './Score';
+import  { PredictTable } from './Score';
 import { observable, action } from 'mobx';
 import { Checkbox } from 'antd';
 import { formatNumber } from '../../util';
 import EN from '../../constant/en';
 import MPF from '../Modeling/Result/MPF';
+import AdvancedView from 'components/Modeling/Result/AdvancedView'
+import AdvancedModelTable from './Score/AdvancedModelTable';
 
 const addComma = number => {
   if (Number.isNaN(number)) return number;
@@ -479,19 +481,35 @@ class Report extends Component<Interface> {
           {this.isShow('score') && (
             <div className={classnames(styles.block, styles.score)}>
               {this.checkBox('score')}
-              {/*<h3 className={styles.blockTitle}>{EN.Charts} {list[0].problemType === 'Classification' && <small onClick={this.reset}> reset</small>}</h3>*/}
               <div className={styles.blockRow}>
-                {/*<Score models={[list[0].selectModel]} project={list[0]} />*/}
-                <AdvancedView
-                  models={list[0].models}
-                  project={list[0]}
-                  sort={this.sort.advanced}
-                  handleSort={this.handleSort.bind(null, 'advanced')}
-                  metric={this.metric}
+                <AdvancedView models={list[0].models}
+                              project={list[0]}
+                              sort={{
+                                key:'name',
+                                value:1,
+                              }}
+                              handleSort={()=>{}}
+                              metric={this.metric}
+                              handleChange={this.handleChange}
+                              currentSettingId='all'
+                              changeSetting={()=>{}}
+                              report={true}
                 />
               </div>
             </div>
           )}
+
+          <AdvancedModelTable
+            {...this.props}
+            models={list[0].models}
+            project={list[0]}
+            sort={{
+              key:'name',
+              value:1,
+            }}
+            handleSort={()=>{}}
+            metric={this.metric}
+          />
 
           <div className={classnames(styles.block, styles.processFlow)}>
             {this.checkBox('processFlow')}

@@ -162,13 +162,10 @@ export default class ModelResult extends Component<ModelResultProps> {
           <SimpleView models={filterModels} project={project} exportReport={this.exportReport} sort={this.sort.simple} handleSort={this.handleSort.bind(null, 'simple')} /> :
           <AdvancedView models={models}
             project={project}
-            // exportReport={this.exportReport}
             sort={this.sort.advanced}
             handleSort={this.handleSort.bind(null, 'advanced')}
             metric={this.metric}
             handleChange={this.handleChange}
-            // isHoldout={isHoldout}
-            // handleHoldout={this.handleHoldout}
             currentSettingId={this.currentSettingId}
             changeSetting={this.changeSetting} />}
         <div className={styles.buttonBlock}>

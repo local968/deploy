@@ -27,6 +27,8 @@
 
 .status {
   color:#f5a623;
+  margin-left:10px;
+  display: inline-block;
 }
 
 .options {
@@ -64,4 +66,12 @@
 
 .mytable strong{
   color:orange;
+}
+
+.flex{
+  display:flex;
+}
+
+.sb{
+  justify-content:space-between;
 }

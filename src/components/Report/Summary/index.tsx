@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import { observer } from 'mobx-react';
 import { formatNumber } from '../../../util';
@@ -7,10 +7,9 @@ import { PIE } from '../../Charts';
 interface Interface {
   project:any
 }
-@observer
-class Summary extends Component<Interface> {
-  render() {
-    const { project } = this.props;
+
+const Summary = observer((props:Interface)=>{
+    const { project } = props;
     const {
       mapHeader,
       target,
@@ -30,7 +29,6 @@ class Summary extends Component<Interface> {
       variableIssues: { nullRow, mismatchRow, outlierRow },
       totalFixedLines,
       problemType,
-      // issues,
     } = project;
     const deletePercent:any = formatNumber(String((deletedCount / totalRawLines) * 100), 2);
     const fixedPercent:any = formatNumber(
@@ -59,8 +57,8 @@ class Summary extends Component<Interface> {
     const targetClassesCount =
       !!target && !targetIsNum
         ? Object.entries(colValueCounts[target]).reduce((sum, [k, v]) => {
-            return sum + +(targetArr.includes(k) ? v : 0);
-          }, 0) + nullLineCounts[target]
+        return sum + +(targetArr.includes(k) ? v : 0);
+      }, 0) + nullLineCounts[target]
         : totalRawLines;
     const targetPercent = {
       classesError:
@@ -105,15 +103,15 @@ class Summary extends Component<Interface> {
               </div>
             )}
             {problemType !== 'Classification' &&
-              (!!targetIssuesCountsOrigin.outlierRow || !!outlierCount) && (
-                <div className={styles.summaryType}>
-                  <div
-                    className={styles.summaryCube}
-                    style={{ backgroundColor: '#f9cf37' }}
-                  />
-                  <span>{EN.OutlierDetection}</span>
-                </div>
-              )}
+            (!!targetIssuesCountsOrigin.outlierRow || !!outlierCount) && (
+              <div className={styles.summaryType}>
+                <div
+                  className={styles.summaryCube}
+                  style={{ backgroundColor: '#f9cf37' }}
+                />
+                <span>{EN.OutlierDetection}</span>
+              </div>
+            )}
           </div>
           <div className={styles.summaryTable}>
             <div className={styles.summaryTableLeft}>
@@ -346,7 +344,6 @@ class Summary extends Component<Interface> {
         </div>
       </div>
     );
-  }
-}
+});
 
 export default Summary;
