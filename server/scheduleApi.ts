@@ -299,9 +299,10 @@ const api = {
       mapHeader: message.mapHeader
     };
 
-    const mapHeader = await uploadDatabase(databaseConfig, progress)
-    schedule.mapHeader = mapHeader
+    const { rawHeader, originalIndex } = await uploadDatabase(databaseConfig, progress)
+    schedule.mapHeader = rawHeader
     api.upsertSchedule(schedule)
+    return originalIndex
   },
   getLineCount: async index => {
     const { data } = await axios.get(`${esServicePath}/etls/${index}/count`);

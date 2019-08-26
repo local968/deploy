@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config';
 import { Switch } from 'antd';
@@ -19,11 +19,7 @@ export default function CorrelationMatrixs(props: Interface) {
   const [_data, upData] = useState([]);
   const [fields, upFields] = useState(message.fields);
 
-  useEffect(() => {
-    const _fields = _.cloneDeep(toJS(message.fields));
-    if (show) {
-      _fields.push(target);
-    }
+  function result(_fields) {
     let _index = -1;
     const __data = [];
     _.forEach(data, (itm, index) => {
@@ -38,11 +34,36 @@ export default function CorrelationMatrixs(props: Interface) {
         });
       }
     });
-    upData(__data.map(item => [item[1], item[0], item[2] || '-']));
-    upFields(_fields);
-  }, [show]);
+    return {
+      data:__data.map(item => [item[1], item[0], item[2] || '-']),
+      fields:_fields
+    }
+  }
 
-  const len = _.max([...header.map(itm => itm.length), 0]);
+  const show_result = useMemo(()=>{
+    const _fields = _.cloneDeep(toJS(message.fields));
+    _fields.push(target);
+    return result(_fields);
+  },[]);
+
+  const hide_result = useMemo(()=>{
+    const _fields = _.cloneDeep(toJS(message.fields));
+    return result(_fields);
+  },[]);
+
+  useEffect(()=>{
+    if(show){
+      var {data,fields} = show_result;
+    }else{
+      var {data,fields} = hide_result;
+    }
+
+    upData(data);
+    upFields(fields);
+  },[show]);
+
+  const len = useMemo(()=>_.max([...header.map(itm => itm.length), 0]),[]);
+
   const nameTextStyle = {
     color: '#000',
   };
