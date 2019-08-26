@@ -7,7 +7,7 @@ import { message } from 'antd';
 import EN from '../../../constant/en';
 import styles from './Start.module.css';
 import SimplifiedView from './Supervised/SimplifiedView';
-import AdvancedView from './Supervised/advancedView';
+import AdvancedView from './Supervised/AdvancedView';
 import UnSimplifiedView from './UnSupervised/SimplifiedView';
 import UnAdvancedView from './UnSupervised/advancedView';
 import classnames from 'classnames'
