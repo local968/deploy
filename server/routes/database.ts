@@ -43,7 +43,7 @@ wss.register('downloadFromDatabase', async (message, socket, progress) => {
     encode: message.sqlEncoding,
   };
 
-  uploadDatabase(databaseConfig, progress)
+  return uploadDatabase(databaseConfig, progress)
 });
 
 export const uploadDatabase = async (databaseConfig: DatabaseConfig, progress) => {
