@@ -334,7 +334,7 @@ function ModelResult(props) {
         {cannotDeploy ? (
           <Tooltip title={EN.cannotDeploy} visible={showTips}>
             <button
-              className={`${classes.button} ${classes.disable}`}
+              className={`${classes.button} ${classes.disabled}`}
               onMouseOver={() => setShowTips(true)}
               onMouseOut={() => setShowTips(false)}
             >
@@ -347,7 +347,7 @@ function ModelResult(props) {
             </button>
           )}
         {problemType === 'Clustering' && (isNull ? <button
-          className={`${classes.button} ${classes.disable}`}
+          className={`${classes.button} ${classes.disabled}`}
           style={{ marginLeft: '.1em' }}
         >
           <span>{EN.Exportmodelresults}</span>
@@ -1192,7 +1192,7 @@ const ClusteringRow = observer(props => {
                 : ''}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disable : ''}`}>
             <span onClick={() => isNull ? null : toggleImpact('impact')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>
@@ -1202,7 +1202,7 @@ const ClusteringRow = observer(props => {
               <img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disable : ''}`}>
             <span onClick={() => isNull ? null : toggleImpact('explanation')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>
