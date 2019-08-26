@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React  from 'react';
 import styles from './styles.module.css';
 import { BoxPlots, FitBar, TSENOne, UnivariantPlots } from '../../../Charts';
 
@@ -11,9 +11,8 @@ interface Interface {
   renameVariable:any
 }
 
-export default class ScatterPlot extends Component<Interface> {
-  render() {
-    const { type, style, data, message, colType,renameVariable } = this.props;
+export default function ScatterPlot(props:Interface){
+    const { type, style, data, message, colType,renameVariable } = props;
 
     if(type === "MultiClassification"){
       return <FitBar
@@ -48,6 +47,4 @@ export default class ScatterPlot extends Component<Interface> {
         renameVariable={renameVariable}
       />
     </div>
-
-  }
 }

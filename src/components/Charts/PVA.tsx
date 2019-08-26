@@ -49,7 +49,7 @@ export default class PVA extends Component<Interface>{
 
 	async componentDidMount(model=this.props.model||{}) {
 		const { validatePlotData, holdoutPlotData } = model as any;
-		const {data} = this.props as any;
+		const {data} = this.props;
 
 		if(!data){
 			request.post({

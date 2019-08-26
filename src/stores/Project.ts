@@ -2923,36 +2923,6 @@ class Project {
     // aaa.routing.history.push('/report')
     console.log(this, 'ttttttttttttttttttttttt')
 
-
-
-    // const data = {
-    //   field: "sex",
-    //   id: this.etlIndex,
-    // };
-    // const { uniqueValues } = this.dataViews["sex"];
-    // data.size = uniqueValues > 8 ? 8 : uniqueValues;
-    // request.post({
-    //   url: '/graphics/histogram-categorical',
-    //   data,
-    // })
-
-    // this.dataViews.forEach((res) => {
-    //   console.log(res)
-    // })
-
-
-    // let cancel = false
-    // const changeReportProgress = action((text, progress) => {
-    //   if (!cancel) {
-    //     if (text) this.reportProgressText = text
-    //     if (progress) this.reportProgress = progress
-    //   }
-    // })
-    //
-    // const report = async (modelId) => {
-    //   changeReportProgress('initializing report.', 0)
-
-
     const model: any = this.models.find(m => m.id === modelId);
     //在这里获取所以直方图折线图数据
     // changeReportProgress('preparing univariate plot.', 75)

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styles from "./PAW.module.css";
 import {Select} from "antd";
 import PCS from "./PCS";
@@ -38,13 +38,12 @@ export default function PAW(props:Interface){
 					re.push(it)
 				}
 			});
-			// return re;
 			data.filter(it=>it.name === predicts[index])[0].value.push(re);
 		});
 		return data;
 	}
 
-	useEffect( function() {
+	useMemo( function() {
 			request.post({
 				url: '/graphics/paw',
 				data: {

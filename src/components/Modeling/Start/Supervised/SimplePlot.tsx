@@ -1,36 +1,19 @@
 import { observer } from 'mobx-react';
-import React, { Component } from 'react';
-import { observable } from 'mobx';
+import React, { useEffect, useState } from 'react';
 import request from 'components/Request'
 
 interface Interface {
-  path:any
-  isNew:any
+  path:string
+  isNew:boolean
+  children?: any
 }
-@observer
-export default class SimplePlot extends Component<Interface> {
-  @observable visible = false;
-  @observable result = {};
-  constructor(props) {
-    super(props);
-  }
 
-  componentDidMount() {
-    this.getData();
-  }
+const SimplePlot = observer((props:Interface)=>{
+  const {path,isNew,children} = props;
+  const [visible,upVisible] = useState(false);
+  const [result,upResult] = useState();
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.path !== this.props.path) {
-      this.getData(nextProps);
-    }
-  }
-
-  getData(props = this.props) {
-    const { path, isNew } = props;
-    if (isNew && !path) return;
-    if (!isNew) {
-      return (this.visible = true);
-    }
+  useEffect(()=>{
     if (isNew && path) {
       request
         .post({
@@ -40,19 +23,21 @@ export default class SimplePlot extends Component<Interface> {
           },
         })
         .then(res => {
-          this.result = res;
-          this.visible = true;
+          upResult(res);
+          upVisible(true);
         });
     }
+  },[path,isNew]);
+
+  if(!visible&&path){
+    return null
   }
 
-  render() {
-    const { children, isNew } = this.props;
-    if (!this.visible) return null;
-    if (!isNew) {
-      return children;
-    }
-    const cloneEl = el => React.cloneElement(el, { ...this.result });
-    return Array.isArray(children) ? children.map(cloneEl) : cloneEl(children);
+  if (!isNew) {
+    return children;
   }
-}
+  const cloneEl = el => React.cloneElement(el, { ...result });
+  return Array.isArray(children) ? children.map(cloneEl) : cloneEl(children);
+});
+
+export default SimplePlot;
