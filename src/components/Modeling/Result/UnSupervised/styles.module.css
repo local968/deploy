@@ -703,12 +703,15 @@ span.ccellHeaderSpan {
 
 .disabled {
   cursor: not-allowed;
+  background-color: #d3d3d3;
+  /* color: #aaaaaa; */
+  background-image: none;
 }
 
 
-.disabled span {
-  color: #ccc;
-}
+/* .disabled span { */
+  /* color: #ccc; */
+/* } */
 
 .abortButtonAll {
   margin: 0;
