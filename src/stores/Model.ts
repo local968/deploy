@@ -163,7 +163,7 @@ class Model {
     this._id = modelName;
     Object.assign(this, model);
 
-    this.updateModel = debounce(this.updateModel, 1000)
+    this.updateModel = debounce(this.updateModel, 1000).bind(this);
   }
 
   @action
@@ -490,7 +490,7 @@ class Model {
   //   })
   // }
   updateModel(data: Object) {
-    this.setProperty(data)
+    this.setProperty(data);
     return socketStore.ready().then(api => api.updateModel({
       data,
       id: this.id,
