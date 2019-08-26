@@ -3,6 +3,7 @@ import ReactEcharts from 'echarts-for-react';
 const Echarts = require('echarts');
 import 'echarts/dist/extension/dataTool';
 import initEcharts from './echarts.config';
+import _ from 'lodash';
 
 initEcharts(Echarts);
 
@@ -35,8 +36,8 @@ export default function BoxPlots(props: Interface) {
   const { boxData, outliers } = data;
 
   const max = Math.max(
-    Math.max(...boxData.map(itm => Math.max(...itm))),
-    Math.max(...outliers.map(itm => Math.max(...itm))),
+    _.max(boxData.map(itm => Math.max(...itm))),
+    _.max(outliers.map(itm => Math.max(...itm))),
   );
 
   const option = {

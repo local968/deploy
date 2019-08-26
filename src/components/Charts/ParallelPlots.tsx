@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import request from '../Request';
 import EN from "../../constant/en";
@@ -13,7 +13,7 @@ export default function ParallelPlot(props:Interface){
 	const [ready,upReady] = useState(false);
 	const [result,upResult] = useState({} as any);
 
-	useState(()=>{
+	useMemo(()=>{
 		const {url} = props;
 		request.post({
 			url: '/graphics/parallel-coordinate-map',
@@ -24,7 +24,7 @@ export default function ParallelPlot(props:Interface){
 			upReady(true);
 			upResult(result)
 		});
-	});
+	},[]);
 	let option:any = {
 		xAxis:{},
 		yAxis:{},

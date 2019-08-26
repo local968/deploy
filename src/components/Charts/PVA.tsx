@@ -41,7 +41,7 @@ export default class PVA extends Component<Interface>{
 	}
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-		const {model} = this.props as any;
+		const {model} = this.props;
 		if(nextProps.model.validatePlotData !== model.validatePlotData){
 			return this.componentDidMount(nextProps.model);
 		}
