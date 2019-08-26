@@ -39,6 +39,11 @@ export default class RabbitMQ {
           console.error('************** mq 连接失败，开始重连');
           this.connect();
         });
+        conn.on('error', (err) => {
+          this.amqplib = undefined;
+          console.error(err, '************** mq 连接错误，开始重连');
+          this.connect();
+        })
       })
       .catch(() => {
         this.amqplib = undefined;
