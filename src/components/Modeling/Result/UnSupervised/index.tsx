@@ -334,7 +334,7 @@ function ModelResult(props) {
         {cannotDeploy ? (
           <Tooltip title={EN.cannotDeploy} visible={showTips}>
             <button
-              className={`${classes.button} ${classes.disable}`}
+              className={`${classes.button} ${classes.disabled}`}
               onMouseOver={() => setShowTips(true)}
               onMouseOut={() => setShowTips(false)}
             >
@@ -347,7 +347,7 @@ function ModelResult(props) {
             </button>
           )}
         {problemType === 'Clustering' && (isNull ? <button
-          className={`${classes.button} ${classes.disable}`}
+          className={`${classes.button} ${classes.disabled}`}
           style={{ marginLeft: '.1em' }}
         >
           <span>{EN.Exportmodelresults}</span>
