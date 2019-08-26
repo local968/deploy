@@ -1192,7 +1192,7 @@ const ClusteringRow = observer(props => {
                 : ''}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disable : ''}`}>
             <span onClick={() => isNull ? null : toggleImpact('impact')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>
@@ -1202,7 +1202,7 @@ const ClusteringRow = observer(props => {
               <img src={'/static/modeling/Process.svg'} alt="" /> {EN.Compute}
             </span>
           </div>
-          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disabled : ''}`}>
+          <div className={`${classes.ccell} ${classes.compute} ${isNull ? classes.disable : ''}`}>
             <span onClick={() => isNull ? null : toggleImpact('explanation')}>
               <img src={'/static/modeling/Variable.svg'} alt="" /> {EN.Compute}
             </span>

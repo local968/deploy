@@ -708,10 +708,13 @@ span.ccellHeaderSpan {
   background-image: none;
 }
 
+.disable {
+  cursor: not-allowed;
+}
 
-/* .disabled span { */
-  /* color: #ccc; */
-/* } */
+.disable span {
+  color: #ccc;
+}
 
 .abortButtonAll {
   margin: 0;
