@@ -41,7 +41,7 @@ export default function FitBar(props:Interface){
 		return itm.map((it=0)=>+it/sum)
 	});
 
-	const yNameL = Math.max(...y_names.map(itm=>itm.length));
+	const yNameL:number = _.max(y_names.map(itm=>itm.length));
 
 	let data = [];
 	let sum = 0;

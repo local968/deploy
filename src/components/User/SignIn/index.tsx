@@ -137,7 +137,7 @@ export default class SignIn extends Component {
       </div>
       <div className={styles.row}>
         <div className={styles.warning}>{this.warning.password && <span><img src={warnIcon} alt='warning' />{this.warning.password}</span>}</div>
-        <input type="password" placeholder={EN.SetPassword} value={this.password} onChange={this.onChangePassword.bind(this)} onKeyUp={this.onKeyUp} />
+        <input type="password" placeholder={EN.Enteryourpassword} value={this.password} onChange={this.onChangePassword.bind(this)} onKeyUp={this.onKeyUp} />
       </div>
       <div className={styles.row}>
         <Link

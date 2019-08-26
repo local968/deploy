@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import _ from 'lodash';
 import config from 'config'
@@ -21,20 +21,22 @@ export default function PredictionDistributions(props){
 			setPoint(s);
 	},[metric]);
 
-	const data =  [{
-		name:'False',
-		value:_.zip(_PERCENTAGE,_NEGATIVE),
-	},{
-		name:'True',
-		value:_.zip(_PERCENTAGE,_POSITIVE),
-	}];
-	const series = data.map(itm=>({
-		type: 'line',
-		areaStyle: {},
-		name:itm.name,
-		data:itm.value,
-		symbol: 'circle',
-	}));
+	const series = useMemo(()=>{
+		const data =  [{
+			name:'False',
+			value:_.zip(_PERCENTAGE,_NEGATIVE),
+		},{
+			name:'True',
+			value:_.zip(_PERCENTAGE,_POSITIVE),
+		}];
+		return data.map(itm=>({
+			type: 'line',
+			areaStyle: {},
+			name:itm.name,
+			data:itm.value,
+			symbol: 'circle',
+		}));
+	},[]);
 
 	const setf = _.debounce((value)=>{
 		if(point === value||!value){
