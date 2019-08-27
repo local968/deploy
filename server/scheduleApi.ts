@@ -359,6 +359,7 @@ const etl = async (schedule, index, projectId, modelName) => {
     stats,
   );
   const { etlIndex, opaqueId } = response.data;
+  redis.zadd('pipelines', moment().valueOf(), etlIndex)
   return await new Promise((resolve, reject) => {
     const interval = setInterval(async () => {
       const { data } = await axios.get(
