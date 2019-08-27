@@ -5,6 +5,7 @@ import config from '../../config';
 import _ from 'lodash';
 import { Metric, Project, ProjectRedisValue, Stats } from '../types';
 import { createOrUpdate, deleteModels } from './project';
+import moment from 'moment'
 import * as s from 'connect-redis';
 
 const esServicePath = config.services.ETL_SERVICE;
@@ -344,6 +345,7 @@ wss.register('newEtl', async (message, socket, process) => {
     stats,
   );
   const { etlIndex, opaqueId, error } = response.data;
+  redis.zadd('pipelines', moment().valueOf(), etlIndex)
   if (error) return response.data;
   return new Promise(resolve => {
     const interval = setInterval(async () => {
@@ -409,6 +411,24 @@ wss.register('getHeader', async message => {
   );
   return { header: data.split(',').filter(k => k !== '__no') };
 });
+
+const removeOutdatePipelines = async () => {
+  try {
+    const pipelines = await redis.zrangebyscore('pipelines', '-inf', moment().subtract(1, 'days').valueOf())
+    const removes = []
+    for (let pipeline of pipelines) {
+      axios.delete(`${esServicePath}/etls/${pipeline}_deleted`)
+      const response = await axios.delete(`${esServicePath}/etls/pipeline/${pipeline}`)
+      if (response.status === 200) removes.push(pipeline)
+    }
+    redis.zrem(...removes)
+  } catch (e) {
+    console.error('remove pipeline error')
+    console.error(e)
+  }
+}
+
+setInterval(removeOutdatePipelines, 3600 * 24)
 
 export { originalStats }
 
