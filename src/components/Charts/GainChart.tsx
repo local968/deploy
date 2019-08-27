@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
 interface Interface {
@@ -10,7 +10,7 @@ interface Interface {
 	isHoldout:boolean
 }
 
-export default function GainChart(props:Interface){
+export default function GainChart(props:Interface):ReactElement{
 	const {x_name='',y_name='',width=600,height=400,model,isHoldout} = props;
 	const {holdoutChartData,chartData} = model;
 	const {lift={}} = isHoldout?holdoutChartData:chartData;

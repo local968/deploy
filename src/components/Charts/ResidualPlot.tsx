@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
 import _ from 'lodash';
@@ -10,7 +10,7 @@ interface Interface {
 	height?
 }
 
-export default function ResidualPlot(props:Interface){
+export default function ResidualPlot(props:Interface):ReactElement{
 	const {chartDate={},title='',width=500,height=300} = props;
 	const num:any = [];
 	const data = _.map(chartDate.data,itm=>{

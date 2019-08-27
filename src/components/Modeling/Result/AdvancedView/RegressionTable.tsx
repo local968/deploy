@@ -225,7 +225,7 @@ const RegressionTable = (props: RegressionTableProps) => {
             <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />
             <span>{EN.Holdout}</span>
           </div>
-          <div className={styles.metricBg}></div>
+          <div className={styles.metricBg}/>
           <div className={styles.metric}>
             <span className={styles.metricText} >{EN.MeasurementMetric}</span>
             <Select size="large" value={metric} onChange={handleChange} style={{ width: '120px', fontSize: '1.125rem' }} getPopupContainer={el => el.parentElement}>

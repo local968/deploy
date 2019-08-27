@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config';
 import { Switch } from 'antd';
@@ -7,17 +7,15 @@ import _ from 'lodash';
 import { toJS } from 'mobx';
 
 interface Interface {
-  height?;
-  width?;
-  message: any;
+  height?:number;
+  width?:number;
+  readonly message: any;
 }
 
-export default function CorrelationMatrixs(props: Interface) {
+export default function CorrelationMatrixs(props: Interface):ReactElement {
   const { message, height = 500, width = 600 } = props;
   const { header, data, target } = message;
   const [show, upShow] = useState(!!target);
-  const [_data, upData] = useState([]);
-  const [fields, upFields] = useState(message.fields);
 
   function result(_fields) {
     let _index = -1;
@@ -51,15 +49,11 @@ export default function CorrelationMatrixs(props: Interface) {
     return result(_fields);
   },[]);
 
-  useEffect(()=>{
+  const {data:_data,fields} = useMemo(()=>{
     if(show){
-      var {data,fields} = show_result;
-    }else{
-      var {data,fields} = hide_result;
+      return show_result;
     }
-
-    upData(data);
-    upFields(fields);
+    return hide_result;
   },[show]);
 
   const len = useMemo(()=>_.max([...header.map(itm => itm.length), 0]),[]);
@@ -181,7 +175,7 @@ export default function CorrelationMatrixs(props: Interface) {
       />
       {target && (
         <div>
-          <Switch checked={show} onClick={upShow} />
+          <Switch checked={show} onClick={(e)=>upShow(e)} />
           {EN.DisplayTargetVariable}
         </div>
       )}

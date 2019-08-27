@@ -293,10 +293,8 @@ export default class SimplifiedView extends Component<Interface> {
                 className={styles.tableImage}
                 alt="histogram"
               />
-              {
                 <Popover
                   placement="bottomLeft"
-                  // getPopupContainer={() => document.getElementById(target)}
                   visible={this.showHistograms}
                   onVisibleChange={this.hide}
                   trigger="click"
@@ -323,7 +321,6 @@ export default class SimplifiedView extends Component<Interface> {
                     />
                   }
                 />
-              }
             </div>
             <div className={styles.targetCell}>
               <span>

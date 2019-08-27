@@ -1,11 +1,11 @@
 import ReactEcharts from "echarts-for-react";
-import React from "react";
+import React, { ReactElement } from 'react';
 
 interface Interface {
 	data:Object
 }
 
-export default function NetworkDiagram(props:Interface) {
+export default function NetworkDiagram(props:Interface):ReactElement {
 	const {data:_data} = props;
 	const data = Object.keys(_data).map(name=>{
 		const color = name.match(/^R\d+$/)?'yellow':'#31C4E9';

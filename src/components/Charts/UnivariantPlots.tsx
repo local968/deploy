@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import './echarts.config';
 import { toJS } from 'mobx';
@@ -15,7 +15,7 @@ interface Interface {
   renameVariable: any;
 }
 
-export default function UnivariantPlots(props: Interface) {
+export default function UnivariantPlots(props: Interface):ReactElement {
   const {
     title = '',
     x_name = '',

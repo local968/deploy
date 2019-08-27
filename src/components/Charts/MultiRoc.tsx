@@ -1,5 +1,5 @@
 import ReactEcharts from 'echarts-for-react';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import _ from 'lodash';
 import EN from '../../constant/en';
 
@@ -11,7 +11,7 @@ interface Interface {
   };
 }
 
-export default function MultiRoc(props: Interface) {
+export default function MultiRoc(props: Interface):ReactElement {
   const {
     chartData: { fpr, tpr,roc_auc },
   } = props;
@@ -49,7 +49,6 @@ export default function MultiRoc(props: Interface) {
 
   const option = {
     title:{
-      // text: 'Some extension of Receiver operating characteristic to multi-class',
     },
     xAxis: {
       type: 'value',

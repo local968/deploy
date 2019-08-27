@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, ReactElement } from 'react';
 import TSEN from './T-SEN'
 import request from '../Request'
 import styles from './charts.module.css';
@@ -8,9 +8,9 @@ import {MobXProviderContext, observer } from 'mobx-react';
 import D3D2List from './D3D2List'
 
 interface Interface {
-	url:string
+	readonly url:string
 }
-const D3D2 = observer((props:Interface)=>{
+const D3D2 = observer((props:Interface):ReactElement=>{
 	const {url} = props;
 	const {projectStore:{project:{mapHeader}}} = useContext(MobXProviderContext);
 	const [ready,upReady] = useState(false);
@@ -20,7 +20,7 @@ const D3D2 = observer((props:Interface)=>{
 	const [z_name,upz_name] = useState('');
 	const [result,upResult] = useState({} as any);
 	const [changing,upChanging] = useState(false);
-	useEffect(()=>{
+	useEffect(():void=>{
 		upShow(false);
 		upChanging(true);
 		request.post({
@@ -41,10 +41,10 @@ const D3D2 = observer((props:Interface)=>{
 			upShow(true);
 		})
 	},[url]);
-	function chart(){
+	function chart():ReactElement{
 		if(!show)return null;
 		const { featuresLabel, featureData, labels } = result;
-		const data = [...new Set(labels)].map(itm => {
+		const data:Array<any> = [...new Set(labels)].map(itm => {
 			return {
 				name: itm,
 				value: [],
@@ -74,7 +74,7 @@ const D3D2 = observer((props:Interface)=>{
 			average={true}
 		/>
 	}
-	async function save(show_name){
+	async function save(show_name):Promise<void>{
 		const {x_name,y_name,z_name} = show_name;
 		await upShow(false);
 

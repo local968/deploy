@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 const Echarts = require('echarts');
 import 'echarts/dist/extension/dataTool';
@@ -17,7 +17,7 @@ interface Interface {
   y_name?: string;
 }
 
-export default function BoxPlots(props: Interface) {
+export default function BoxPlots(props: Interface):ReactElement {
   const {
     value = [],
     title = '',
