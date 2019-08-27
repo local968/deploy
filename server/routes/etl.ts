@@ -421,14 +421,14 @@ const removeOutdatePipelines = async () => {
       const response = await axios.delete(`${esServicePath}/etls/pipeline/${pipeline}`)
       if (response.status === 200) removes.push(pipeline)
     }
-    redis.zrem('pipelines', ...removes)
+    if (removes.length) await redis.zrem('pipelines', removes)
   } catch (e) {
     console.error('remove pipeline error')
     console.error(e)
   }
 }
 
-setInterval(removeOutdatePipelines, 3600 * 24)
+setInterval(removeOutdatePipelines, 60 * 60 * 1000)
 
 export { originalStats }
 
