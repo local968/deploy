@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 import { HistogramCategorical, HS } from '../../../Charts';
 
@@ -13,10 +13,8 @@ interface Interface {
   across?:boolean
 }
 
-export default class SimplifiedViewPlot extends Component<Interface> {
-
-  render() {
-    const { type, style, data, target,value,result,renameVariable={},across} = this.props;
+export default function SimplifiedViewPlot(props:Interface){
+    const { type, style, data, target,value,result,renameVariable={},across} = props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {
       return <div className={styles.plot} style={{
@@ -42,6 +40,5 @@ export default class SimplifiedViewPlot extends Component<Interface> {
         height = {330}
       />
     </div>
-  }
 }
 

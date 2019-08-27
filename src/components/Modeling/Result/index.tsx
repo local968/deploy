@@ -1,13 +1,13 @@
-import Supervised from './Supervised'
-import UnSupervised from './UnSupervised'
-import Association from './Association'
+import Supervised from './Supervised';
+import UnSupervised from './UnSupervised';
+import Association from './Association';
 import { observer } from 'mobx-react';
 import Project from 'stores/Project';
 import React from 'react';
 
 interface ResultProps {
-  project: Project,
-  resetSide: () => void
+  project: Project;
+  resetSide: () => void;
 }
 
 const Result = (props: ResultProps) => {
@@ -15,8 +15,12 @@ const Result = (props: ResultProps) => {
   const { problemType } = project;
   const isAssociation = problemType === 'Association';
   const isUnsupervised = ['Clustering', 'Outlier'].includes(problemType);
-  if (isAssociation) return <Association project={project} />
-  return isUnsupervised ? <UnSupervised resetSide={resetSide} /> : <Supervised resetSide={resetSide} />
-}
+  if (isAssociation) return <Association project={project} />;
+  return isUnsupervised ? (
+    <UnSupervised resetSide={resetSide} />
+  ) : (
+    <Supervised resetSide={resetSide} />
+  );
+};
 
-export default observer(Result)
+export default observer(Result);
