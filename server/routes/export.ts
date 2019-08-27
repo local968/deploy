@@ -49,17 +49,27 @@ router.get('/', (req, res) => {
 
   return redis.hgetall('project:' + id).then(p => {
     const project = {
-      colType: JSON.parse(p.colType || '""'),
-      colMap: JSON.parse(p.colMap || '""'),
-      rawDataView: JSON.parse(p.rawDataView || '""'),
-      nullFillMethod: JSON.parse(p.nullFillMethod || '""'),
-      mismatchFillMethod: JSON.parse(p.mismatchFillMethod || '""'),
-      outlierFillMethod: JSON.parse(p.outlierFillMethod || '""'),
-      featureLabel: JSON.parse(p.dataHeader || '""'),
+      colType: JSON.parse(p.colType || '{}'),
+      colMap: JSON.parse(p.colMap || '{}'),
+      rawDataView: JSON.parse(p.rawDataView || '{}'),
+      nullFillMethod: JSON.parse(p.nullFillMethod || '{}'),
+      mismatchFillMethod: JSON.parse(p.mismatchFillMethod || '{}'),
+      outlierFillMethod: JSON.parse(p.outlierFillMethod || '{}'),
+      featureLabel: JSON.parse(p.dataHeader || '[]'),
       targetLabel: [JSON.parse(p.target || '""')],
       problemType: JSON.parse(p.problemType || '""'),
-      mapHeader: JSON.parse(p.mapHeader || '""'),
+      mapHeader: JSON.parse(p.mapHeader || '[]'),
       cutoff: {}
+    }
+    //默认值 
+    if (project.colType && project.rawDataView) {
+      Object.entries(project.colType).forEach(([key, type]) => {
+        const value = type === 'Numerical'
+          ? project.rawDataView[key].mean
+          : project.rawDataView[key].mode;
+        project.nullFillMethod[key] = project.nullFillMethod[key] || value
+        project.mismatchFillMethod[key] = project.mismatchFillMethod[key] || value
+      })
     }
     let promise = Promise.resolve()
     if (project.problemType === 'Classification') promise = queryModelList(id, result => {
