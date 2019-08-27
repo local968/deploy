@@ -1,10 +1,16 @@
-import React,{useState} from 'react'
+import React, { ReactElement, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import EN from "../../constant/en";
 import { Spin } from 'antd';
 import _ from 'lodash';
 
-export default function SSPlot(props){
+interface Interface {
+	width?:number
+	height?:number
+	project:any
+}
+
+export default function SSPlot(props:Interface):ReactElement{
 	const {width=600,height=400,project} = props;
 	const [ssPlot,upSsPlot] = useState(project.ssPlot);
 	let max = 1;

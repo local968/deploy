@@ -563,8 +563,6 @@ class DataSchema extends Component<DataSchemaProps> {
               rowCount={tableData.length}
               fixedColumnCount={1}
               fixedRowCount={this.showSelect ? 3 : 2}
-              checked={this.checked}
-              select={this.select}
               style={{ border: '1px solid #ccc' }}
               data={tableData}
             />

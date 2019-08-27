@@ -930,7 +930,7 @@ class Project {
     };
     updObj.measurement = this.changeProjectType === 'Classification' && 'auc' || this.changeProjectType === 'Regression' && 'r2' || this.changeProjectType === 'Clustering' && 'CVNN' || this.changeProjectType === 'Outlier' && 'score' || this.problemType === 'MultiClassification' && 'macro_auc' || ''
     if (this.problemType && this.changeProjectType !== this.problemType) {
-      await this.abortTrainByEtl()
+      await this.abortTrainByEtl(false)
       if (this.originalIndex) await this.deleteIndex(this.originalIndex)
       if (this.etlIndex) await this.deleteIndex(this.etlIndex)
       this.models = []
@@ -953,7 +953,7 @@ class Project {
   @action
   fastTrackInit = async (data: UploadProps) => {
 
-    await this.abortTrainByEtl()
+    await this.abortTrainByEtl(false)
     if (this.originalIndex) await this.deleteIndex(this.originalIndex)
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
@@ -1065,7 +1065,7 @@ class Project {
   @action
   endSchema = async () => {
     this.etling = true
-    await this.abortTrainByEtl()
+    await this.abortTrainByEtl(false)
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -1161,7 +1161,7 @@ class Project {
   endQuality = async () => {
     if (!this.qualityHasChanged) return
     this.etling = true
-    await this.abortTrainByEtl()
+    await this.abortTrainByEtl(false)
     if (this.etlIndex) await this.deleteIndex(this.etlIndex)
     this.models = []
     const data: {
@@ -1604,7 +1604,7 @@ class Project {
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score' || problemType === 'MultiClassification' && 'macro_auc')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     // const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
-    const currentModels = models
+    const currentModels = models.filter(_m => !_m.id.includes('DBSCAN'))
 
     return (!currentModels.length ? models : currentModels)
       .map(m => {
@@ -2224,14 +2224,15 @@ class Project {
     })
   }
 
-  abortTrain = (stopId: string) => {
+  abortTrain = (stopId: string, isModeling: boolean = true) => {
     if (!stopId) return Promise.resolve()
     // if (this.isAbort) return Promise.resolve()
     const command = {
       command: 'top.stop',
       action: 'train',
       projectId: this.id,
-      stopId
+      stopId,
+      isModeling
     }
     return socketStore.ready().then(api => api.abortTrain(command).then((returnValue: BaseResponse) => {
       const { status, message, result, id } = returnValue
@@ -2241,13 +2242,13 @@ class Project {
     }))
   }
 
-  abortTrainByEtl = async () => {
+  abortTrainByEtl = async (isModeling: boolean = true) => {
     // this.models = []
     this.isAbort = true
     // const arr = []
     if (this.train2ing && !!this.stopIds.length) {
       for (let si of this.stopIds) {
-        await this.abortTrain(si)
+        await this.abortTrain(si, isModeling)
       }
       // const arr = this.stopIds.map(si => this.abortTrain(si))
       // return Promise.all(arr)
@@ -2351,7 +2352,7 @@ class Project {
     if (this.correlationMatrixData) return Promise.resolve();
     if (this.correlationMatrixLoading) return Promise.resolve();
     return socketStore.ready().then(api => {
-      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target&&!(this.colType[h] === 'Categorical'&&this.dataViews[h].uniqueValues === 1));
+      const featureLabel = this.dataHeader.filter(h => this.colType[h] !== 'Raw' && h !== this.target && !(this.colType[h] === 'Categorical' && this.dataViews[h].uniqueValues === 1));
       if (this.target) featureLabel.push(this.target);
       const command = {
         command: 'top.correlationMatrix',

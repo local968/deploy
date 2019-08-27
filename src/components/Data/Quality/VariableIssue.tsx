@@ -389,8 +389,6 @@ class VariableIssue extends Component<VariableIssueProps> {
               rowCount={tableData.length}
               fixedColumnCount={0}
               fixedRowCount={4}
-              checked={null}
-              select={null}
               style={{ border: '1px solid #ccc' }}
               data={tableData}
             />

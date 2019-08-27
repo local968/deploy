@@ -1,19 +1,19 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styles from './styles.module.css';
 import { HistogramCategorical, HS } from '../../../Charts';
 
 interface Interface {
-  type:any
-  style?:any
-  data:any
-  target?:any
-  value?:any
-  result:any
-  renameVariable?:any
-  across?:boolean
+  readonly type:string
+  readonly style?:any
+  readonly data:any
+  readonly target?:any
+  readonly value?:any
+  readonly result:any
+  readonly renameVariable?:any
+  readonly across?:boolean
 }
 
-export default function SimplifiedViewPlot(props:Interface){
+export default function SimplifiedViewPlot(props:Interface):ReactElement{
     const { type, style, data, target,value,result,renameVariable={},across} = props;
     if (type === 'Raw') return null;
     if (type === 'Numerical') {

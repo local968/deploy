@@ -68,8 +68,6 @@ export default function Explanation(props: ExplanationProps) {
       rowCount={4}
       fixedColumnCount={1}
       fixedRowCount={0}
-      checked={null}
-      select={null}
       // style={{ border: "1px solid #ccc" }}
       data={tableData}
     />

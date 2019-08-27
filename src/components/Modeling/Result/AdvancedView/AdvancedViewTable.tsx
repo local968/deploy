@@ -44,7 +44,7 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
 
   const submitBeta = () => project.updateProject({ fbeta });
 
-  const renderTable = () => {
+  const renderTable = ():ReactElement => {
     switch (problemType) {
       case "Classification":
         return <ClassificationTable
@@ -57,9 +57,9 @@ const AdvancedViewTable = (props: AdvancedViewTableProps) => {
           currentSettingId={currentSettingId}
         />;
       case "Regression":
-        return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />
+        return <RegressionTable sort={sort} handleSort={handleSort} project={project} metric={metric} handleChange={handleChange} models={models} currentSettingId={currentSettingId} />;
       case "Clustering":
-        return <ClusteringTable sort={sort} handleSort={handleSort} project={project} models={models} currentSettingId={currentSettingId} />
+        return <ClusteringTable sort={sort} handleSort={handleSort} project={project} models={models} currentSettingId={currentSettingId} />;
       case "MultiClassification":
         return <MultiClassificationTable
           sort={sort}

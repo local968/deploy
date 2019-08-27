@@ -193,6 +193,7 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
     const { problemType } = this.props.project;
     if (!value) {
       this.props.project.algorithms = [];
+      this.props.project.version = this.props.project.version.filter(_v => _v !== 4)
       this.props.setSetting({ algorithms: [] });
       return;
     }
@@ -321,12 +322,12 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
     const measurementList =
       problemType === 'Classification'
         ? // [{ value: "acc", label: 'Accuracy' }, { value: "auc", label: 'AUC' }, { value: "f1", label: 'F1' }, { value: "precision", label: 'Precision' }, { value: "recall", label: 'Recall' }] :
-          [
-            { value: 'auc', label: 'AUC' },
-            { value: 'log_loss', label: 'LogLoss' },
-          ]
+        [
+          { value: 'auc', label: 'AUC' },
+          { value: 'log_loss', label: 'LogLoss' },
+        ]
         : problemType === 'Regression'
-        ? [
+          ? [
             {
               value: 'r2',
               label: (
@@ -338,7 +339,7 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
             { value: 'mse', label: 'MSE' },
             { value: 'rmse', label: 'RMSE' },
           ]
-        : [
+          : [
             { value: 'macro_auc', label: 'Macro AUC' },
             { value: 'macro_f1', label: 'Macro F1' },
             { value: 'micro_f1', label: 'Micro F1' },
@@ -643,7 +644,7 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
                         checked={!disabled && features.includes(v.value)}
                         onChange={
                           disabled
-                            ? () => {}
+                            ? () => { }
                             : this.handleFeatures.bind(null, v.value)
                         }
                       />
@@ -870,33 +871,33 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
                         onChange={this.handleSlider}
                         value={[
                           100 -
-                            parseInt(validationRate.toString(), 10) -
-                            parseInt(holdoutRate.toString(), 10),
+                          parseInt(validationRate.toString(), 10) -
+                          parseInt(holdoutRate.toString(), 10),
                           100 - parseInt(holdoutRate.toString(), 10),
                         ]}
                         tooltipVisible={false}
                       />
                     </div>
                   ) : (
-                    <div className={styles.advancedPercentBlock}>
-                      <div className={styles.advancedPercent}>
-                        {this.crossPercent()}
-                        <div
-                          className={styles.advancedPercentHoldout}
-                          style={{ width: holdoutRate + '%' }}
-                        ></div>
+                      <div className={styles.advancedPercentBlock}>
+                        <div className={styles.advancedPercent}>
+                          {this.crossPercent()}
+                          <div
+                            className={styles.advancedPercentHoldout}
+                            style={{ width: holdoutRate + '%' }}
+                          ></div>
+                        </div>
+                        <Range
+                          range={false}
+                          step={1}
+                          min={1}
+                          max={99}
+                          onChange={this.handleDrag}
+                          value={100 - parseInt(holdoutRate.toString(), 10)}
+                          tooltipVisible={false}
+                        />
                       </div>
-                      <Range
-                        range={false}
-                        step={1}
-                        min={1}
-                        max={99}
-                        onChange={this.handleDrag}
-                        value={100 - parseInt(holdoutRate.toString(), 10)}
-                        tooltipVisible={false}
-                      />
-                    </div>
-                  )}
+                    )}
                   {runWith === 'holdout' ? (
                     <div className={styles.advancedPercentBox}>
                       <div className={styles.advancedPercentInput}>
@@ -945,41 +946,41 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
                       </div>
                     </div>
                   ) : (
-                    <div className={styles.advancedPercentBox}>
-                      <div className={styles.advancedPercentInput}>
-                        <div className={styles.advancedPercentText}>
-                          <div
-                            className={classnames(
-                              styles.advancedPercetColor,
-                              styles.advancedPercentCross,
-                            )}
+                      <div className={styles.advancedPercentBox}>
+                        <div className={styles.advancedPercentInput}>
+                          <div className={styles.advancedPercentText}>
+                            <div
+                              className={classnames(
+                                styles.advancedPercetColor,
+                                styles.advancedPercentCross,
+                              )}
+                            />
+                            <span>{EN.SelectNumberofCVfolds}</span>
+                          </div>
+                          <NumberInput
+                            value={crossCount}
+                            onBlur={this.changeCrossCount}
+                            min={2}
+                            max={10}
+                            isInt={true}
                           />
-                          <span>{EN.SelectNumberofCVfolds}</span>
+                          {/* <span>{crossCount}</span> */}
                         </div>
-                        <NumberInput
-                          value={crossCount}
-                          onBlur={this.changeCrossCount}
-                          min={2}
-                          max={10}
-                          isInt={true}
-                        />
-                        {/* <span>{crossCount}</span> */}
-                      </div>
-                      <div className={styles.advancedPercentInput}>
-                        <div className={styles.advancedPercentText}>
-                          <div
-                            className={classnames(
-                              styles.advancedPercetColor,
-                              styles.advancedPercentHoldout,
-                            )}
-                          />
-                          <span>{EN.Holdout}</span>
+                        <div className={styles.advancedPercentInput}>
+                          <div className={styles.advancedPercentText}>
+                            <div
+                              className={classnames(
+                                styles.advancedPercetColor,
+                                styles.advancedPercentHoldout,
+                              )}
+                            />
+                            <span>{EN.Holdout}</span>
+                          </div>
+                          {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
+                          <span>{parseInt(holdoutRate.toString(), 10)}%</span>
                         </div>
-                        {/* <NumberInput value={parseInt(holdoutRate, 10)} onBlur={this.changeHoldoutRate} min={1} max={99} isInt={true} /> */}
-                        <span>{parseInt(holdoutRate.toString(), 10)}%</span>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             )}

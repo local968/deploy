@@ -2,7 +2,18 @@ import React, { Component } from 'react';
 import styles from './styles.module.css';
 import { Slider } from 'antd'
 
-export default class Range extends Component {
+interface RageProps {
+  range?,
+  min?,
+  max?,
+  onChange?,
+  value?,
+  step?,
+  tooltipVisible?,
+  marks?
+}
+
+export default class Range extends Component<RageProps> {
   stop = e => {
     e.stopPropagation()
   }

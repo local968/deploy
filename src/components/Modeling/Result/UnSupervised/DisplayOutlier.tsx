@@ -131,8 +131,6 @@ const DisplayOutlier = (props: DisplayOutlierProps) => {
       rowCount={tableData.length}
       fixedColumnCount={1}
       fixedRowCount={2}
-      checked={null}
-      select={null}
       style={{ border: "1px solid #ccc" }}
       data={tableData}
     />

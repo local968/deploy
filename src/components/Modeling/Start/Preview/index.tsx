@@ -8,10 +8,18 @@ import { Table } from 'components/Common';
 import EN from '../../../../constant/en';
 
 import dataIcon from './data.svg';
-import { formatNumber } from 'util';
+import { formatNumber } from '../../../../util';
+import Project from 'stores/Project';
+
+interface PreviewProps {
+  visiable: boolean,
+  project: Project,
+  hideTable: () => void,
+  showTable: () => void
+}
 
 @observer
-export default class Preview extends Component {
+export default class Preview extends Component<PreviewProps> {
   @observable cleanData = []
   @observable newVariableData = []
   @observable loading = false
@@ -122,7 +130,7 @@ export default class Preview extends Component {
       <div className={styles.arrow}>{<Icon type="caret-right" theme="filled" style={{ transform: `rotate(${visiable ? 0 : 180}deg)` }} />}</div>
       <div className={styles.header}>
         {(!isUn && !!target) && <div className={styles.text}><span>{EN.TargetVariable}:</span><span className={styles.value} title={mapHeader[target]}>{mapHeader[target]}</span></div>}
-        <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length}>{header.length}</span></div>
+        <div className={styles.text}><span>{EN.TotalVariables}:</span><span className={styles.value} title={header.length.toString()}>{header.length}</span></div>
       </div>
       <div className={styles.table}>
         <Table
@@ -132,8 +140,6 @@ export default class Preview extends Component {
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={3}
-          checked={null}
-          select={null}
           style={{ border: "1px solid #ccc" }}
           data={tableData}
         />

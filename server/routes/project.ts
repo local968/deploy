@@ -1019,51 +1019,49 @@ wss.register('createNewVariable', async (message, socket, progress) => {
   return returnValue;
 });
 
-wss.register('abortTrain', (message, socket) => {
-  const { projectId, _id: requestId, stopId } = message;
+wss.register('abortTrain', async (message, socket) => {
+  const { projectId, _id: requestId, stopId, isModeling } = message;
   const { userId } = socket.session;
-  return getProjectField(projectId, 'stopIds').then((stopIds = []) => {
-    if (!stopIds.length) return { status: 200, message: 'ok' };
-    if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' };
-    // return axios
-    //   .get(
-    //     `${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([
-    //       { ...message, userId, requestId, stopId },
-    //     ])}`,
-    //   )
-    command({ ...message, userId, requestId, stopId })
-    // .then(async () => {
-    command.clearListener(stopId);
-    userLogger.warn({
-      userId,
-      pid: projectId,
-      params: JSON.stringify({ stopId }),
-      message: `abort train: ${stopId}`,
-      time: moment().unix(),
-    });
-    return getProjectField(projectId, 'trainModel').then(trainModel => {
-      Reflect.deleteProperty(trainModel, stopId);
-      const curStopIds = stopIds.filter(si => si !== stopId);
-      const statusData: StatusData = {
-        trainModel,
-        stopIds: curStopIds,
-      };
-      // const modelCounts = await getModelCount(projectId);
-      if (!curStopIds.length) {
-        statusData.trainModel = {};
-        statusData.stopIds = [];
-        statusData.train2Finished = true
-        statusData.train2ing = false
-        // if (isModeling && !modelCounts) {
-        //   statusData.mainStep = 3;
-        //   statusData.curStep = 3;
-        //   statusData.lastSubStep = 1;
-        //   statusData.subStepActive = 1;
-        // }
-      }
-      return createOrUpdate(projectId, userId, statusData);
-    });
-  })
+  const stopIds = await getProjectField(projectId, 'stopIds')
+  if (!stopIds.length) return { status: 200, message: 'ok' };
+  if (!stopIds.includes(stopId)) return { status: 200, message: 'ok' };
+  // return axios
+  //   .get(
+  //     `${config.services.BACK_API_SERVICE}/putRunTask?data=${JSON.stringify([
+  //       { ...message, userId, requestId, stopId },
+  //     ])}`,
+  //   )
+  command({ ...message, userId, requestId, stopId })
+  // .then(async () => {
+  command.clearListener(stopId);
+  userLogger.warn({
+    userId,
+    pid: projectId,
+    params: JSON.stringify({ stopId }),
+    message: `abort train: ${stopId}`,
+    time: moment().unix(),
+  });
+  const trainModel = await getProjectField(projectId, 'trainModel')
+  Reflect.deleteProperty(trainModel, stopId);
+  const curStopIds = stopIds.filter(si => si !== stopId);
+  const statusData: StatusData = {
+    trainModel,
+    stopIds: curStopIds,
+  };
+  const modelCounts = await getModelCount(projectId);
+  if (!curStopIds.length) {
+    statusData.trainModel = {};
+    statusData.stopIds = [];
+    statusData.train2Finished = true
+    statusData.train2ing = false
+    if (isModeling && !modelCounts) {
+      statusData.mainStep = 3;
+      statusData.curStep = 3;
+      statusData.lastSubStep = 1;
+      statusData.subStepActive = 1;
+    }
+  }
+  return createOrUpdate(projectId, userId, statusData);
   // const trainModel = await getProjectField(projectId, 'trainModel');
 
   // return command(, () => {
