@@ -1604,7 +1604,7 @@ class Project {
     const currentMeasurement = measurement || (problemType === 'Classification' && 'auc' || problemType === 'Regression' && 'r2' || problemType === 'Clustering' && 'CVNN' || problemType === 'Outlier' && 'score' || problemType === 'MultiClassification' && 'macro_auc')
     const sort = (currentMeasurement === 'CVNN' || currentMeasurement.endsWith("se")) ? -1 : 1
     // const currentModels = models.filter(_m => (currentSetting ? _m.settingId === currentSetting.id : true));
-    const currentModels = models
+    const currentModels = models.filter(_m => !_m.id.includes('DBSCAN'))
 
     return (!currentModels.length ? models : currentModels)
       .map(m => {
