@@ -421,7 +421,7 @@ const removeOutdatePipelines = async () => {
       const response = await axios.delete(`${esServicePath}/etls/pipeline/${pipeline}`)
       if (response.status === 200) removes.push(pipeline)
     }
-    redis.zrem(...removes)
+    redis.zrem('pipelines', ...removes)
   } catch (e) {
     console.error('remove pipeline error')
     console.error(e)
