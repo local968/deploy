@@ -1,21 +1,18 @@
 import { observer } from 'mobx-react';
-import React, { Component } from 'react';
+import React, { ReactElement } from 'react';
 import styles from './DetailCurves.module.css';
 import EN from '../../../../constant/en';
 import { Table } from 'antd';
 
 interface Interface {
-  model: any;
-  yes: any;
-  no: any;
-  isHoldout: any;
+  readonly model: any;
+  readonly yes: any;
+  readonly no: any;
+  readonly isHoldout: any;
 }
 
-
-@observer
-export default class PredictTable extends Component<Interface> {
-  render() {
-    const { model, yes, no, isHoldout } = this.props;
+const PredictTable = observer((props:Interface):ReactElement=>{
+    const { model, yes, no, isHoldout } = props;
     const { fitIndex, chartData, holdoutChartData } = model;
     const { roc } = isHoldout ? holdoutChartData : chartData;
     let TN = roc.TN[fitIndex];
@@ -73,5 +70,6 @@ export default class PredictTable extends Component<Interface> {
         pagination={false}
       />
     );
-  }
-}
+});
+
+export default PredictTable;

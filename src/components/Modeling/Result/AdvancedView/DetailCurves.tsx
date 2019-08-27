@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import EN from '../../../../constant/en';
 import {
   GainChart,
@@ -40,220 +40,204 @@ const varImpactSelected =
 import styles from './DetailCurves.module.css';
 import Thumbnail from './Thumbnail';
 import PredictTable from './PredictTable';
+import { observer } from 'mobx-react';
+
+
+const thumbnails = [
+  {
+    normalIcon: ROCCurve,
+    hoverIcon: ROCCurve,
+    selectedIcon: rocSelected,
+    text: EN.ROCCurve,
+  },
+  {
+    normalIcon: predictDist,
+    hoverIcon: predictDist,
+    selectedIcon: predictionDistributionSelected,
+    text: EN.PredictionDistribution,
+  },
+  {
+    normalIcon: precisionRecall,
+    hoverIcon: precisionRecall,
+    selectedIcon: precisionRecallSelected,
+    text: EN.PrecisionRecallTradeoff,
+  },
+  {
+    normalIcon: liftChart,
+    hoverIcon: liftChart,
+    selectedIcon: liftchartSelected,
+    text: EN.LiftChart,
+  },
+  {
+    normalIcon: gainChart,
+    hoverIcon: gainChart,
+    selectedIcon: gainchartSelected,
+    text: EN.GainChart,
+  },
+  {
+    normalIcon: ksCurve,
+    hoverIcon: ksCurve,
+    selectedIcon: ksCurveSelected,
+    text: EN.KSCurve,
+  },
+  {
+    normalIcon: varImpactNormal,
+    hoverIcon: varImpactNormal,
+    selectedIcon: varImpactSelected,
+    text: EN.VariableImpact,
+  },
+];
 
 interface Interface {
-  model: any
-  yes: any
-  no: any
-  project: any
+  readonly model: any
+  readonly yes: any
+  readonly no: any
+  readonly project: any
 }
 
-export default class DetailCurves extends Component<Interface> {
-  state = {
-    curve: EN.ROCCurve,
-    show: true,
-  };
-  handleClick = val => {
-    this.setState({ curve: val });
-  };
-  reset = () => {
-    this.props.model.resetFitIndex();
-    this.setState({
-      show: false,
-    },()=>{
-      this.setState({
-        show: true,
-      });
-    });
-  };
+function DetailCurves(props:Interface):ReactElement {
+  const {
+    model:{resetFitIndex},
+    model,
+    yes,
+    no,
+    project:{isHoldout, mapHeader},
+    project,
+  } = props;
+  const [curve,upCurve] = useState(EN.ROCCurve);
+  const [show,upShow] = useState(true);
+  let curComponent;
+  let hasReset = !isHoldout;
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.isHoldout !== this.props.project.isHoldout) {
-      this.setState(
-        {
-          show: false,
-        },
-        () => {
-          this.setState({
-            show: true,
-          });
-        },
+  switch (curve) {
+    case EN.ROCCurve:
+      curComponent = show && (
+        <ROCCurves
+          height={300}
+          width={600}
+          x_name={EN.FalsePositiveRate}
+          y_name={EN.TruePositiveRate}
+          model={model}
+          isHoldout={isHoldout}
+        />
       );
-    }
+      break;
+    case EN.PredictionDistribution:
+      curComponent = show && (
+        <PredictionDistributions
+          height={300}
+          width={600}
+          x_name={EN.ProbabilityThreshold}
+          y_name={EN.ProbabilityDensity}
+          model={model}
+          isHoldout={isHoldout}
+        />
+      );
+      break;
+    case EN.PrecisionRecallTradeoff:
+      curComponent = show && (
+        <PRCharts
+          height={300}
+          width={500}
+          x_name={EN.Recall}
+          y_name={EN.Precision}
+          model={model}
+          project={project}
+        />
+      );
+      break;
+    case EN.LiftChart:
+      curComponent = (
+        <SingleLiftCharts
+          height={300}
+          width={600}
+          x_name={EN.percentage}
+          y_name={EN.lift}
+          model={model}
+          isHoldout={isHoldout}
+        />
+      );
+      hasReset = false;
+      break;
+    case EN.GainChart:
+      curComponent = (
+        <GainChart
+          height={300}
+          width={600}
+          x_name={EN.percentage}
+          y_name={EN.Gain}
+          model={model}
+          isHoldout={isHoldout}
+        />
+      );
+      hasReset = false;
+      break;
+    case EN.KSCurve:
+      curComponent = (
+        <KsChart
+          height={300}
+          width={600}
+          x_name={EN.percentage}
+          y_name="KS"
+          model={model}
+          isHoldout={isHoldout}
+        />
+      );
+      hasReset = false;
+      break;
+    case EN.VariableImpact:
+      curComponent = (
+        <div style={{ fontSize: 50 }}>
+          <VariableImpact model={model} mapHeader={mapHeader} />
+        </div>
+      );
+      hasReset = false;
+      break;
+    default:
+      break;
   }
 
-  render() {
-    const {
-      model,
-      yes,
-      no,
-      project,
-    } = this.props;
-    const { isHoldout, mapHeader } = project;
-    const { curve, show } = this.state;
-    let curComponent;
-    let hasReset = !isHoldout;
+  function reset(){
+    resetFitIndex();
+    upShow(false);
+    upShow(true);
+  }
 
-    switch (curve) {
-      case EN.ROCCurve:
-        curComponent = show && (
-          <ROCCurves
-            height={300}
-            width={600}
-            x_name={EN.FalsePositiveRate}
-            y_name={EN.TruePositiveRate}
-            model={model}
-            isHoldout={isHoldout}
-          />
-        );
-        break;
-      case EN.PredictionDistribution:
-        curComponent = show && (
-          <PredictionDistributions
-            height={300}
-            width={600}
-            x_name={EN.ProbabilityThreshold}
-            y_name={EN.ProbabilityDensity}
-            model={model}
-            isHoldout={isHoldout}
-          />
-        );
-        break;
-      case EN.PrecisionRecallTradeoff:
-        curComponent = show && (
-          <PRCharts
-            height={300}
-            width={500}
-            x_name={EN.Recall}
-            y_name={EN.Precision}
-            model={model}
-            project={project}
-          />
-        );
-        break;
-      case EN.LiftChart:
-        curComponent = (
-          <SingleLiftCharts
-            height={300}
-            width={600}
-            x_name={EN.percentage}
-            y_name={EN.lift}
-            model={model}
-            isHoldout={isHoldout}
-          />
-        );
-        hasReset = false;
-        break;
-      case EN.GainChart:
-        curComponent = (
-          <GainChart
-            height={300}
-            width={600}
-            x_name={EN.percentage}
-            y_name={EN.Gain}
-            model={model}
-            isHoldout={isHoldout}
-          />
-        );
-        hasReset = false;
-        break;
-      case EN.KSCurve:
-        curComponent = (
-          <KsChart
-            height={300}
-            width={600}
-            x_name={EN.percentage}
-            y_name="KS"
-            model={model}
-            isHoldout={isHoldout}
-          />
-        );
-        hasReset = false;
-        break;
-      case EN.VariableImpact:
-        curComponent = (
-          <div style={{ fontSize: 50 }}>
-            <VariableImpact model={model} mapHeader={mapHeader} />
-          </div>
-        );
-        hasReset = false;
-        break;
-      default:
-        break;
-    }
-    const thumbnails = [
-      {
-        normalIcon: ROCCurve,
-        hoverIcon: ROCCurve,
-        selectedIcon: rocSelected,
-        text: EN.ROCCurve,
-      },
-      {
-        normalIcon: predictDist,
-        hoverIcon: predictDist,
-        selectedIcon: predictionDistributionSelected,
-        text: EN.PredictionDistribution,
-      },
-      {
-        normalIcon: precisionRecall,
-        hoverIcon: precisionRecall,
-        selectedIcon: precisionRecallSelected,
-        text: EN.PrecisionRecallTradeoff,
-      },
-      {
-        normalIcon: liftChart,
-        hoverIcon: liftChart,
-        selectedIcon: liftchartSelected,
-        text: EN.LiftChart,
-      },
-      {
-        normalIcon: gainChart,
-        hoverIcon: gainChart,
-        selectedIcon: gainchartSelected,
-        text: EN.GainChart,
-      },
-      {
-        normalIcon: ksCurve,
-        hoverIcon: ksCurve,
-        selectedIcon: ksCurveSelected,
-        text: EN.KSCurve,
-      },
-      {
-        normalIcon: varImpactNormal,
-        hoverIcon: varImpactNormal,
-        selectedIcon: varImpactSelected,
-        text: EN.VariableImpact,
-      },
-    ];
-    return (
-      <div className={styles.detailCurves}>
-        <div className={styles.leftPanel} style={{ flex: 1 }}>
-          <div className={styles.thumbnails}>
-            {thumbnails.map((tn, i) => (
-              <Thumbnail
-                curSelected={curve}
-                key={i}
-                thumbnail={tn}
-                onClick={this.handleClick}
-                value={tn.text}
-              />
-            ))}
-          </div>
-          <PredictTable isHoldout={isHoldout} model={model} yes={yes} no={no} />
+  useEffect(()=>{
+    upShow(false);
+    upShow(true);
+  },[isHoldout]);
+
+  return (
+    <div className={styles.detailCurves}>
+      <div className={styles.leftPanel} style={{ flex: 1 }}>
+        <div className={styles.thumbnails}>
+          {thumbnails.map((tn, i) => (
+            <Thumbnail
+              curSelected={curve}
+              key={i}
+              thumbnail={tn}
+              onClick={upCurve}
+              value={tn.text}
+            />
+          ))}
         </div>
-        <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
-          {curComponent}
-          {hasReset && (
-            <button
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.reset}
-              className={styles.button + ' ' + styles.buttonr}
-            >
-              {EN.Reset}
-            </button>
-          )}
-        </div>
+        <PredictTable isHoldout={isHoldout} model={model} yes={yes} no={no} />
       </div>
-    );
-  }
+      <div className={styles.rightPanel} style={{ marginLeft: 10 }}>
+        {curComponent}
+        {hasReset && (
+          <button
+            style={{ whiteSpace: 'nowrap' }}
+            onClick={reset}
+            className={styles.button + ' ' + styles.buttonr}
+          >
+            {EN.Reset}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
+
+export default observer(DetailCurves);
