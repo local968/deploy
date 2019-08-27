@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import EN from '../../../constant/en';
 import styles from './AdvancedView.module.css';
 import { toJS } from 'mobx';
@@ -18,7 +18,7 @@ interface Interface {
   readonly metric: any;
 }
 
-const AdvancedModelTable = observer((props: Interface) => {
+const AdvancedModelTable = observer((props: Interface):ReactElement => {
   const {
     models,
     project: {
@@ -126,9 +126,7 @@ const AdvancedModelTable = observer((props: Interface) => {
           <RegressionModleRow
             project={project}
             key={m.id}
-            texts={texts}
             model={m}
-            metric={metric.key}
           />
         );
     }
