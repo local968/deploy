@@ -1020,7 +1020,7 @@ wss.register('createNewVariable', async (message, socket, progress) => {
 });
 
 wss.register('abortTrain', (message, socket) => {
-  const { projectId, _id: requestId, stopId } = message;
+  const { projectId, _id: requestId, stopId, isModeling } = message;
   const { userId } = socket.session;
   return getProjectField(projectId, 'stopIds').then((stopIds = []) => {
     if (!stopIds.length) return { status: 200, message: 'ok' };
@@ -1048,18 +1048,18 @@ wss.register('abortTrain', (message, socket) => {
         trainModel,
         stopIds: curStopIds,
       };
-      // const modelCounts = await getModelCount(projectId);
+      const modelCounts = await getModelCount(projectId);
       if (!curStopIds.length) {
         statusData.trainModel = {};
         statusData.stopIds = [];
         statusData.train2Finished = true
         statusData.train2ing = false
-        // if (isModeling && !modelCounts) {
-        //   statusData.mainStep = 3;
-        //   statusData.curStep = 3;
-        //   statusData.lastSubStep = 1;
-        //   statusData.subStepActive = 1;
-        // }
+        if (isModeling && !modelCounts) {
+          statusData.mainStep = 3;
+          statusData.curStep = 3;
+          statusData.lastSubStep = 1;
+          statusData.subStepActive = 1;
+        }
       }
       return createOrUpdate(projectId, userId, statusData);
     });
