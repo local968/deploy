@@ -1324,8 +1324,6 @@ const MappingDict = observer(props => {
           rowCount={tableData.length}
           fixedColumnCount={0}
           fixedRowCount={1}
-          checked={null}
-          select={null}
           // style={{ border: "1px solid #ccc" }}
           data={tableData}
         />

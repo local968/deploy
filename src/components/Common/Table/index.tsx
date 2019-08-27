@@ -1,10 +1,27 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import { observer } from 'mobx-react';
 import { AutoSizer, MultiGrid } from 'react-virtualized';
 import { Spin } from 'antd'
 
+interface TableProps {
+  columnCount?: number,
+  columnWidth?: number,
+  rowHeight?: ((obj: { index: number }) => number )| number,
+  fixedColumnCount?: number,
+  fixedRowCount?: number,
+  rowCount?: number,
+  data?: {
+    cn?: string,
+    style?: any,
+    title?: string,
+    content?: string | JSX.Element
+  }[][],
+  style?: any
+}
+
 @observer
-export default class Table extends Component {
+export default class Table extends Component<TableProps> {
+  gridRef: RefObject<MultiGrid>
   constructor(props) {
     super(props)
     this.gridRef = React.createRef();
@@ -16,8 +33,8 @@ export default class Table extends Component {
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
     const { data } = this.props;
-    const row = data[rowIndex] || []
-    const cell = row[columnIndex] || {}
+    const row = data[rowIndex]
+    const cell = row[columnIndex]
     return (
       <div
         className={cell.cn}

@@ -297,7 +297,7 @@ export default class DataConnect extends Component<DataConnectProps> {
             onError={this.onError}
             params={{ userId: userStore.info.id, projectId: project.id }}
             onProgress={this.onProgress}
-            onCheck={this.onChecks}
+            // onCheck={this.onChecks}
             file={this.file}
             ref={this.uploadRef}
             charset={charset}

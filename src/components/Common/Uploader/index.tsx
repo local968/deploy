@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, RefObject } from 'react';
 import styles from './styles.module.css';
 import axios from 'axios';
 import config from 'config'
@@ -7,7 +7,31 @@ import EsUploader from '../EsUploader';
 import EN from '../../../constant/en'
 const AllowExt = ["csv", "CSV"]
 
-export default class Uploader extends Component {
+interface UploaderProps {
+  params?: any,
+  onProgress?: (str: string, speed?: string) => void,
+  onError?: (err: Error, times?: number) => void,
+  onComplete?: (data: {
+    originalIndex: string,
+    totalRawLines: number,
+    rawHeader: string[],
+    fileName: string
+  }, file: File) => void,
+  charset?: string,
+  afterClose?: (index: string) => void,
+  onStart?: (obj: {
+    pause: () => void,
+    resume: () => void,
+    abort: () => void,
+  }) => void
+  className?: string,
+  file?: File
+}
+
+export default class Uploader extends Component<UploaderProps> {
+  inputRef: RefObject<HTMLInputElement>
+  uploader: any
+
   constructor(props) {
     super(props)
     this.inputRef = React.createRef()
