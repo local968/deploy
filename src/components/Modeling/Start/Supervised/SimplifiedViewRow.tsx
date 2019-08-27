@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { formatNumber } from '../../../../util';
 import styles from './styles.module.css';
 import histogramIcon from './histogramIcon.svg';
@@ -13,20 +13,27 @@ import classnames from 'classnames';
 import SimplePlot from './SimplePlot';
 
 interface Interface {
-  data: any;
-  colType: any;
-  importance: any;
-  value: any;
-  project: any;
-  isChecked: any;
-  handleCheck: any;
-  id: any;
-  lines: any;
-  isNew: any;
-  mapHeader: any;
+  readonly data: any;
+  readonly colType: any;
+  readonly importance: any;
+  readonly value: any;
+  readonly project: any;
+  readonly isChecked: any;
+  readonly handleCheck: any;
+  readonly id: any;
+  readonly lines: any;
+  readonly isNew: any;
+  readonly mapHeader: ReadonlyArray<string>
 }
 
-const SimplifiedViewRow = observer((props: Interface) => {
+interface InterfaceData {
+  readonly field:string
+  readonly id:number
+  interval?:number
+  size?:number
+}
+
+const SimplifiedViewRow = observer((props: Interface):ReactElement => {
   const {
     value,
     project: {
@@ -61,7 +68,7 @@ const SimplifiedViewRow = observer((props: Interface) => {
       return upHistograms(true);
     }
     if (!chartData[value]) {
-      const data: any = {
+      const data:InterfaceData = {
         field: value,
         id: etlIndex,
       };
@@ -78,7 +85,9 @@ const SimplifiedViewRow = observer((props: Interface) => {
             url: '/graphics/histogram-numerical',
             data,
           })
-          .then((result: any) =>
+          .then((result: {
+              data?
+            }) =>
             showback(result.data, value, {
               min,
               max,
@@ -93,7 +102,7 @@ const SimplifiedViewRow = observer((props: Interface) => {
             url: '/graphics/histogram-categorical',
             data,
           })
-          .then((result: any) => showback(result.data, value));
+          .then((result: {data?}) => showback(result.data, value));
       }
     } else {
       upHistograms(true);
@@ -281,7 +290,7 @@ const SimplifiedViewRow = observer((props: Interface) => {
         />
         {!isRaw && histograms ? (
           <Popover
-            placement="rightTop"
+            placement="right"
             visible={!isRaw && histograms}
             onVisibleChange={() => upHistograms(false)}
             overlayClassName="popovers"

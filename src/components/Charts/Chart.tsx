@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import EN from '../../constant/en';
 import {
   FitBar,
@@ -21,7 +21,7 @@ interface Interface {
   report?:boolean
 }
 
-export default function Chart(props: Interface) {
+export default function Chart(props: Interface):ReactElement {
   let { x_name = '', y_name = '', project, name, data: _data = {},report=false} = props;
   const { problemType, mapHeader, target } = project;
   let data;

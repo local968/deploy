@@ -11,6 +11,7 @@ interface Interface {
   isHoldout: any;
 }
 
+
 @observer
 export default class PredictTable extends Component<Interface> {
   render() {

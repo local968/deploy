@@ -11,11 +11,11 @@ import config from '../../../config';
 const { isEN } = config;
 
 interface Interface {
-  models: any;
-  project: any;
-  sort: any;
-  handleSort: any;
-  metric: any;
+  readonly models: any;
+  readonly project: any;
+  readonly sort: any;
+  readonly handleSort: any;
+  readonly metric: any;
 }
 
 const AdvancedModelTable = observer((props: Interface) => {
@@ -23,7 +23,6 @@ const AdvancedModelTable = observer((props: Interface) => {
     models,
     project: {
       problemType,
-      selectModel,
       targetArray,
       targetColMap,
       renameVariable,
@@ -119,8 +118,6 @@ const AdvancedModelTable = observer((props: Interface) => {
           <MultiClassificationModelRow
             project={project}
             key={m.id}
-            texts={texts}
-            checked={selectModel.id === m.id}
             model={m}
           />
         );

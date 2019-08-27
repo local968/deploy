@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import { toJS } from 'mobx';
 interface Interface {
@@ -8,7 +8,7 @@ interface Interface {
   x_name:string
   index:number
 }
-export default function TwinBar(props:Interface) {
+export default function TwinBar(props:Interface):ReactElement {
   const { x, same, diff,x_name,index } = props;
   const x_values = toJS(x);
   const _same = toJS(same);

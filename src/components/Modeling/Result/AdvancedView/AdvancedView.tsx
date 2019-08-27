@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { ReactElement, useMemo } from 'react';
 import styles from './AdvancedView.module.css'
 import EN from '../../../../constant/en'
 import { Select } from 'antd'
@@ -27,7 +27,7 @@ interface AdvancedViewProps {
   report?:boolean
 }
 
-const AdvancedView = (props: AdvancedViewProps) => {
+const AdvancedView = (props: AdvancedViewProps):ReactElement => {
   const { project, currentSettingId, changeSetting, models, sort, handleSort, metric, handleChange,report=false } = props;
   const { selectModel, problemType, train2Finished, metricCorrection, fbeta } = project;
 
@@ -43,16 +43,16 @@ const AdvancedView = (props: AdvancedViewProps) => {
     } catch (e) {
       return 'OK'
     }
-  }, [selectModel, problemType])
+  }, [selectModel, problemType]);
 
   const handleMetricCorrection = (correction, isAll) => {
     //不应用到全部  保存当前选择模型ID
-    const selectId = selectModel.id
-    const curModels = isAll ? models : [selectModel]
+    const selectId = selectModel.id;
+    const curModels = isAll ? models : [selectModel];
 
     const promises = curModels.map(m => {
-      const { chartData: { roc }, initialFitIndex, fitIndex } = m
-      const { TP, TN, FP, FN, Threshold } = roc
+      const { chartData: { roc }, initialFitIndex, fitIndex } = m;
+      const { TP, TN, FP, FN, Threshold } = roc;
       const Length = 101
       const Tpr = index => TP[index] / (TP[index] + FN[index])
       const Fpr = index => FP[index] / (FP[index] + TN[index])
@@ -165,7 +165,7 @@ const AdvancedView = (props: AdvancedViewProps) => {
     })
   };
 
-  return <div className={styles.main}>
+  return <div className={styles.main} style={{minHeight:(report?'unset':'')}}>
     {(problemType === 'Classification' || problemType === 'Regression') && <div className={styles.title}>
       <div className={styles.model}>
         <span className={styles.label}>{EN.ModelingResults} :<div className={styles.status}>{performance}</div></span>

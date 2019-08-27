@@ -124,8 +124,8 @@ interface MultiClassificationTableProps {
   currentSettingId: string
 }
 
-const MultiClassificationTable = (props: MultiClassificationTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props;
+const MultiClassificationTable = (props: MultiClassificationTableProps):ReactElement => {
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId} = props;
   const { isHoldout,m_cro} = project;
   const [detailArr, setDetail] = useState([] as string[]);
 
@@ -303,7 +303,6 @@ const MultiClassificationTable = (props: MultiClassificationTableProps) => {
               </Select>
             </div>
           </div>
-
           <div className={styles.metricSwitch}>
             <span>{EN.Validation}</span>
             <Switch checked={isHoldout} onChange={handleHoldout} style={{ backgroundColor: '#1D2B3C' }} />

@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-export default function Bar(){
+export default function Bar():ReactElement{
 		const result = {
 			x_name:'x_name',
 			y_name:'y_name',

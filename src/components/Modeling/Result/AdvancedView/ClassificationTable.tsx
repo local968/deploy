@@ -11,7 +11,7 @@ import moment from 'moment';
 import { formatNumber } from '../../../../util'
 import DetailCurves from './DetailCurves';
 
-const Option = Select.Option
+const {Option} = Select;
 
 const Headers: TableHeader[] = [
   {
@@ -95,8 +95,8 @@ interface ClassificationTableProps {
   currentSettingId: string
 }
 
-const ClassificationTable = (props: ClassificationTableProps) => {
-  const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props;
+const ClassificationTable = (props: ClassificationTableProps):ReactElement => {
+  const { sort, handleSort, project, metric, handleChange, models, currentSettingId} = props;
   const { isHoldout, fbeta } = project;
   const [detailArr, setDetail] = useState([] as string[]);
 
@@ -309,7 +309,7 @@ const ClassificationRow = observer((props: ClassificationRowProps) => {
   </Tooltip>
 });
 
-const Row = (props: ClassificationRowProps) => {
+const Row = (props: ClassificationRowProps):ReactElement => {
   const { model, project, detail } = props;
   const { targetArray, targetColMap, renameVariable } = project;
   const [v0, v1] = !targetArray.length ? Object.keys(targetColMap) : targetArray;
@@ -323,4 +323,4 @@ const Row = (props: ClassificationRowProps) => {
       project={project}
     />}
   </div>
-}
+};
