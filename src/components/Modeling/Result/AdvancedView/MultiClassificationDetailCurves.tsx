@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import EN from '../../../../constant/en';
 import VariableImpact from '../../Result/VariableImpact';
 const ROCCurve =
@@ -19,54 +19,49 @@ import MulitiPredictTable from './MulitiPredictTable'
 import { MultiRoc } from '../../../Charts';
 import MultiReportTable from './MulitiReportTable';
 import { toJS } from 'mobx';
+import { observer } from 'mobx-react';
+
+const thumbnails = [
+  {
+    normalIcon: ROCCurve,
+    selectedIcon: rocSelected,
+    text: EN.ROCCurve,
+  },
+  {
+    normalIcon: ConfusionMatrix,
+    selectedIcon: ConfusionMatrixSelected,
+    text: EN.ConfusionMatrix,
+  },{
+    normalIcon: Report,
+    selectedIcon: ReportSelected,
+    text: EN.Report,
+  },
+  {
+    normalIcon: varImpactNormal,
+    selectedIcon: varImpactSelected,
+    text: EN.VariableImpact,
+  },
+];
 
 interface Interface {
-  model: any
-  project: any
+  readonly model: any
+  readonly project: any
 }
 
-export default class MultiClassificationDetailCurves extends Component<Interface> {
-  state = {
-    curve: EN.ROCCurve,
-    show: true,
-  };
-  handleClick = val => {
-    this.setState({ curve: val });
-  };
-  reset = () => {
-    this.props.model.resetFitIndex();
-    this.setState({
-      show: false,
-    },()=>{
-      this.setState({
-        show: true,
-      });
-    });
-  };
+function MultiClassificationDetailCurves(props:Interface):ReactElement{
+  const {
+    model:{chartData,holdoutChartData,validateConfusion,holdoutConfusion,validateReport,holdoutReport},
+    model,
+    project:{isHoldout, mapHeader},
+    project,
+  } = props;
+  const [curve,upCurve] = useState(EN.ROCCurve);
+  const [show,upShow] = useState(true);
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.isHoldout !== this.props.project.isHoldout) {
-      this.setState(
-        {
-          show: false,
-        },
-        () => {
-          this.setState({
-            show: true,
-          });
-        },
-      );
-    }
-  }
-
-  render() {
-    const {
-      model,
-      project,
-    } = this.props;
-    const {chartData,holdoutChartData,validateConfusion,holdoutConfusion,validateReport,holdoutReport} = model;
-    const { isHoldout, mapHeader } = project;
-    const { curve, show } = this.state;
+  useEffect(()=>{
+    upShow(false);
+    upShow(true);
+  },[isHoldout]);
     let curComponent;
 
     switch (curve) {
@@ -89,27 +84,6 @@ export default class MultiClassificationDetailCurves extends Component<Interface
       default:
         break;
     }
-    const thumbnails = [
-      {
-        normalIcon: ROCCurve,
-        selectedIcon: rocSelected,
-        text: EN.ROCCurve,
-      },
-      {
-        normalIcon: ConfusionMatrix,
-        selectedIcon: ConfusionMatrixSelected,
-        text: EN.ConfusionMatrix,
-      },{
-        normalIcon: Report,
-        selectedIcon: ReportSelected,
-        text: EN.Report,
-      },
-      {
-        normalIcon: varImpactNormal,
-        selectedIcon: varImpactSelected,
-        text: EN.VariableImpact,
-      },
-    ];
     return (
       <div className={styles.detailCurves}>
         <div className={styles.leftPanel} style={{ flex: 0.5 }}>
@@ -119,7 +93,7 @@ export default class MultiClassificationDetailCurves extends Component<Interface
                 curSelected={curve}
                 key={i}
                 thumbnail={tn}
-                onClick={this.handleClick}
+                onClick={upCurve}
                 value={tn.text}
                 style={{flexBasis:"100%"}}
               />
@@ -131,5 +105,6 @@ export default class MultiClassificationDetailCurves extends Component<Interface
         </div>
       </div>
     );
-  }
 }
+
+export default observer(MultiClassificationDetailCurves);

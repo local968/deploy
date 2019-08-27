@@ -85,7 +85,7 @@ const MetricOptions = [{
 }]
 
 interface RegressionTableProps {
-  project: Project,
+  readonly project: Project,
   metric: string,
   handleChange: (k: string) => void
   sort: {
@@ -97,7 +97,7 @@ interface RegressionTableProps {
   currentSettingId: string
 }
 
-const RegressionTable = (props: RegressionTableProps) => {
+const RegressionTable = (props: RegressionTableProps):ReactElement => {
   const { sort, handleSort, project, metric, handleChange, models, currentSettingId } = props
   const { isHoldout } = project
   const [detailArr, setDetail] = useState([] as string[])
@@ -248,7 +248,7 @@ const RegressionTable = (props: RegressionTableProps) => {
       {/* {filtedModels.map((m, i) => <RegressionTableRow model={m} project={project} metric={metric} key={i} detail={detailArr.includes(m.id)} handleDetail={handleDetail} />)} */}
     </div>
   </div>
-}
+};
 
 export default observer(RegressionTable)
 
@@ -315,4 +315,4 @@ const RegressionTableRow = observer((props: RegressionTableRowProps) => {
       mapHeader={newMapHeader}
     />}
   </div>
-})
+});

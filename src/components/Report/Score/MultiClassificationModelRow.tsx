@@ -2,8 +2,8 @@ import { observer } from 'mobx-react';
 import React, { ReactElement } from 'react';
 import MultiClassificationDetailCurves from '../../Modeling/Result/AdvancedView/MultiClassificationDetailCurves';
 interface Interface {
-  project:any
-  model:any
+  readonly project:any
+  readonly model:any
 }
 const MultiClassificationModelRow = observer((props:Interface):ReactElement=>{
   const { model, project} = props;
