@@ -76,6 +76,7 @@
 
 .schemaSelect span {
     font-size: 0.875rem;
+    white-space: nowrap;
 }
 
 .content {
@@ -219,6 +220,7 @@
 .schemaMissed span {
     font-size: 0.875rem;
     color: #ff3151;
+    white-space: nowrap;
  }
 
 .schemaMissed .errorBlock{
