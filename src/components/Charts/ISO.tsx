@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactElement, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import Slider from 'rc-slider';
 import InputNum from 'rc-input-number';
@@ -22,7 +22,7 @@ interface Interface {
   width?: number;
 }
 
-const ISO = observer((props: Interface) => {
+const ISO = observer((props: Interface):ReactElement => {
   const { height = 500, width = 600 } = props;
   const {
     projectStore: {
@@ -55,10 +55,11 @@ const ISO = observer((props: Interface) => {
   const [show_name, up_show_name] = useState({ var1: '', var2: '' });
   const [default_point, up_default_point] = useState(0);
 
-  const updatePoint = _.debounce(point => {
+  const updatePoint = point => {
     upPoint(point);
     updateModel({ rate: point });
-  }, 280);
+    // chart.current.getEchartsInstance().showLoading();
+  };
 
   useEffect(() => {
     const _chart = chart.current.getEchartsInstance();
@@ -114,16 +115,7 @@ const ISO = observer((props: Interface) => {
   function save() {
     const { var1 = '', var2 = '' } = show_name;
     upVars([var1, var2]);
-
-    // this.setState(
-    //   {
-    //     modelName,
-    //   },
-    //   () => {
-    //     const chart = this.chart.getEchartsInstance();
-    //     chart.showLoading();
-    //   },
-    // );
+    chart.current.getEchartsInstance().showLoading();
     saveFeatureList([var1, var2]);
   }
 
@@ -165,10 +157,6 @@ const ISO = observer((props: Interface) => {
     );
   }
 
-  let option: any = {
-    xAxis: {},
-    yAxis: {},
-  };
   const { _dot, series, x_range, y_range } = useMemo(() => {
     if (!ready) {
       return {};
@@ -224,7 +212,13 @@ const ISO = observer((props: Interface) => {
     };
   }, [url, ready]);
 
-  if (ready) {
+  const option = useMemo(()=>{
+    if(!ready){
+      return {
+        xAxis: {},
+        yAxis: {},
+      }
+    }
     let data1 = [],
       data2 = [];
     if (point) {
@@ -268,7 +262,7 @@ const ISO = observer((props: Interface) => {
       color: '#000',
     };
 
-    option = {
+    return {
       tooltip: {
         position: 'top',
       },
@@ -325,7 +319,7 @@ const ISO = observer((props: Interface) => {
       ],
       series: _series,
     };
-  }
+  },[point,ready]);
 
   return (
     <>
@@ -371,6 +365,8 @@ const ISO = observer((props: Interface) => {
           step={0.001}
           onChange={slider_value => {
             up_slider_value(slider_value);
+          }}
+          onAfterChange={slider_value => {
             updatePoint(slider_value);
           }}
           value={+slider_value}
@@ -390,6 +386,8 @@ const ISO = observer((props: Interface) => {
           style={{ width: 100 }}
           onChange={slider_value => {
             up_slider_value(slider_value);
+          }}
+          onAfterChange={slider_value => {
             updatePoint(slider_value);
           }}
         />

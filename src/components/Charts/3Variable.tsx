@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {  ReactElement } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import 'echarts-gl'
 import EN from "../../constant/en";
@@ -30,7 +30,7 @@ interface Interface {
 	data:Array<any>
 }
 
-export default function ThreeVariable(props:Interface){
+export default function ThreeVariable(props:Interface):ReactElement{
 		const symbolSize = 5;
 		const {x_name='',y_name='',z_name='',data=[]} = props;
 
