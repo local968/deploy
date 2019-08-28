@@ -92,6 +92,7 @@ export const mysqlUpload = async function* (index: string, setting: DatabaseConf
   for (; ;) {
     if (connectionError) throw connectionError
     if (isEnd) {
+      yield* await uploadChunk()
       yield rawHeader
       break;
     }
