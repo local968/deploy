@@ -27,17 +27,17 @@ interface Interface {
 }
 
 interface InterfaceData {
-  readonly field:string
-  readonly id:number
-  interval?:number
-  size?:number
+  readonly field: string
+  readonly id: number
+  interval?: number
+  size?: number
 }
 
-const SimplifiedViewRow = observer((props: Interface):ReactElement => {
+const SimplifiedViewRow = observer((props: Interface): ReactElement => {
   const {
     value,
+    colType,
     project: {
-      colType,
       etlIndex,
       dataViews,
       mapHeader,
@@ -68,7 +68,7 @@ const SimplifiedViewRow = observer((props: Interface):ReactElement => {
       return upHistograms(true);
     }
     if (!chartData[value]) {
-      const data:InterfaceData = {
+      const data: InterfaceData = {
         field: value,
         id: etlIndex,
       };
@@ -86,8 +86,8 @@ const SimplifiedViewRow = observer((props: Interface):ReactElement => {
             data,
           })
           .then((result: {
-              data?
-            }) =>
+            data?
+          }) =>
             showback(result.data, value, {
               min,
               max,
@@ -102,7 +102,7 @@ const SimplifiedViewRow = observer((props: Interface):ReactElement => {
             url: '/graphics/histogram-categorical',
             data,
           })
-          .then((result: {data?}) => showback(result.data, value));
+          .then((result: { data?}) => showback(result.data, value));
       }
     } else {
       upHistograms(true);
