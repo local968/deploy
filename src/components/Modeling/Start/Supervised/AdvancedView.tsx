@@ -192,9 +192,10 @@ export default class AdvancedView extends Component<AdvancedViewProps> {
   handleSelectAll = value => {
     const { problemType } = this.props.project;
     if (!value) {
+      const version = this.props.project.version.filter(_v => _v !== 4)
       this.props.project.algorithms = [];
-      this.props.project.version = this.props.project.version.filter(_v => _v !== 4)
-      this.props.setSetting({ algorithms: [] });
+      this.props.project.version = version
+      this.props.setSetting({ algorithms: [], version });
       return;
     }
     this.props.project.algorithms = Algorithms[problemType].map(v => v.value);

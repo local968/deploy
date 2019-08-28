@@ -1,51 +1,39 @@
-import React, { Component } from 'react';
-// import styles from './AdvancedView.module.css';
+import React, { ReactElement, useEffect, useState } from 'react';
 import styles from './DetailCurves.module.css';
 
 interface Interface {
-  curSelected:any
-  value:any
-  thumbnail:any
-  onClick:any
-  style?:Object
+  readonly curSelected: any;
+  readonly value: any;
+  readonly thumbnail: any;
+  readonly onClick: any;
+  readonly style?: Object;
 }
 
-export default class Thumbnail extends Component<Interface>{
-  state = {
-    clickActive: false,
-    hoverActive: false,
-  };
-  componentDidMount() {
-    const { curSelected, value } = this.props;
-    this.setState({ clickActive: curSelected === value });
-  }
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { curSelected, value } = nextProps;
-    this.setState({ clickActive: curSelected === value });
-  }
-  handleClick = e => {
+export default function Thumbnail(props: Interface): ReactElement {
+  const {
+    curSelected,
+    value,
+    thumbnail: { selectedIcon, normalIcon, text },
+    onClick,
+    style = {},
+  } = props;
+  const [clickActive, upClickActive] = useState(curSelected === value);
+
+  useEffect(() => {
+    upClickActive(curSelected === value);
+  }, [curSelected, value]);
+
+  const handleClick = e => {
     e.stopPropagation();
-    this.setState({ clickActive: true });
-    this.props.onClick(this.props.value);
+    upClickActive(true);
+    onClick(value);
   };
-  render() {
-    const { selectedIcon, hoverIcon, normalIcon, text} = this.props.thumbnail;
-    const { clickActive, hoverActive } = this.state;
-    const {style={}} = this.props;
-    const icon = clickActive
-      ? selectedIcon
-      : hoverActive
-      ? hoverIcon
-      : normalIcon;
-    return (
-      <div
-        className={styles.thumbnail}
-        style={style}
-        onClick={this.handleClick}
-      >
-        <img src={icon} alt="icon" />
-        <div>{text}</div>
-      </div>
-    );
-  }
+
+  const icon = clickActive ? selectedIcon : normalIcon;
+  return (
+    <div className={styles.thumbnail} style={style} onClick={handleClick}>
+      <img src={icon} alt="icon" />
+      <div>{text}</div>
+    </div>
+  );
 }
