@@ -265,14 +265,17 @@ wss.register('getScheduleSummary', async (message) => {
     const { data } = await axios.get(
       `${esServicePath}/etls/${index}/headerArray`,
     );
-    const origin = await originalStats(index, data)
+    const origin = await originalStats(index, data.header)
     if (origin.error) throw new Error(origin.message)
 
     const originResult = origin.result
 
     const modelStats = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'stats'))
     const featureLabel = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'featureLabel'))
-    const target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
+    let target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
+    if (!target.every(t => data.header.includes(t))) {
+      target = []
+    }
     // const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
 
     const stats = featureLabel.reduce((prev, l) => {
@@ -280,7 +283,7 @@ wss.register('getScheduleSummary', async (message) => {
       return prev
     }, {})
 
-    if (type === 'performance') {
+    if (type === 'performance' && !!target.length) {
       target.forEach(t => {
         stats[t] = modelStats[t]
       })

@@ -324,27 +324,34 @@ const etl = async (schedule, index, projectId, modelName) => {
   );
   const mapHeaderResult = await redis.hmget(`project:${projectId}`,
     'mapHeader')
-  let [stats, problemType, featureLabel] = result;
+  let [stats, problemType, featureLabel, targetLabel] = result;
   let [mapHeader] = mapHeaderResult
   mapHeader = JSON.parse(mapHeader)
   stats = JSON.parse(stats);
   featureLabel = JSON.parse(featureLabel)
   problemType = JSON.parse(problemType)
+  targetLabel = JSON.parse(targetLabel)
 
   const mappingResponse = await
     axios.get(`${esServicePath}/etls/${index}/header`)
   const dataHeader = mappingResponse.data.split(',')
   const headerArray = dataHeader.filter(h => h !== '__no')
+  let hasTarget = true
+  if (schedule.type === 'deployment' || ((problemType === 'Outlier' || problemType === 'Clustering') && !targetLabel.every(t => headerArray.includes(t)))) {
+    hasTarget = false
+  }
   Object.keys(stats).forEach(key => {
-    if (schedule.type === 'deployment') {
-      if (stats[key].isTarget) return delete stats[key];
-    }
-    if (problemType === 'Outlier' || problemType === 'Clustering') {
-      if (stats[key].isTarget && featureLabel.indexOf(key) === -1) return delete stats[key];
-    }
+    if (!hasTarget) return delete stats[key];
+    // if (schedule.type === 'deployment') {
+    //   if (stats[key].isTarget) return delete stats[key];
+    // }
+    // if (problemType === 'Outlier' || problemType === 'Clustering') {
+    //   if (stats[key].isTarget && targetLabel.indexOf(key) === -1) return delete stats[key];
+    // }
     if (!stats[key].isTarget && featureLabel.indexOf(key) === -1) return delete stats[key]
     return true
   });
+
   const lackHeaders = Object.keys(stats).filter(key => headerArray.indexOf(key)
     === -1)
   if (lackHeaders.length > 0) {
