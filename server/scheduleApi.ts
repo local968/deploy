@@ -336,8 +336,11 @@ const etl = async (schedule, index, projectId, modelName) => {
   const dataHeader = mappingResponse.data.split(',')
   const headerArray = dataHeader.filter(h => h !== '__no')
   Object.keys(stats).forEach(key => {
-    if (schedule.type === 'deployment' || problemType === 'Outlier' || problemType === 'Clustering') {
-      if (stats[key].isTarget && headerArray.indexOf(key) === -1) return delete stats[key];
+    if (schedule.type === 'deployment') {
+      if (stats[key].isTarget) return delete stats[key];
+    }
+    if (problemType === 'Outlier' || problemType === 'Clustering') {
+      if (stats[key].isTarget && featureLabel.indexOf(key) === -1) return delete stats[key];
     }
     if (!stats[key].isTarget && featureLabel.indexOf(key) === -1) return delete stats[key]
     return true

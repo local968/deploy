@@ -115,7 +115,7 @@ class ScheduleOperation extends Component {
     socketStore.ready()
       .then(api => api.getScheduleSummary({ sid: schedule.schedule.id, pid: schedule.deployment.projectId, problemType: schedule.deployment.modelType }))
       .then(result => {
-        this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader }
+        this.summary = { ...result.result, mapHeader: schedule.deployment.mapHeader, target: [] }
         this.loading = false
         this.finished = true
       })

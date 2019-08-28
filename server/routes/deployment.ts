@@ -273,14 +273,14 @@ wss.register('getScheduleSummary', async (message) => {
     const modelStats = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'stats'))
     const featureLabel = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'featureLabel'))
     const target = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'target'))
-    const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
+    // const problemType = JSON.parse(await redis.hmget(`project:${pid}:model:${modelName}`, 'problemType'))
 
     const stats = featureLabel.reduce((prev, l) => {
       prev[l] = modelStats[l]
       return prev
     }, {})
 
-    if (type === 'performance' && (problemType === 'Classification' || problemType === 'Regression')) {
+    if (type === 'performance') {
       target.forEach(t => {
         stats[t] = modelStats[t]
       })

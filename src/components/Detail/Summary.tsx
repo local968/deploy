@@ -27,13 +27,12 @@ export interface SummaryProps {
   },
   loading: boolean
   onClose: () => void,
-  hasTarget: boolean
 }
 
 class Summary extends Component<SummaryProps> {
 
   render() {
-    const { summary, onClose, loading, hasTarget } = this.props;
+    const { summary, onClose, loading } = this.props;
     if (loading) return <div className={styles.loading}>
       <ProcessLoading style={{ backgroundColor: '#fff' }} />
     </div>
@@ -76,7 +75,7 @@ class Summary extends Component<SummaryProps> {
       outlier: 0,
     }
 
-    if (hasTarget) {
+    if (!!target.length) {
       target.forEach(t => {
         const d = {
           classesError: 0,
@@ -129,7 +128,7 @@ class Summary extends Component<SummaryProps> {
             <span id={styles.summaryTypeSpan}>{EN.OutlierDetection}</span>
           </div>}
         </div>
-        {hasTarget && <div className={styles.summaryTable}>
+        {!!target.length && <div className={styles.summaryTable}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span id={styles.summaryCellSpan} style={{ fontWeight: 'bold' }}>{EN.TargetVariable}</span></div>
@@ -161,7 +160,7 @@ class Summary extends Component<SummaryProps> {
             })}
           </div>
         </div>}
-        <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: !hasTarget ? '4em' : '3em', marginTop: !hasTarget ? '10px' : 0 }}>
+        <div className={styles.summaryTable} style={{ paddingRight: '.2em', maxHeight: !target.length ? '4em' : '3em', marginTop: !target.length ? '10px' : 0 }}>
           <div className={styles.summaryTableLeft}>
             <div className={styles.summaryTableRow}>
               <div className={styles.summaryCell}><span id={styles.summaryCellSpan} style={{ fontWeight: 'bold' }}>{EN.PredictorVariables}</span></div>
